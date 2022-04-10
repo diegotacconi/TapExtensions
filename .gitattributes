@@ -1,0 +1,16 @@
+# Auto detect text files and perform LF normalization
+*            text=auto
+
+# Visual Studio
+*.cs         text eol=crlf
+*.csproj     text eol=crlf
+*.sln        text eol=crlf
+
+# Binary Files
+*.bin        binary
+*.bit        binary
+*.dll        binary
+*.mcs        binary
+*.prm        binary
+*.svf        binary
+*.sh         binary
