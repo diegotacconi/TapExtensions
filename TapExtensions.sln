@@ -1,0 +1,30 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32328.378
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Interfaces", "Interfaces", "{58DF74F1-DD2D-48F8-9175-E86F667A7E93}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TapExtensions.Interfaces", "Interfaces\TapExtensions.Interfaces\TapExtensions.Interfaces.csproj", "{1B948103-5BDD-41E0-86C8-8F6BF0CC194B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1B948103-5BDD-41E0-86C8-8F6BF0CC194B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B948103-5BDD-41E0-86C8-8F6BF0CC194B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B948103-5BDD-41E0-86C8-8F6BF0CC194B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B948103-5BDD-41E0-86C8-8F6BF0CC194B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1B948103-5BDD-41E0-86C8-8F6BF0CC194B} = {58DF74F1-DD2D-48F8-9175-E86F667A7E93}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {74C3CC78-0A76-46BC-8FFB-05637E0539E2}
+	EndGlobalSection
+EndGlobal
