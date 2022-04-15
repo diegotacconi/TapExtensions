@@ -19,6 +19,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Steps", "Steps", "{A4257A18
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TapExtensions.Instruments.DcPwr", "Instruments\TapExtensions.Instruments.DcPwr\TapExtensions.Instruments.DcPwr.csproj", "{02482773-8D34-4108-B180-BCE2B21774C1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TapExtensions.Duts.Ssh", "Duts\TapExtensions.Duts.Ssh\TapExtensions.Duts.Ssh.csproj", "{2E771203-910F-42E1-9934-B5260538CBB6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TapExtensions.Gui.Wpf", "Gui\TapExtensions.Gui.Wpf\TapExtensions.Gui.Wpf.csproj", "{7C1D85D4-556B-4272-B163-26819A3AE9AA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{02482773-8D34-4108-B180-BCE2B21774C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02482773-8D34-4108-B180-BCE2B21774C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02482773-8D34-4108-B180-BCE2B21774C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E771203-910F-42E1-9934-B5260538CBB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E771203-910F-42E1-9934-B5260538CBB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E771203-910F-42E1-9934-B5260538CBB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E771203-910F-42E1-9934-B5260538CBB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7C1D85D4-556B-4272-B163-26819A3AE9AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7C1D85D4-556B-4272-B163-26819A3AE9AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7C1D85D4-556B-4272-B163-26819A3AE9AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7C1D85D4-556B-4272-B163-26819A3AE9AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -40,6 +52,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{1B948103-5BDD-41E0-86C8-8F6BF0CC194B} = {58DF74F1-DD2D-48F8-9175-E86F667A7E93}
 		{02482773-8D34-4108-B180-BCE2B21774C1} = {C9D59B48-0AC2-4E6B-B907-2392E4FDAAC4}
+		{2E771203-910F-42E1-9934-B5260538CBB6} = {00989AAE-70CE-4702-832A-1FC9E19B40B8}
+		{7C1D85D4-556B-4272-B163-26819A3AE9AA} = {E2A3B055-94C4-4610-84C5-881F7D150538}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {74C3CC78-0A76-46BC-8FFB-05637E0539E2}
