@@ -7,14 +7,17 @@ jobs:
   
     # For a list of available runner types, refer to
     # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
-    runs-on: windows-latest
+    runs-on: windows-2022
+    strategy:
+      matrix:
+        Architecture: [x86, x64]
 
     env:
       Solution_Name: TapExtensions.sln
 
     steps:
     
-      # Checks-out the repository under $GITHUB_WORKSPACE, so the job can access it
+      # Checkout our repository, so the job can access it
     - name: Checkout
       uses: actions/checkout@v3
       with:
