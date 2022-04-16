@@ -4,9 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <OpenTapPackageDefinitionPath>package.xml</OpenTapPackageDefinitionPath>
-    <CreateOpenTapPackage>false</CreateOpenTapPackage>
-    <OutputPath>..\..\bin\</OutputPath>
+    <OutputPath>..\..\bin\$(Configuration)</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
