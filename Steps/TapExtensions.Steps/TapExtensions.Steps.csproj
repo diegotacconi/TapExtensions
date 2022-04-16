@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -15,6 +15,11 @@
       <PrivateAssets>compile</PrivateAssets>
       <IncludeAssets>compile</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Gui\TapExtensions.Gui.Wpf\TapExtensions.Gui.Wpf.csproj" />
+    <ProjectReference Include="..\..\Interfaces\TapExtensions.Interfaces\TapExtensions.Interfaces.csproj" />
   </ItemGroup>
 
 </Project>

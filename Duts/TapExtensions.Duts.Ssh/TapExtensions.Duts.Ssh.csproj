@@ -1,15 +1,17 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <OpenTapPackageDefinitionPath>package.xml</OpenTapPackageDefinitionPath>
+    <CreateOpenTapPackage>false</CreateOpenTapPackage>
     <OutputPath>C:\OpenTap\Packages\TapExtensions\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="OpenTAP">
-      <Version>9.17.3</Version>
+      <Version>9.9.3</Version>
       <PrivateAssets>compile</PrivateAssets>
       <IncludeAssets>compile</IncludeAssets>
     </PackageReference>

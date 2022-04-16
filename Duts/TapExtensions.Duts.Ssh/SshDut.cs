@@ -11,7 +11,7 @@ using TapExtensions.Interfaces.Ssh;
 namespace TapExtensions.Duts.Ssh
 {
     [Display("SshDut",
-        Groups: new[] { "TapExtensions", "Duts", "Ssh" })]
+        Groups: new[] {"TapExtensions", "Duts", "Ssh"})]
     public class SshDut : Dut, ISsh
     {
         #region Settings
@@ -38,7 +38,7 @@ namespace TapExtensions.Duts.Ssh
 
         #endregion
 
-        private SshClient? _sshClient;
+        private SshClient _sshClient;
 
         public SshDut()
         {

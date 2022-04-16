@@ -4,14 +4,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C537788C-AEC7-4A8A-83F1-D76FC316533F}</ProjectGuid>
+    <ProjectGuid>{494025D5-68F1-4F1F-8795-681A5EF4FC89}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TapExtensions.Gui.Wpf</RootNamespace>
-    <AssemblyName>TapExtensions.Gui.Wpf</AssemblyName>
+    <RootNamespace>TapExtensions.Instruments.BarcodeScanner</RootNamespace>
+    <AssemblyName>TapExtensions.Instruments.BarcodeScanner</AssemblyName>
     <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,33 +33,37 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="WindowsBase" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\SharedAssemblyInfo.cs">
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="PictureDialogGui.cs" />
-    <Compile Include="PictureDialogWpf.xaml.cs">
-      <DependentUpon>PictureDialogWpf.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="ZebraMS4717.cs" />
+    <Compile Include="ZebraSsi.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="PictureDialogWpf.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
+    <ProjectReference Include="..\..\Interfaces\TapExtensions.Interfaces\TapExtensions.Interfaces.csproj">
+      <Project>{25671aa2-c818-4687-8a62-da8588421a8b}</Project>
+      <Name>TapExtensions.Interfaces</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="OpenTAP">
+      <Version>9.9.3</Version>
+      <PrivateAssets>compile</PrivateAssets>
+      <IncludeAssets>compile</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.ValueTuple">
+      <Version>4.5.0</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

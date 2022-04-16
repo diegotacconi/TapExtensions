@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DutSettings type="OpenTap.DutSettings">
+  <UartDut type="TapExtensions.Duts.Uart.UartDut" Source="">
+    <PortName>COM4</PortName>
+    <BaudRate>115200</BaudRate>
+    <Parity>None</Parity>
+    <DataBits>8</DataBits>
+    <StopBits>One</StopBits>
+    <Handshake>None</Handshake>
+    <VerboseLoggingEnabled>true</VerboseLoggingEnabled>
+    <ID />
+    <Comment />
+    <Name>Uart</Name>
+  </UartDut>
+  <SshDut type="TapExtensions.Duts.Ssh.SshDut" Source="">
+    <Host>192.168.101.1</Host>
+    <Port>22</Port>
+    <Username>pi</Username>
+    <Password></Password>
+    <KeepAliveInterval>30</KeepAliveInterval>
+    <VerboseLoggingEnabled>true</VerboseLoggingEnabled>
+    <ID />
+    <Comment />
+    <Name>Ssh</Name>
+  </SshDut>
+  <Package.Dependencies>
+    <Package Name="OpenTAP" Version="9.12.1+ed899ae1" />
+  </Package.Dependencies>
+</DutSettings>

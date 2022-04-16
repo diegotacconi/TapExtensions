@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using OpenTap;
 using TapExtensions.Interfaces.Common;
 using TapExtensions.Interfaces.DcPwr;

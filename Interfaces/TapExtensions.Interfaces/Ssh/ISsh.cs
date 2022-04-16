@@ -1,4 +1,5 @@
-﻿using OpenTap;
+﻿using System.Collections.Generic;
+using OpenTap;
 
 namespace TapExtensions.Interfaces.Ssh
 {

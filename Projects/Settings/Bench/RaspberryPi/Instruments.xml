@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<InstrumentSettings type="OpenTap.InstrumentSettings">
+  <KeysightE3632A type="TapExtensions.Instruments.DcPwr.KeysightE3632A" Source="">
+    <VoltageRangeChoice>P15V</VoltageRangeChoice>
+    <VisaAddress>GPIB0::9::INSTR</VisaAddress>
+    <IoTimeout>2000</IoTimeout>
+    <FinegrainedLock>false</FinegrainedLock>
+    <Lock>false</Lock>
+    <LockRetries>5</LockRetries>
+    <LockHoldoff>0.1</LockHoldoff>
+    <QueryErrorAfterCommand>false</QueryErrorAfterCommand>
+    <SendClearOnConnect>true</SendClearOnConnect>
+    <VerboseLoggingEnabled>true</VerboseLoggingEnabled>
+    <Name>KeysightE3632A</Name>
+  </KeysightE3632A>
+  <Package.Dependencies>
+    <Package Name="OpenTAP" Version="9.12.1+ed899ae1" />
+  </Package.Dependencies>
+</InstrumentSettings>

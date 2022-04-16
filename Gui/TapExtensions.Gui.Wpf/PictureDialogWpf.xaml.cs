@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 
@@ -17,7 +16,7 @@ namespace TapExtensions.Gui.Wpf
         internal double WindowMaxHeight { get; set; } = 0;
         internal bool IsWindowResizable { get; set; } = false;
 
-        internal PictureDialogWpf(Window? windowOwner = null)
+        internal PictureDialogWpf(Window windowOwner = null)
         {
             InitializeComponent();
 
