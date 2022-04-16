@@ -10,7 +10,7 @@ jobs:
     runs-on: windows-2022
     strategy:
       matrix:
-        Architecture: [x86, x64]
+        Architecture: [x64]
 
     env:
       Solution_Name: TapExtensions.sln
