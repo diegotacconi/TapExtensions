@@ -6,7 +6,7 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <OpenTapPackageDefinitionPath>package.xml</OpenTapPackageDefinitionPath>
     <CreateOpenTapPackage>false</CreateOpenTapPackage>
-    <OutputPath>C:\OpenTap\Packages\TapExtensions\</OutputPath>
+    <OutputPath>..\..\bin\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>

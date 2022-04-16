@@ -6,14 +6,18 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <OpenTapPackageDefinitionPath>package.xml</OpenTapPackageDefinitionPath>
     <CreateOpenTapPackage>false</CreateOpenTapPackage>
-    <OutputPath>C:\OpenTap\Packages\TapExtensions\</OutputPath>
+    <InstallCreatedOpenTapPackage>false</InstallCreatedOpenTapPackage>	  
+    <OutputPath>..\..\bin\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="OpenTAP">
       <Version>9.9.3</Version>
+		
+      <!-- Remove the following two Assets lines to create TapPackages -->
       <PrivateAssets>compile</PrivateAssets>
       <IncludeAssets>compile</IncludeAssets>
+
     </PackageReference>
   </ItemGroup>
 
