@@ -4,20 +4,14 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <OpenTapPackageDefinitionPath>package.xml</OpenTapPackageDefinitionPath>
-    <CreateOpenTapPackage>false</CreateOpenTapPackage>
-    <InstallCreatedOpenTapPackage>false</InstallCreatedOpenTapPackage>	  
     <OutputPath>..\..\bin\$(Configuration)</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="OpenTAP">
       <Version>9.9.3</Version>
-
-      <!-- Remove the following two lines to create TapPackages -->
       <PrivateAssets>compile</PrivateAssets>
       <IncludeAssets>compile</IncludeAssets>
-
     </PackageReference>
   </ItemGroup>
 
