@@ -1,14 +1,34 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <Package Name="TapExtensions"
          xmlns="http://opentap.io/schemas/package"
-         Version="$(GitVersion)"
-         OS="$(Platform)">
+         Version="$(GitVersion)">
   <Description>TapExtensions package</Description>
   <SourceUrl>https://github.com/diegotacconi/TapExtensions</SourceUrl>
   <Files>
-    <File Path="Packages/TapExtensions/TapExtensions.*.dll">
-      <!-- SetAssemblyInfo Applied to all '.dll' files matching the wildcard. -->
+
+    <File Path="Packages/TapExtensions/TapExtensions.Duts.Ssh.dll" SourcePath="TapExtensions.Duts.Ssh.dll">
       <SetAssemblyInfo Attributes="Version"/> 
     </File>
+
+    <File Path="Packages/TapExtensions/TapExtensions.Duts.Uart.dll" SourcePath="TapExtensions.Duts.Uart.dll">
+      <SetAssemblyInfo Attributes="Version"/>
+    </File>
+
+    <File Path="Packages/TapExtensions/TapExtensions.Gui.Wpf.dll" SourcePath="TapExtensions.Gui.Wpf.dll">
+      <SetAssemblyInfo Attributes="Version"/>
+    </File>
+
+    <File Path="Packages/TapExtensions/TapExtensions.Instruments.DcPwr.dll" SourcePath="TapExtensions.Instruments.DcPwr.dll">
+      <SetAssemblyInfo Attributes="Version"/>
+    </File>
+
+    <File Path="Packages/TapExtensions/TapExtensions.Interfaces.dll" SourcePath="TapExtensions.Interfaces.dll">
+      <SetAssemblyInfo Attributes="Version"/>
+    </File>
+
+    <File Path="Packages/TapExtensions/TapExtensions.Steps.dll" SourcePath="TapExtensions.Steps.dll">
+      <SetAssemblyInfo Attributes="Version"/>
+    </File>
+
   </Files>
 </Package>
