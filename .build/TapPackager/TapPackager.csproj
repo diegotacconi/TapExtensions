@@ -8,6 +8,7 @@
     <CreateOpenTapPackage>false</CreateOpenTapPackage>
     <InstallCreatedOpenTapPackage>false</InstallCreatedOpenTapPackage>
     <OutputPath>..\..\bin\$(Configuration)</OutputPath>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">

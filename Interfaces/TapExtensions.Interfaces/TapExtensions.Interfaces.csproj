@@ -5,6 +5,7 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <OutputPath>..\..\bin\$(Configuration)</OutputPath>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
 
   <ItemGroup>
