@@ -3,6 +3,20 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Steps", "Steps", "{38ABC1DA-7E70-4598-B0E0-FBB77F9F05B3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Steps", "Steps\TapExtensions.Steps\TapExtensions.Steps.csproj", "{9F7081CC-E7CE-412B-A8CF-8902BC1E8E75}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Duts", "Duts", "{A21FD5A5-C473-4C8C-B929-A658A40020B4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Duts.Ssh", "Duts\TapExtensions.Duts.Ssh\TapExtensions.Duts.Ssh.csproj", "{A96C8400-9CA8-4CAE-918B-6BB0F68F0C51}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TapExtensions.Duts.Uart", "Duts\TapExtensions.Duts.Uart\TapExtensions.Duts.Uart.csproj", "{F9CF4D4D-752C-4722-8685-10FC8944C8D4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gui", "Gui", "{E18976EB-2B40-4CFB-A4E7-73F10F8AC77C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TapExtensions.Gui.Wpf", "Gui\TapExtensions.Gui.Wpf\TapExtensions.Gui.Wpf.csproj", "{C537788C-AEC7-4A8A-83F1-D76FC316533F}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Instruments", "Instruments", "{6536E8DB-FFA1-4E97-91E7-DBA37839B386}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Instruments.DcPwr", "Instruments\TapExtensions.Instruments.DcPwr\TapExtensions.Instruments.DcPwr.csproj", "{EB23E2DD-F70C-48B0-9F27-33E0EBA8424E}"
@@ -11,21 +25,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Interfaces", "Interfaces", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Interfaces", "Interfaces\TapExtensions.Interfaces\TapExtensions.Interfaces.csproj", "{25671AA2-C818-4687-8A62-DA8588421A8B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Duts", "Duts", "{A21FD5A5-C473-4C8C-B929-A658A40020B4}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Steps", "Steps", "{38ABC1DA-7E70-4598-B0E0-FBB77F9F05B3}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Steps", "Steps\TapExtensions.Steps\TapExtensions.Steps.csproj", "{9F7081CC-E7CE-412B-A8CF-8902BC1E8E75}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Duts.Ssh", "Duts\TapExtensions.Duts.Ssh\TapExtensions.Duts.Ssh.csproj", "{A96C8400-9CA8-4CAE-918B-6BB0F68F0C51}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TapExtensions.Duts.Uart", "Duts\TapExtensions.Duts.Uart\TapExtensions.Duts.Uart.csproj", "{F9CF4D4D-752C-4722-8685-10FC8944C8D4}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Results", "Results", "{798B7510-669C-4A94-B74E-ADE8EC0F2319}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gui", "Gui", "{E18976EB-2B40-4CFB-A4E7-73F10F8AC77C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TapExtensions.Gui.Wpf", "Gui\TapExtensions.Gui.Wpf\TapExtensions.Gui.Wpf.csproj", "{C537788C-AEC7-4A8A-83F1-D76FC316533F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{4E9CC033-6F93-4532-8202-319CBFF49494}"
 EndProject
