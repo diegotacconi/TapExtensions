@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Package Name="TapExtensions"
+         xmlns="http://opentap.io/schemas/package"
+         Version="$(GitVersion)"
+         OS="$(Platform)">
+  <Description>TapExtensions package</Description>
+  <SourceUrl>https://github.com/diegotacconi/TapExtensions</SourceUrl>
+  <Files>
+    <File Path="Packages/TapExtensions/TapExtensions.*.dll">
+      <!-- SetAssemblyInfo Applied to all '.dll' files matching the wildcard. -->
+      <SetAssemblyInfo Attributes="Version"/> 
+    </File>
+  </Files>
+</Package>
