@@ -17,7 +17,7 @@
 
   <ItemGroup Condition="'$(Configuration)' == 'Release'">
     <PackageReference Include="OpenTAP">
-      <Version>9.9.3</Version>
+      <Version>9.16.4</Version>
     </PackageReference>
   </ItemGroup>
 
