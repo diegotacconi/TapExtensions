@@ -14,6 +14,7 @@
     <Name>KeysightE3632A</Name>
   </KeysightE3632A>
   <Package.Dependencies>
-    <Package Name="OpenTAP" Version="9.12.1+ed899ae1" />
+    <Package Name="OpenTAP" Version="^9.17.4+ea67c63a" />
+    <Package Name="TapExtensions" Version="^1.0.0-beta.8+e08d13d0" />
   </Package.Dependencies>
 </InstrumentSettings>
