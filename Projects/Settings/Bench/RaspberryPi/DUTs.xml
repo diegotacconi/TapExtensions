@@ -16,7 +16,7 @@
     <Host>192.168.101.1</Host>
     <Port>22</Port>
     <Username>pi</Username>
-    <Password></Password>
+    <Password>raspberry</Password>
     <KeepAliveInterval>30</KeepAliveInterval>
     <VerboseLoggingEnabled>true</VerboseLoggingEnabled>
     <ID />

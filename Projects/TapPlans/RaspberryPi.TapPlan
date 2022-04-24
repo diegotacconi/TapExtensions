@@ -42,7 +42,7 @@
       <Command>pwd</Command>
       <ExpectedResponse>/</ExpectedResponse>
       <Timeout>5</Timeout>
-      <Enabled>false</Enabled>
+      <Enabled>true</Enabled>
       <Name>SshQuery</Name>
       <ChildTestSteps />
       <BreakConditions>Inherit</BreakConditions>
@@ -53,7 +53,7 @@
       <Command>cat /etc/issue</Command>
       <ExpectedResponse>Linux</ExpectedResponse>
       <Timeout>5</Timeout>
-      <Enabled>false</Enabled>
+      <Enabled>true</Enabled>
       <Name>SshQueryVersion</Name>
       <ChildTestSteps />
       <BreakConditions>Inherit</BreakConditions>
