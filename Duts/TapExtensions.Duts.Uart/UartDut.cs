@@ -9,7 +9,7 @@ using TapExtensions.Interfaces.Uart;
 namespace TapExtensions.Duts.Uart
 {
     [Display("UartDut",
-        Groups: new[] {"TapExtensions", "Duts", "Uart" })]
+        Groups: new[] {"TapExtensions", "Duts", "Uart"})]
     public class UartDut : Dut, IUart
     {
         #region Settings
@@ -64,7 +64,11 @@ namespace TapExtensions.Duts.Uart
         public override void Open()
         {
             base.Open();
+            Connect();
+        }
 
+        private void Connect()
+        {
             _sp = new SerialPort
             {
                 PortName = PortName,
@@ -72,11 +76,7 @@ namespace TapExtensions.Duts.Uart
                 Parity = Parity,
                 DataBits = DataBits,
                 StopBits = StopBits,
-                Handshake = Handshake,
-                // ReadTimeout = 500,
-                // WriteTimeout = 500
-                // ReadBufferSize = 2048,
-                // Encoding = Encoding.ASCII
+                Handshake = Handshake
             };
 
             // Close serial port if already opened
@@ -91,8 +91,8 @@ namespace TapExtensions.Duts.Uart
 
             if (VerboseLoggingEnabled)
                 Log.Debug($"Opening serial port ({_sp.PortName}) with BaudRate={_sp.BaudRate}, " +
-                    $"Parity={_sp.Parity}, DataBits={_sp.DataBits}, StopBits={_sp.StopBits}, " +
-                    $"Handshake={_sp.Handshake}");
+                          $"Parity={_sp.Parity}, DataBits={_sp.DataBits}, StopBits={_sp.StopBits}, " +
+                          $"Handshake={_sp.Handshake}");
             else
                 Log.Debug($"Opening serial port ({_sp.PortName})");
 
@@ -109,6 +109,12 @@ namespace TapExtensions.Duts.Uart
 
         public override void Close()
         {
+            Disconnect();
+            base.Close();
+        }
+
+        private void Disconnect()
+        {
             Log.Debug($"Closing serial port ({_sp.PortName})");
 
             // Stop monitoring serial port
@@ -121,8 +127,6 @@ namespace TapExtensions.Duts.Uart
             _sp.DiscardOutBuffer();
             _sp.Close();
             _sp.Dispose();
-
-            base.Close();
         }
 
         private void OnDataReceived(object sender, SerialDataReceivedEventArgs e)
@@ -161,7 +165,7 @@ namespace TapExtensions.Duts.Uart
 
                             var msg = $"{_sp.PortName} << {lineWithoutAnsiEscapeCodes}";
 
-                            // Truncate log message to a maximum sting lenght
+                            // Truncate log message to a maximum sting length
                             const int maxLength = 500;
                             if (msg.Length > maxLength)
                                 msg = msg.Substring(0, maxLength) + "***";
@@ -219,6 +223,7 @@ namespace TapExtensions.Duts.Uart
         {
             // if (VerboseLoggingEnabled)
             //     Log.Debug($"{_sp.PortName} >> {command}");
+            _sp.DiscardOutBuffer();
             _sp.WriteLine(command);
         }
     }
