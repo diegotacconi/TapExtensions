@@ -26,6 +26,10 @@
       <SetAssemblyInfo Attributes="Version"/>
     </File>
 
+    <File Path="Packages/TapExtensions/TapExtensions.Results.dll" SourcePath="TapExtensions.Results.dll">
+      <SetAssemblyInfo Attributes="Version"/>
+    </File>
+
     <File Path="Packages/TapExtensions/TapExtensions.Steps.dll" SourcePath="TapExtensions.Steps.dll">
       <SetAssemblyInfo Attributes="Version"/>
     </File>

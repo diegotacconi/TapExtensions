@@ -27,6 +27,7 @@
     <ProjectReference Include="..\..\Gui\TapExtensions.Gui.Wpf\TapExtensions.Gui.Wpf.csproj" />
     <ProjectReference Include="..\..\Instruments\TapExtensions.Instruments.DcPwr\TapExtensions.Instruments.DcPwr.csproj" />
     <ProjectReference Include="..\..\Interfaces\TapExtensions.Interfaces\TapExtensions.Interfaces.csproj" />
+    <ProjectReference Include="..\..\Results\TapExtensions.Results\TapExtensions.Results.csproj" />
     <ProjectReference Include="..\..\Steps\TapExtensions.Steps\TapExtensions.Steps.csproj" />
   </ItemGroup>
 
