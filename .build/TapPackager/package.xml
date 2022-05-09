@@ -18,6 +18,10 @@
       <SetAssemblyInfo Attributes="Version"/>
     </File>
 
+    <File Path="Packages/TapExtensions/TapExtensions.Instruments.BarcodeScanner.dll" SourcePath="TapExtensions.Instruments.BarcodeScanner.dll">
+      <SetAssemblyInfo Attributes="Version"/>
+    </File>
+    
     <File Path="Packages/TapExtensions/TapExtensions.Instruments.DcPwr.dll" SourcePath="TapExtensions.Instruments.DcPwr.dll">
       <SetAssemblyInfo Attributes="Version"/>
     </File>
