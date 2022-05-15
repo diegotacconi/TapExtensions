@@ -8,6 +8,7 @@ namespace TapExtensions.Gui.Wpf
         public string Title { get; set; } = "";
         public string Message { get; set; } = "";
         public string Picture { get; set; } = "";
+        public InputButtons Buttons { get; set; } = InputButtons.OkCancel;
         public double FontSize { get; set; } = 0;
         public double MaxWidth { get; set; } = 0;
         public double MaxHeight { get; set; } = 0;
@@ -31,6 +32,7 @@ namespace TapExtensions.Gui.Wpf
                     WindowTitle = Title,
                     WindowMessage = Message,
                     WindowPicture = Picture,
+                    Buttons = Buttons,
                     WindowFontSize = FontSize,
                     WindowMaxWidth = MaxWidth,
                     WindowMaxHeight = MaxHeight,

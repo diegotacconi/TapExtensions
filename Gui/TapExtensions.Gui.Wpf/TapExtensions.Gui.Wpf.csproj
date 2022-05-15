@@ -45,6 +45,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enums.cs" />
     <Compile Include="PictureDialogGui.cs" />
     <Compile Include="PictureDialogWpf.xaml.cs">
       <DependentUpon>PictureDialogWpf.xaml</DependentUpon>

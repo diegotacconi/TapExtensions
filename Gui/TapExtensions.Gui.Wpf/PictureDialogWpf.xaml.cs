@@ -11,6 +11,7 @@ namespace TapExtensions.Gui.Wpf
         internal string WindowTitle { get; set; } = "";
         internal string WindowMessage { get; set; } = "";
         internal string WindowPicture { get; set; } = "";
+        internal InputButtons Buttons { get; set; } = InputButtons.OkCancel;
         internal double WindowFontSize { get; set; } = 0;
         internal double WindowMaxWidth { get; set; } = 0;
         internal double WindowMaxHeight { get; set; } = 0;
@@ -59,6 +60,29 @@ namespace TapExtensions.Gui.Wpf
             else
             {
                 Image.Visibility = Visibility.Collapsed;
+            }
+
+            // Change buttons
+            switch (Buttons)
+            {
+                case InputButtons.StartCancel:
+                    ButtonOk.Content = "Start";
+                    ButtonCancel.Content = "Cancel";
+                    break;
+
+                case InputButtons.OkCancel:
+                    ButtonOk.Content = "OK";
+                    ButtonCancel.Content = "Cancel";
+                    break;
+
+                case InputButtons.YesNo:
+                    ButtonOk.Content = "Yes";
+                    ButtonCancel.Content = "No";
+                    break;
+
+                default:
+                    throw new ArgumentException(
+                        $"Case not found for {nameof(Buttons)}={Buttons}");
             }
 
             // Change fontSize
