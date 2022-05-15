@@ -15,7 +15,7 @@ namespace TapExtensions.Gui.Wpf
         public double MaxHeight { get; set; } = 0;
         public bool IsResizable { get; set; } = false;
 
-        public Application WpfApp { get; set; } = Application.Current;
+        private Application WpfApp;
 
         public bool ShowDialog()
         {
