@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Windows;
 
 namespace TapExtensions.Gui.Wpf
@@ -15,7 +14,7 @@ namespace TapExtensions.Gui.Wpf
         public double MaxHeight { get; set; } = 0;
         public bool IsResizable { get; set; } = false;
 
-        private Application WpfApp;
+        private Application _wpfApp;
 
         public bool ShowDialog()
         {
@@ -27,18 +26,18 @@ namespace TapExtensions.Gui.Wpf
                 // When called from a Console process
                 var thread = new Thread(() =>
                 {
-                    WpfApp = new Application();
-                    WpfApp.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-                    WpfApp.Run();
+                    _wpfApp = new Application();
+                    _wpfApp.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+                    _wpfApp.Run();
                 });
                 thread.SetApartmentState(ApartmentState.STA);
                 thread.IsBackground = true;
                 thread.Start();
 
-                while (WpfApp == null)
+                while (_wpfApp == null)
                     Thread.Sleep(150);
 
-                WpfApp.Dispatcher.Invoke(() =>
+                _wpfApp.Dispatcher.Invoke(() =>
                 {
                     result = CallShowWindow();
                 });
