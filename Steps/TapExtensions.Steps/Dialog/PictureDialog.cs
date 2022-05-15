@@ -1,11 +1,11 @@
 ﻿using System;
 using System.IO;
-using TapExtensions.Gui.Wpf;
 using OpenTap;
+using TapExtensions.Gui.Wpf;
 
 namespace TapExtensions.Steps.Dialog
 {
-    [Display("PictureDialog", Groups: new[] { "TapExtensions", "Steps", "Dialog" })]
+    [Display("PictureDialog", Groups: new[] {"TapExtensions", "Steps", "Dialog"})]
     public class PictureDialog : TestStep
     {
         #region Settings

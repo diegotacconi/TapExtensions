@@ -1,10 +1,10 @@
 ﻿using System;
-using TapExtensions.Gui.Wpf;
 using OpenTap;
+using TapExtensions.Gui.Wpf;
 
 namespace TapExtensions.Steps.Dialog
 {
-    [Display("MessageDialog", Groups: new[] { "TapExtensions", "Steps", "Dialog" })]
+    [Display("MessageDialog", Groups: new[] {"TapExtensions", "Steps", "Dialog"})]
     public class MessageDialog : TestStep
     {
         #region Settings
