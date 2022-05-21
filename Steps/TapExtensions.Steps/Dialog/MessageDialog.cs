@@ -1,10 +1,11 @@
 ﻿using System;
 using OpenTap;
 using TapExtensions.Gui.Wpf;
+using TapExtensions.Interfaces.Gui;
 
 namespace TapExtensions.Steps.Dialog
 {
-    [Display("MessageDialog", Groups: new[] {"TapExtensions", "Steps", "Dialog"})]
+    [Display("MessageDialog", Groups: new[] { "TapExtensions", "Steps", "Dialog" })]
     public class MessageDialog : TestStep
     {
         #region Settings
@@ -30,7 +31,7 @@ namespace TapExtensions.Steps.Dialog
             try
             {
                 // Show dialog window
-                var gui = new PictureDialogGui {Title = Title, Message = Message};
+                IGui gui = new PictureDialogGui { Title = Title, Message = Message };
                 var result = gui.ShowDialog();
 
                 // Check response from the user

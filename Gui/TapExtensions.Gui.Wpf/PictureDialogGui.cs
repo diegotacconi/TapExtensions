@@ -1,9 +1,10 @@
 ﻿using System.Threading;
 using System.Windows;
+using TapExtensions.Interfaces.Gui;
 
 namespace TapExtensions.Gui.Wpf
 {
-    public class PictureDialogGui
+    public class PictureDialogGui : IGui
     {
         public string Title { get; set; } = "";
         public string Message { get; set; } = "";

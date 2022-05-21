@@ -2,10 +2,11 @@
 using System.IO;
 using OpenTap;
 using TapExtensions.Gui.Wpf;
+using TapExtensions.Interfaces.Gui;
 
 namespace TapExtensions.Steps.Dialog
 {
-    [Display("PictureDialog", Groups: new[] {"TapExtensions", "Steps", "Dialog"})]
+    [Display("PictureDialog", Groups: new[] { "TapExtensions", "Steps", "Dialog" })]
     public class PictureDialog : TestStep
     {
         #region Settings
@@ -51,9 +52,9 @@ namespace TapExtensions.Steps.Dialog
             Title = "Title";
             Message = "Message";
             Picture = @"C:\Windows\Web\Screen\img103.png";
-            FontSize = new Enabled<double> {IsEnabled = false, Value = 14};
-            MaxWidth = new Enabled<double> {IsEnabled = false, Value = 550};
-            MaxHeight = new Enabled<double> {IsEnabled = false, Value = 500};
+            FontSize = new Enabled<double> { IsEnabled = false, Value = 14 };
+            MaxWidth = new Enabled<double> { IsEnabled = false, Value = 550 };
+            MaxHeight = new Enabled<double> { IsEnabled = false, Value = 500 };
             IsResizable = false;
         }
 
@@ -66,7 +67,7 @@ namespace TapExtensions.Steps.Dialog
                     throw new FileNotFoundException($"Cannot find picture file {Picture}");
 
                 // Show dialog window
-                var gui = new PictureDialogGui
+                IGui gui = new PictureDialogGui
                 {
                     Title = Title,
                     Message = Message,
