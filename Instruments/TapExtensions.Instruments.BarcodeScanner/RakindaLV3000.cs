@@ -49,12 +49,26 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
         public override void Open()
         {
+            const int timeout = 5;
+
             base.Open();
 
             OpenSerialPort();
 
             // Send "?" and expect the response to be "!"
-            WriteRead(new byte[] { 0x3F }, new byte[] { 0x21 }, 5);
+            WriteRead(new byte[] { 0x3F }, new byte[] { 0x21 }, timeout);
+
+            // Default all commands
+            SetCommand("NLS0001000;", timeout);
+
+            // Reading mode = Trigger
+            SetCommand("NLS0302000;", timeout);
+
+            // Enable command programming
+            SetCommand("NLS0006010;", timeout);
+
+            // Enable all bar codes
+            SetCommand("NLS0001020;", timeout);
 
             CloseSerialPort();
         }
@@ -71,6 +85,8 @@ namespace TapExtensions.Instruments.BarcodeScanner
                 DataBits = 8,
                 StopBits = StopBits.One,
                 Handshake = Handshake.None,
+                ReadTimeout = 1000, // 1 second
+                WriteTimeout = 1000, // 1 second
             };
 
             // Close serial port if already opened
@@ -228,6 +244,15 @@ namespace TapExtensions.Instruments.BarcodeScanner
                     Log.Debug($"{serialPortName} {direction} Ascii: {ascii}");
                     break;
             }
+        }
+
+        private void SetCommand(string command, int timeout)
+        {
+            // When received a set command, the scanner would process it and returned a byte of response data.
+            // The scanner returns '0x06' if successfully set, or '0x15' if failure.
+            var cmdBytes = Encoding.ASCII.GetBytes(command);
+            var expectedSuccessfulReply = new byte[] { 0x06 };
+            WriteRead(cmdBytes, expectedSuccessfulReply, timeout);
         }
     }
 }
