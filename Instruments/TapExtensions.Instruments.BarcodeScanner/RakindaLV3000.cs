@@ -43,7 +43,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
         {
             // Default values
             Name = nameof(RakindaLV3000);
-            SerialPortName = "COM4";
+            SerialPortName = "COM5";
             LoggingLevel = ELoggingLevel.Normal;
         }
 
