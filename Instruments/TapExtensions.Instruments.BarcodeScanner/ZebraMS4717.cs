@@ -1,4 +1,4 @@
-﻿// Information on the Zebra MS4717 barcode scanner is available at:
+﻿// Information on the Zebra MS4717 barcode scanner:
 // https://www.zebra.com/ms4717
 // https://www.zebra.com/content/dam/zebra_new_ia/en-us/manuals/oem/ms4717-ig-en.pdf
 //
@@ -54,7 +54,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
         {
             base.Open();
             // OpenSerialPort();
-            // ToDo: Init barcode scanner
+            // ToDo: Check if barcode scanner is available
             // CloseSerialPort();
         }
 
@@ -112,6 +112,44 @@ namespace TapExtensions.Instruments.BarcodeScanner
             }
         }
 
+        public byte[] GetRawBytes()
+        {
+            const int timeout = 5;
+
+            OpenSerialPort();
+
+            Wakeup();
+
+            // Start Scanning
+            StartSession();
+
+            // Attempt to read the barcode label
+            var expectedEndOfBarcodeLabel = new byte[] { 0x1E, 0x04 };
+            var rawBarcodeLabel = Read(expectedEndOfBarcodeLabel, timeout);
+
+            // Stop Scanning
+            StopSession();
+
+            CloseSerialPort();
+
+            return rawBarcodeLabel;
+        }
+
+        private byte[] WriteRead(byte[] command, byte[] expectedEndOfMessage, int timeout)
+        {
+            Write(command);
+            var response = Read(expectedEndOfMessage, timeout);
+            return response;
+        }
+
+        private void Write(byte[] command)
+        {
+            LogBytes(_sp.PortName, ">>", command);
+            _sp.DiscardInBuffer();
+            _sp.DiscardOutBuffer();
+            _sp.Write(command, 0, command.Length);
+        }
+
         private byte[] Read(byte[] expectedResponse, int timeout)
         {
             bool responseReceived;
@@ -142,34 +180,6 @@ namespace TapExtensions.Instruments.BarcodeScanner
                 throw new InvalidOperationException("Did not receive the expected end of message");
 
             return response.ToArray();
-        }
-
-        private byte[] WriteRead(byte[] command, byte[] expectedEndOfMessage, int timeout)
-        {
-            Write(command);
-            var response = Read(expectedEndOfMessage, timeout);
-            return response;
-        }
-
-        private void Write(byte[] command)
-        {
-            LogBytes(_sp.PortName, ">>", command);
-            _sp.DiscardInBuffer();
-            _sp.DiscardOutBuffer();
-            _sp.Write(command, 0, command.Length);
-        }
-
-        private byte[] CalculateChecksum(byte[] bytes)
-        {
-            // Twos complement of the sum of the message
-            int sum = 0;
-            foreach (var item in bytes)
-                sum += (int)item;
-
-            var sum16 = (ushort)(sum % 255);
-            var twosComplement = (ushort)(~sum16 + 1);
-            var checksumBytes = BitConverter.GetBytes(twosComplement);
-            return checksumBytes;
         }
 
         private static int FindPattern(byte[] source, byte[] pattern)
@@ -221,27 +231,6 @@ namespace TapExtensions.Instruments.BarcodeScanner
             }
         }
 
-        byte[] IBarcodeScanner.GetRawBytes()
-        {
-            OpenSerialPort();
-
-            Wakeup();
-
-            // Start Scanning
-            StartSession();
-
-            // Attempt to read the barcode label
-            var expectedEndOfBarcode = new byte[] { 0x1E, 0x04 };
-            var rawBarcodeResponse = Read(expectedEndOfBarcode, 5);
-
-            // Stop Scanning
-            StopSession();
-
-            CloseSerialPort();
-
-            return rawBarcodeResponse;
-        }
-
         protected virtual byte[] Query(byte opCode, byte expectedByte)
         {
             return Query(opCode, new byte[0], expectedByte);
@@ -276,6 +265,19 @@ namespace TapExtensions.Instruments.BarcodeScanner
             // Send message
             var response = WriteRead(message.ToArray(), new byte[] { expectedByte }, timeout);
             return response;
+        }
+
+        private byte[] CalculateChecksum(byte[] bytes)
+        {
+            // Twos complement of the sum of the message
+            int sum = 0;
+            foreach (var item in bytes)
+                sum += (int)item;
+
+            var sum16 = (ushort)(sum % 255);
+            var twosComplement = (ushort)(~sum16 + 1);
+            var checksumBytes = BitConverter.GetBytes(twosComplement);
+            return checksumBytes;
         }
 
         #region Zebra’s SSI Commands
