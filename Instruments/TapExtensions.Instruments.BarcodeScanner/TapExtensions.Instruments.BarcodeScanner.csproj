@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="RakindaLV3000.cs" />
     <Compile Include="ZebraMS4717.cs" />
   </ItemGroup>
   <ItemGroup>
