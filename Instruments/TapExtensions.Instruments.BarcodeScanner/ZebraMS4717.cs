@@ -69,7 +69,9 @@ namespace TapExtensions.Instruments.BarcodeScanner
                 Parity = Parity.None,
                 DataBits = 8,
                 StopBits = StopBits.One,
-                Handshake = Handshake.None,
+                Handshake = Handshake.RequestToSend,
+                ReadTimeout = 1000, // 1 second
+                WriteTimeout = 1000, // 1 second
             };
 
             // Close serial port if already opened
@@ -124,8 +126,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
             StartSession();
 
             // Attempt to read the barcode label
-            var expectedEndOfBarcodeLabel = new byte[] { 0x1E, 0x04 };
-            var rawBarcodeLabel = Read(expectedEndOfBarcodeLabel, timeout);
+            var rawBarcodeLabel = Read(new byte[0], timeout);
 
             // Stop Scanning
             StopSession();
