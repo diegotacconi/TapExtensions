@@ -53,9 +53,13 @@ namespace TapExtensions.Instruments.BarcodeScanner
         public override void Open()
         {
             base.Open();
-            // OpenSerialPort();
-            // ToDo: Check if barcode scanner is available
-            // CloseSerialPort();
+            
+            OpenSerialPort();
+
+            // Check if barcode scanner is available
+            ParamDefaults();
+            
+            CloseSerialPort();
         }
 
         private void OpenSerialPort()
