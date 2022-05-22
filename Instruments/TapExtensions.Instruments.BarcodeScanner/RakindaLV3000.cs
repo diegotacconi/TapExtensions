@@ -1,4 +1,4 @@
-﻿// Information on the Rakinda LV3000U and LV3000H barcode scanner:
+﻿// Information on the Rakinda LV3000U and LV3000H barcode scanners:
 // https://www.rakinda.com/en/productdetail/83/118/154.html
 // https://www.rakinda.com/en/productdetail/83/135/95.html
 // https://rakindaiot.com/product/mini-barcode-scanner-lv3000u-2d-with-external-insulation-board/
@@ -16,7 +16,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
 {
     [Display("Rakinda LV3000",
         Groups: new[] { "TapExtensions", "Instruments", "BarcodeScanner" },
-        Description: "Rakinda LV3000U or LV3000H Fixed Mount Imager")]
+        Description: "Rakinda LV3000U or LV3000H Fixed Mount Scanner")]
     public class RakindaLV3000 : Instrument, IBarcodeScanner
     {
         #region Settings
@@ -49,11 +49,10 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
         public override void Open()
         {
-            const int timeout = 5;
-
             base.Open();
 
             OpenSerialPort();
+            const int timeout = 5;
 
             // Send "?" and expect the response to be "!"
             WriteRead(new byte[] { 0x3F }, new byte[] { 0x21 }, timeout);
