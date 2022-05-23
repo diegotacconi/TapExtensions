@@ -5,7 +5,7 @@ using TapExtensions.Interfaces.Ssh;
 namespace TapExtensions.Steps.Ssh
 {
     [Display("SshQuery",
-        Groups: new[] {"TapExtensions", "Steps", "Ssh"})]
+        Groups: new[] { "TapExtensions", "Steps", "Ssh" })]
     public class SshQuery : TestStep
     {
         #region Settings

@@ -6,7 +6,7 @@ using TapExtensions.Interfaces.DcPwr;
 namespace TapExtensions.Steps.DcPwr
 {
     [Display("DcPowerOff",
-        Groups: new[] {"TapExtensions", "Steps", "DcPwr"})]
+        Groups: new[] { "TapExtensions", "Steps", "DcPwr" })]
     public class DcPowerOff : TestStep
     {
         [Display("DcPwr", Group: "Instruments",

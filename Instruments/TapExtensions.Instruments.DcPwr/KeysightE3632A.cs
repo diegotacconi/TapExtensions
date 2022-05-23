@@ -3,7 +3,7 @@
 namespace TapExtensions.Instruments.DcPwr
 {
     [Display("Keysight E3632A",
-        Groups: new[] {"TapExtensions", "Instruments", "DcPwr"},
+        Groups: new[] { "TapExtensions", "Instruments", "DcPwr" },
         Description: "Keysight E3632A Single-output Dual-range DC Power Supply")]
     public class KeysightE3632A : KeysightE3630Base
     {

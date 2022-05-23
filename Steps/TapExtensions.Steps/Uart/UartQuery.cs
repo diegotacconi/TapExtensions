@@ -5,7 +5,7 @@ using TapExtensions.Interfaces.Uart;
 namespace TapExtensions.Steps.Uart
 {
     [Display("UartQuery",
-        Groups: new[] {"TapExtensions", "Steps", "Uart"})]
+        Groups: new[] { "TapExtensions", "Steps", "Uart" })]
     public class UartQuery : TestStep
     {
         #region Settings

@@ -17,7 +17,7 @@ namespace TapExtensions.Steps.BarcodeScanner
             try
             {
                 var rawBytes = BarcodeScanner.GetRawBytes();
-                Log.Debug(asciiBytesToString(rawBytes));
+                Log.Debug(AsciiBytesToString(rawBytes));
             }
             catch (Exception ex)
             {
@@ -25,7 +25,7 @@ namespace TapExtensions.Steps.BarcodeScanner
             }
         }
 
-        private string asciiBytesToString(byte[] bytes)
+        private static string AsciiBytesToString(byte[] bytes)
         {
             var msg = new StringBuilder();
             if (bytes != null && bytes.Length != 0)

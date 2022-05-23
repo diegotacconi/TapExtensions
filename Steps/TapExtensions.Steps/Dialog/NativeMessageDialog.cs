@@ -4,7 +4,7 @@ using OpenTap;
 
 namespace TapExtensions.Steps.Dialog
 {
-    [Display("NativeMessageDialog", Groups: new[] {"TapExtensions", "Steps", "Dialog"})]
+    [Display("NativeMessageDialog", Groups: new[] { "TapExtensions", "Steps", "Dialog" })]
     public class NativeMessageDialog : TestStep
     {
         #region Settings

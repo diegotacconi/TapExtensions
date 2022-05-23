@@ -9,7 +9,7 @@ using TapExtensions.Interfaces.Uart;
 namespace TapExtensions.Duts.Uart
 {
     [Display("UartDut",
-        Groups: new[] {"TapExtensions", "Duts", "Uart"})]
+        Groups: new[] { "TapExtensions", "Duts", "Uart" })]
     public class UartDut : Dut, IUart
     {
         #region Settings
@@ -131,7 +131,7 @@ namespace TapExtensions.Duts.Uart
 
         private void OnDataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            var serialPort = (SerialPort) sender;
+            var serialPort = (SerialPort)sender;
             var data = serialPort.ReadExisting();
 
             _readBuffer.Append(data);
@@ -154,7 +154,7 @@ namespace TapExtensions.Duts.Uart
 
                     if (VerboseLoggingEnabled)
                     {
-                        var lines = currentLine.Split(new[] {"\r\n", "\n\r", "\r", "\n"},
+                        var lines = currentLine.Split(new[] { "\r\n", "\n\r", "\r", "\n" },
                             StringSplitOptions.RemoveEmptyEntries);
 
                         foreach (var line in lines)

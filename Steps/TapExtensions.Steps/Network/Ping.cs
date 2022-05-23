@@ -9,7 +9,7 @@ using OpenTap;
 namespace TapExtensions.Steps.Network
 {
     [Display("Ping",
-        Groups: new[] {"TapExtensions", "Steps", "Network"})]
+        Groups: new[] { "TapExtensions", "Steps", "Network" })]
     public class Ping : TestStep
     {
         #region Settings
@@ -17,7 +17,8 @@ namespace TapExtensions.Steps.Network
         [Display("IP Address", Order: 1)]
         public string IpAddress { get; set; }
 
-        [Display("Min Ping Replies", Order: 2, Description: "Minimum number of successful ping replies required for this test to pass")]
+        [Display("Min Ping Replies", Order: 2,
+            Description: "Minimum number of successful ping replies required for this test to pass")]
         [Unit("Pings")]
         public int MinSuccessfulReplies { get; set; }
 

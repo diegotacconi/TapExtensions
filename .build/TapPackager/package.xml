@@ -7,7 +7,7 @@
   <Files>
 
     <File Path="Packages/TapExtensions/TapExtensions.Duts.Ssh.dll" SourcePath="TapExtensions.Duts.Ssh.dll">
-      <SetAssemblyInfo Attributes="Version"/> 
+      <SetAssemblyInfo Attributes="Version"/>
     </File>
 
     <File Path="Packages/TapExtensions/TapExtensions.Duts.Uart.dll" SourcePath="TapExtensions.Duts.Uart.dll">
@@ -21,7 +21,7 @@
     <File Path="Packages/TapExtensions/TapExtensions.Instruments.BarcodeScanner.dll" SourcePath="TapExtensions.Instruments.BarcodeScanner.dll">
       <SetAssemblyInfo Attributes="Version"/>
     </File>
-    
+
     <File Path="Packages/TapExtensions/TapExtensions.Instruments.DcPwr.dll" SourcePath="TapExtensions.Instruments.DcPwr.dll">
       <SetAssemblyInfo Attributes="Version"/>
     </File>

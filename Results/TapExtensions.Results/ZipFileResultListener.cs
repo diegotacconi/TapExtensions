@@ -6,7 +6,7 @@ using OpenTap;
 namespace TapExtensions.Results
 {
     [Display("Zip File",
-        Groups: new[] {"TapExtensions", "Results"},
+        Groups: new[] { "TapExtensions", "Results" },
         Description: "Save results and logs into a zip file.")]
     public class ZipFileResultListener : ResultListener
     {
@@ -66,6 +66,7 @@ namespace TapExtensions.Results
                     memoryStream.Seek(0, SeekOrigin.Begin);
                     memoryStream.CopyTo(zipFileStream);
                 }
+
                 Log.Info("Saved results to {0}", zipFullPath);
             }
         }

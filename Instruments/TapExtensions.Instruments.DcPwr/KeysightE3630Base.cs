@@ -140,7 +140,7 @@ namespace TapExtensions.Instruments.DcPwr
                 errorCode = 0;
             }
 
-            return new ScpiError {Code = errorCode, Message = errorMsg};
+            return new ScpiError { Code = errorCode, Message = errorMsg };
         }
     }
 }
