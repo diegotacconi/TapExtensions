@@ -13,7 +13,17 @@ namespace TapExtensions.Results
         [Display("Report Path", Order: 1,
             Description: "Path where report files are to be generated")]
         [DirectoryPath]
-        public string ReportPath { get; set; }
+        public string ReportPath
+        {
+            get => _fullPath;
+            set
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                    _fullPath = Path.GetFullPath(value);
+            }
+        }
+
+        private string _fullPath;
 
         public ZipFileResultListener()
         {
