@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Threading;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -13,12 +14,16 @@ namespace TapExtensions.Gui.Wpf
         internal string WindowTitle { get; set; } = "";
         internal string WindowMessage { get; set; } = "";
         internal string WindowPicture { get; set; } = "";
+        internal int Timeout { get; set; } = 0;
         internal EInputButtons Buttons { get; set; } = EInputButtons.OkCancel;
         internal double WindowFontSize { get; set; } = 0;
         internal double WindowMaxWidth { get; set; } = 0;
         internal double WindowMaxHeight { get; set; } = 0;
         internal bool IsWindowResizable { get; set; } = false;
         public EBorderStyle BorderStyle { get; set; } = EBorderStyle.None;
+
+        private DateTime _StartTime;
+        private DispatcherTimer _Timer;
 
         internal PictureDialogWpf(Window windowOwner = null)
         {
@@ -157,20 +162,31 @@ namespace TapExtensions.Gui.Wpf
             // Change resize mode
             DialogWindow.ResizeMode = IsWindowResizable ? ResizeMode.CanResize : ResizeMode.NoResize;
 
+            // Start the countdown timer
+            if (Timeout > 0)
+                StartTimer();
+
             // Call the base class to show the dialog window
             return ShowDialog();
+        }
+
+        private void CloseWindow()
+        {
+            if(_Timer != null && _Timer.IsEnabled)
+                _Timer.Stop();
+            Close();
         }
 
         private void ButtonOk_OnClick(object sender, RoutedEventArgs e)
         {
             DialogResult = true;
-            Close();
+            CloseWindow();
         }
 
         private void ButtonCancel_OnClick(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
-            Close();
+            CloseWindow();
         }
 
         // Close window when escape key is pressed
@@ -179,7 +195,7 @@ namespace TapExtensions.Gui.Wpf
             if (keyEventArgs.Key == Key.Escape)
             {
                 DialogResult = false;
-                Close();
+                CloseWindow();
             }
         }
 
@@ -188,6 +204,33 @@ namespace TapExtensions.Gui.Wpf
         {
             if (IsWindowResizable)
                 SizeToContent = SizeToContent.WidthAndHeight;
+        }
+
+        private void StartTimer()
+        {
+            _StartTime = DateTime.UtcNow;
+            _Timer = new DispatcherTimer();
+            _Timer.Interval = new TimeSpan(0, 0, 0, 0, 100); // Set interval to 100 milliseconds
+            _Timer.Tick += OnTimedEvent;
+            _Timer.Start();
+        }
+
+        private void OnTimedEvent(object sender, EventArgs e)
+        {
+            var finishTime = _StartTime + TimeSpan.FromSeconds(Timeout);
+            var remainingDuration = finishTime - DateTime.UtcNow;
+
+            if (remainingDuration <= TimeSpan.Zero)
+            {
+                DialogResult = false;
+                CloseWindow();
+            }
+            /*
+            else
+            {
+                _Log.Debug($"{remainingDuration.TotalSeconds:0.#} s");
+            }
+            */
         }
     }
 }
