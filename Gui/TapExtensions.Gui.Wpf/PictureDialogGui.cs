@@ -9,11 +9,12 @@ namespace TapExtensions.Gui.Wpf
         public string Title { get; set; } = "";
         public string Message { get; set; } = "";
         public string Picture { get; set; } = "";
-        public InputButtons Buttons { get; set; } = InputButtons.OkCancel;
+        public EInputButtons Buttons { get; set; } = EInputButtons.OkCancel;
         public double FontSize { get; set; } = 0;
         public double MaxWidth { get; set; } = 0;
         public double MaxHeight { get; set; } = 0;
         public bool IsResizable { get; set; } = false;
+        public EBorderStyle BorderStyle { get; set; } = EBorderStyle.None;
 
         private Application _wpfApp;
 
@@ -66,7 +67,8 @@ namespace TapExtensions.Gui.Wpf
                 WindowFontSize = FontSize,
                 WindowMaxWidth = MaxWidth,
                 WindowMaxHeight = MaxHeight,
-                IsWindowResizable = IsResizable
+                IsWindowResizable = IsResizable,
+                BorderStyle = BorderStyle
             };
             return pictureDialogWpf.ShowWindow() == true;
         }

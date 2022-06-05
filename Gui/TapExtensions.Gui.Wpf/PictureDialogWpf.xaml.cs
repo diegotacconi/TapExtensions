@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace TapExtensions.Gui.Wpf
@@ -11,11 +12,12 @@ namespace TapExtensions.Gui.Wpf
         internal string WindowTitle { get; set; } = "";
         internal string WindowMessage { get; set; } = "";
         internal string WindowPicture { get; set; } = "";
-        internal InputButtons Buttons { get; set; } = InputButtons.OkCancel;
+        internal EInputButtons Buttons { get; set; } = EInputButtons.OkCancel;
         internal double WindowFontSize { get; set; } = 0;
         internal double WindowMaxWidth { get; set; } = 0;
         internal double WindowMaxHeight { get; set; } = 0;
         internal bool IsWindowResizable { get; set; } = false;
+        public EBorderStyle BorderStyle { get; set; } = EBorderStyle.None;
 
         internal PictureDialogWpf(Window windowOwner = null)
         {
@@ -36,6 +38,44 @@ namespace TapExtensions.Gui.Wpf
 
         internal bool? ShowWindow()
         {
+            // Change style
+            DialogWindow.Foreground = new SolidColorBrush(Colors.White);
+            DialogWindow.Background = new SolidColorBrush(Color.FromRgb(27, 27, 31));
+            switch (BorderStyle)
+            {
+                case EBorderStyle.None:
+                    MainBorder.BorderThickness = new Thickness(0);
+                    break;
+
+                case EBorderStyle.Green:
+                    Stripe1.Color = Colors.DarkGreen;
+                    Stripe2.Color = Colors.DarkGreen;
+                    break;
+
+                case EBorderStyle.Yellow:
+                    Stripe1.Color = Color.FromRgb(254, 206, 0);
+                    Stripe2.Color = Color.FromRgb(254, 206, 0);
+                    break;
+
+                case EBorderStyle.Orange:
+                    // Colors.DarkOrange;
+                    // "#E67E22"
+                    Stripe1.Color = Color.FromRgb(230, 126, 34);
+                    Stripe2.Color = Color.FromRgb(230, 126, 34);
+                    break;
+
+                case EBorderStyle.Red:
+                    // Colors.DarkRed;
+                    // "#E74C3C"
+                    Stripe1.Color = Color.FromRgb(231, 76, 60);
+                    Stripe2.Color = Color.FromRgb(231, 76, 60);
+                    break;
+
+                default:
+                    throw new ArgumentException(
+                        $"Case not found for {nameof(BorderStyle)}={BorderStyle}");
+            }
+
             // Change title
             if (!string.IsNullOrWhiteSpace(WindowTitle))
                 DialogWindow.Title = WindowTitle;
@@ -65,17 +105,17 @@ namespace TapExtensions.Gui.Wpf
             // Change buttons
             switch (Buttons)
             {
-                case InputButtons.StartCancel:
+                case EInputButtons.StartCancel:
                     ButtonOk.Content = "Start";
                     ButtonCancel.Content = "Cancel";
                     break;
 
-                case InputButtons.OkCancel:
+                case EInputButtons.OkCancel:
                     ButtonOk.Content = "OK";
                     ButtonCancel.Content = "Cancel";
                     break;
 
-                case InputButtons.YesNo:
+                case EInputButtons.YesNo:
                     ButtonOk.Content = "Yes";
                     ButtonCancel.Content = "No";
                     break;
