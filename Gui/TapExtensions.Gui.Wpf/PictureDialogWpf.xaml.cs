@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using TapExtensions.Interfaces.Gui;
 
 namespace TapExtensions.Gui.Wpf
 {
@@ -48,29 +49,45 @@ namespace TapExtensions.Gui.Wpf
                     break;
 
                 case EBorderStyle.Green:
-                    Stripe1.Color = Colors.DarkGreen;
-                    Stripe2.Color = Colors.DarkGreen;
+                    // Colors.DarkGreen;
+                    Stripe1.Color = Color.FromRgb(46, 204, 113);
+                    Stripe2.Color = Color.FromRgb(46, 204, 113);
                     break;
 
                 case EBorderStyle.Yellow:
-                    Stripe1.Color = Color.FromRgb(254, 206, 0);
-                    Stripe2.Color = Color.FromRgb(254, 206, 0);
+                    Stripe1.Color = Color.FromRgb(241, 196, 15);
+                    Stripe2.Color = Color.FromRgb(241, 196, 15);
                     break;
 
                 case EBorderStyle.Orange:
-                    // Colors.DarkOrange;
-                    // "#E67E22"
                     Stripe1.Color = Color.FromRgb(230, 126, 34);
                     Stripe2.Color = Color.FromRgb(230, 126, 34);
                     break;
 
                 case EBorderStyle.Red:
-                    // Colors.DarkRed;
-                    // "#E74C3C"
                     Stripe1.Color = Color.FromRgb(231, 76, 60);
                     Stripe2.Color = Color.FromRgb(231, 76, 60);
                     break;
 
+                case EBorderStyle.Blue:
+                    Stripe1.Color = Color.FromRgb(76, 142, 255);
+                    Stripe2.Color = Color.FromRgb(76, 142, 255);
+                    break;
+
+                case EBorderStyle.Black:
+                    Stripe1.Color = Colors.Black;
+                    Stripe2.Color = Colors.Black;
+                    break;
+
+                case EBorderStyle.Gray:
+                    Stripe1.Color = Colors.Gray;
+                    Stripe2.Color = Colors.Gray;
+                    break;
+
+                case EBorderStyle.White:
+                    Stripe1.Color = Colors.White;
+                    Stripe2.Color = Colors.White;
+                    break;
                 default:
                     throw new ArgumentException(
                         $"Case not found for {nameof(BorderStyle)}={BorderStyle}");
