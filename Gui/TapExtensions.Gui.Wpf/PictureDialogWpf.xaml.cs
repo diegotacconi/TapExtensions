@@ -45,8 +45,9 @@ namespace TapExtensions.Gui.Wpf
         internal bool? ShowWindow()
         {
             // Change style
-            DialogWindow.Foreground = new SolidColorBrush(Colors.White);
-            DialogWindow.Background = new SolidColorBrush(Color.FromRgb(27, 27, 31));
+            DialogWindow.Style = GetApplicationStyle<Window>();
+            // DialogWindow.Foreground = new SolidColorBrush(Colors.White);
+            // DialogWindow.Background = new SolidColorBrush(Color.FromRgb(27, 27, 31));
             switch (BorderStyle)
             {
                 case EBorderStyle.None:
@@ -172,7 +173,7 @@ namespace TapExtensions.Gui.Wpf
 
         private void CloseWindow()
         {
-            if(_Timer != null && _Timer.IsEnabled)
+            if (_Timer != null && _Timer.IsEnabled)
                 _Timer.Stop();
             Close();
         }
@@ -231,6 +232,17 @@ namespace TapExtensions.Gui.Wpf
                 _Log.Debug($"{remainingDuration.TotalSeconds:0.#} s");
             }
             */
+        }
+
+        private Style GetApplicationStyle<T>()
+        {
+            Style tempStyle;
+            if (Application.Current.Resources.Contains(typeof(T)))
+                tempStyle = new Style(typeof(T), (Style)Application.Current.Resources[typeof(T)]);
+            else
+                tempStyle = new Style(typeof(T));
+
+            return tempStyle;
         }
     }
 }
