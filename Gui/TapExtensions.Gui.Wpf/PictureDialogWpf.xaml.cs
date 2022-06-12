@@ -19,7 +19,7 @@ namespace TapExtensions.Gui.Wpf
         internal double WindowFontSize { get; set; } = 0;
         internal double WindowMaxWidth { get; set; } = 0;
         internal double WindowMaxHeight { get; set; } = 0;
-        internal bool IsWindowResizable { get; set; } = false;
+        internal bool IsWindowResizable { get; set; } = true;
         public EBorderStyle BorderStyle { get; set; } = EBorderStyle.None;
 
         private DateTime _StartTime;
@@ -46,11 +46,12 @@ namespace TapExtensions.Gui.Wpf
         {
             // Change style
             DialogWindow.Style = GetApplicationStyle<Window>();
-            WindowBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(76, 142, 255));
+            MainWindowBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(76, 142, 255));
             switch (BorderStyle)
             {
                 case EBorderStyle.None:
                     BorderWithStripes.BorderThickness = new Thickness(0);
+                    BorderWithStripes.Margin = new Thickness(0);
                     break;
 
                 case EBorderStyle.Green:
@@ -177,13 +178,18 @@ namespace TapExtensions.Gui.Wpf
             Close();
         }
 
-        private void ButtonOk_OnClick(object sender, RoutedEventArgs e)
+        private void OnDragMoveWindow(object sender, MouseButtonEventArgs e)
+        {
+            DragMove();
+        }
+
+        private void OnOkButtonClick(object sender, RoutedEventArgs e)
         {
             DialogResult = true;
             CloseWindow();
         }
 
-        private void ButtonCancel_OnClick(object sender, RoutedEventArgs e)
+        private void OnCancelButtonClick(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
             CloseWindow();

@@ -14,7 +14,7 @@ namespace TapExtensions.Gui.Wpf
         public double FontSize { get; set; } = 0;
         public double MaxWidth { get; set; } = 0;
         public double MaxHeight { get; set; } = 0;
-        public bool IsResizable { get; set; } = false;
+        public bool IsResizable { get; set; } = true;
         public EBorderStyle BorderStyle { get; set; } = EBorderStyle.None;
 
         private Application _wpfApp;

@@ -21,9 +21,9 @@
         <WindowChrome CaptionHeight="32" ResizeBorderThickness = "7" />
     </WindowChrome.WindowChrome>
 
-    <Border x:Name="WindowBorder" BorderThickness="2" BorderBrush="Black">
+    <Border x:Name="MainWindowBorder" BorderThickness="2" BorderBrush="Black" MouseLeftButtonDown="OnDragMoveWindow">
 
-        <Border x:Name="BorderWithStripes" BorderThickness="14">
+        <Border x:Name="BorderWithStripes" Grid.Row="1" Margin="3" BorderThickness="14">
             <Border.BorderBrush>
                 <LinearGradientBrush MappingMode="Absolute" StartPoint="0,0" EndPoint="185,185" SpreadMethod="Repeat">
                     <LinearGradientBrush.RelativeTransform>
@@ -48,11 +48,11 @@
                 <Image x:Name="Image" Grid.Row="1" Margin="7" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                 <StackPanel Grid.Row="2" Margin="7" HorizontalAlignment="Center" Orientation="Horizontal" Width="Auto">
-                    <Button x:Name="ButtonOk" Content="OK" MinWidth="70" MinHeight="26" Margin="0,0,4,0" Click="ButtonOk_OnClick" IsDefault="True"/>
-                    <Button x:Name="ButtonCancel" Content="Cancel" MinWidth="70" MinHeight="26" Margin="4,0,0,0" Click="ButtonCancel_OnClick"/>
+                    <Button x:Name="ButtonOk" Content="OK" MinWidth="70" MinHeight="26" Margin="0,0,4,0" Click="OnOkButtonClick" IsDefault="True"/>
+                    <Button x:Name="ButtonCancel" Content="Cancel" MinWidth="70" MinHeight="26" Margin="4,0,0,0" Click="OnCancelButtonClick"/>
                 </StackPanel>
             </Grid>
-
         </Border>
+
     </Border>
 </Window>
