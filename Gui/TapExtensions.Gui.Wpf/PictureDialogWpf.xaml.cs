@@ -46,12 +46,11 @@ namespace TapExtensions.Gui.Wpf
         {
             // Change style
             DialogWindow.Style = GetApplicationStyle<Window>();
-            // DialogWindow.Foreground = new SolidColorBrush(Colors.White);
-            // DialogWindow.Background = new SolidColorBrush(Color.FromRgb(27, 27, 31));
+            WindowBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(76, 142, 255));
             switch (BorderStyle)
             {
                 case EBorderStyle.None:
-                    MainBorder.BorderThickness = new Thickness(0);
+                    BorderWithStripes.BorderThickness = new Thickness(0);
                     break;
 
                 case EBorderStyle.Green:

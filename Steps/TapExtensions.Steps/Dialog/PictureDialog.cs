@@ -58,7 +58,7 @@ namespace TapExtensions.Steps.Dialog
             FontSize = new Enabled<double> { IsEnabled = false, Value = 14 };
             MaxWidth = new Enabled<double> { IsEnabled = false, Value = 550 };
             MaxHeight = new Enabled<double> { IsEnabled = false, Value = 500 };
-            IsResizable = false;
+            IsResizable = true;
             BorderStyle = EBorderStyle.None;
         }
 
