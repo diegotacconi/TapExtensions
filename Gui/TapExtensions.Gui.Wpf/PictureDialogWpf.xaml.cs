@@ -11,7 +11,6 @@ namespace TapExtensions.Gui.Wpf
     // ReSharper disable once RedundantExtendsListEntry
     internal partial class PictureDialogWpf : Window
     {
-        internal string WindowTitle { get; set; } = "";
         internal string WindowMessage { get; set; } = "";
         internal string WindowPicture { get; set; } = "";
         internal int Timeout { get; set; } = 0;
@@ -98,10 +97,6 @@ namespace TapExtensions.Gui.Wpf
                     throw new ArgumentException(
                         $"Case not found for {nameof(BorderStyle)}={BorderStyle}");
             }
-
-            // Change title
-            if (!string.IsNullOrWhiteSpace(WindowTitle))
-                DialogWindow.Title = WindowTitle;
 
             // Show message
             if (!string.IsNullOrWhiteSpace(WindowMessage))

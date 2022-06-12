@@ -7,7 +7,6 @@
         PreviewMouseDoubleClick="OnMouseDoubleClick"
         PreviewKeyDown="OnPreviewKeyDown"
         SnapsToDevicePixels="True"
-        Title=""
         FontSize="14"
         MinWidth="240" MinHeight="120"
         MaxWidth="550" MaxHeight="500"

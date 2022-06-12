@@ -6,7 +6,6 @@ namespace TapExtensions.Gui.Wpf
 {
     public class PictureDialogGui : IGui
     {
-        public string Title { get; set; } = "";
         public string Message { get; set; } = "";
         public string Picture { get; set; } = "";
         public int Timeout { get; set; } = 0;
@@ -61,7 +60,6 @@ namespace TapExtensions.Gui.Wpf
         {
             var pictureDialogWpf = new PictureDialogWpf(windowOwner)
             {
-                WindowTitle = Title,
                 WindowMessage = Message,
                 WindowPicture = Picture,
                 Timeout = Timeout,

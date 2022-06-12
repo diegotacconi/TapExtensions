@@ -11,14 +11,11 @@ namespace TapExtensions.Steps.Dialog
     {
         #region Settings
 
-        [Display("Title", Order: 1, Description: "The title of the dialog window.")]
-        public string Title { get; set; }
-
-        [Display("Message", Order: 2, Description: "The message shown to the user.")]
+        [Display("Message", Order: 1, Description: "The message shown to the user.")]
         [Layout(LayoutMode.Normal, 2, 6)]
         public string Message { get; set; }
 
-        [Display("Picture", Order: 3, Description: "Path to the picture file such as 'C:\\image.jpg'.")]
+        [Display("Picture", Order: 2, Description: "Path to the picture file such as 'C:\\image.jpg'.")]
         [FilePath]
         public string Picture
         {
@@ -52,7 +49,6 @@ namespace TapExtensions.Steps.Dialog
         public PictureDialog()
         {
             // Default values
-            Title = "Title";
             Message = "Message";
             Picture = @"C:\Windows\Web\Screen\img103.png";
             FontSize = new Enabled<double> { IsEnabled = false, Value = 14 };
@@ -73,7 +69,6 @@ namespace TapExtensions.Steps.Dialog
                 // Show dialog window
                 IGui gui = new PictureDialogGui
                 {
-                    Title = Title,
                     Message = Message,
                     Picture = Picture,
                     FontSize = FontSize.IsEnabled ? FontSize.Value : 0,
