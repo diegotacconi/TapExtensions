@@ -13,9 +13,9 @@ namespace TapExtensions.Steps.FlowControl
     {
         #region Settings
 
-        [Display("Max number of attempts", Order: 1,
+        [Display("Max Count", Order: 1,
             Description: "Maximum number of iteration attempts for repeating child steps.")]
-        public uint MaxNumberOfAttempts { get; set; }
+        public uint MaxCount { get; set; }
 
         [XmlIgnore]
         [Browsable(false)]
@@ -34,7 +34,7 @@ namespace TapExtensions.Steps.FlowControl
 
         public RetryWithTimedDialog()
         {
-            MaxNumberOfAttempts = 3;
+            MaxCount = 3;
             Message = "Would you like to retry this test?";
             Timeout = new Enabled<double> { IsEnabled = true, Value = 5 };
         }
@@ -42,13 +42,13 @@ namespace TapExtensions.Steps.FlowControl
         public override void Run()
         {
             Iteration = 0;
-            while (Iteration < MaxNumberOfAttempts)
+            while (Iteration < MaxCount)
             {
                 Iteration++;
 
                 if (Iteration > 1)
                 {
-                    var msg = $"Retrying attempt {Iteration} of {MaxNumberOfAttempts} ...";
+                    var msg = $"Retrying attempt {Iteration} of {MaxCount} ...";
                     Log.Warning(msg);
 
                     // Ask the operator to continue retrying
