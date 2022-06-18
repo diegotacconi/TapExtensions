@@ -6,14 +6,15 @@ namespace TapExtensions.Steps.FlowControl
 {
     [Display("Retry",
         Groups: new[] { "TapExtensions", "Steps", "FlowControl" },
-        Description: "Run all child steps until all verdicts are passing or max iteration is reached.")]
+        Description: "Run all child steps until all verdicts are passing or max number of attempts is reached.")]
     [AllowAnyChild]
     public class Retry : TestStep
     {
         #region Settings
 
-        [Display("Max repeat count", "Maximum number of iteration attempts for repeating child steps")]
-        public uint MaxIteration { get; set; } = 3;
+        [Display("Max number of attempts", Order: 1,
+            Description: "Maximum number of iteration attempts for repeating child steps.")]
+        public uint MaxNumberOfAttempts { get; set; } = 3;
 
         [XmlIgnore]
         [Browsable(false)]
@@ -24,12 +25,12 @@ namespace TapExtensions.Steps.FlowControl
         public override void Run()
         {
             Iteration = 0;
-            while (Iteration < MaxIteration)
+            while (Iteration < MaxNumberOfAttempts)
             {
                 Iteration++;
 
                 if (Iteration > 1)
-                    Log.Warning($"Retrying attempt {Iteration} of {MaxIteration} ...");
+                    Log.Warning($"Retrying attempt {Iteration} of {MaxNumberOfAttempts} ...");
 
                 ResetResultOfChildSteps();
                 RunChildSteps();
