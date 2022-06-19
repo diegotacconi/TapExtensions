@@ -15,18 +15,19 @@ namespace TapExtensions.Steps.FlowControl
 
         [Display("Max Count", Order: 1,
             Description: "Maximum number of iteration attempts for repeating child steps.")]
-        public uint MaxCount { get; set; }
+        public int MaxCount { get; set; }
 
         [XmlIgnore]
         [Browsable(false)]
         public int Iteration { get; set; }
 
-        [Display("Dialog message", Order: 3, Description: "The message shown to the user.")]
+        [Display("Message", Order: 3, Group: "Dialog",
+            Description: "The message shown to the user.")]
         [Layout(LayoutMode.Normal, 2, 6)]
         public string Message { get; set; }
 
-        [Display("Timeout", Order: 4,
-            Description: "Enabling this will close the dialog window after an amount of time.")]
+        [Display("Timeout", Order: 4, Group: "Dialog",
+            Description: "When enabled, the dialog will close after an amount of time.")]
         [Unit("s")]
         public Enabled<double> Timeout { get; set; }
 
@@ -34,9 +35,20 @@ namespace TapExtensions.Steps.FlowControl
 
         public RetryWithTimedDialog()
         {
+            // Default values
             MaxCount = 3;
             Message = "Would you like to retry this test?";
             Timeout = new Enabled<double> { IsEnabled = true, Value = 5 };
+
+            // Validation rules
+            Rules.Add(() => MaxCount >= 1,
+                "Max Count must be greater than or equal to one", nameof(MaxCount));
+        }
+
+        public override void PrePlanRun()
+        {
+            // Block the test step from being run if there are any validation errors with the current values.
+            ThrowOnValidationError(true);
         }
 
         public override void Run()
@@ -69,7 +81,9 @@ namespace TapExtensions.Steps.FlowControl
                     }
                     catch (TimeoutException)
                     {
+                        // Exit loop if timeout occurred
                         Log.Debug("Dialog timed-out");
+                        break;
                     }
                 }
 

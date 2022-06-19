@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Xml.Serialization;
 using OpenTap;
 
@@ -14,7 +15,7 @@ namespace TapExtensions.Steps.FlowControl
 
         [Display("Max Count", Order: 1,
             Description: "Maximum number of iteration attempts for repeating child steps.")]
-        public uint MaxCount { get; set; }
+        public int MaxCount { get; set; }
 
         [XmlIgnore]
         [Browsable(false)]
@@ -28,8 +29,19 @@ namespace TapExtensions.Steps.FlowControl
 
         public RetryWithDialog()
         {
+            // Default values
             MaxCount = 3;
             Message = "Would you like to retry this test?";
+
+            // Validation rules
+            Rules.Add(() => MaxCount >= 1,
+                "Max Count must be greater than or equal to one", nameof(MaxCount));
+        }
+
+        public override void PrePlanRun()
+        {
+            // Block the test step from being run if there are any validation errors with the current values.
+            ThrowOnValidationError(true);
         }
 
         public override void Run()
