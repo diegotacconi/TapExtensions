@@ -49,8 +49,10 @@ namespace TapExtensions.Steps.FlowControl
 
         public override void PrePlanRun()
         {
-            // Block the test step from being run if there are any validation errors with the current values.
             ThrowOnValidationError(false);
+
+            if (Timeout.IsEnabled && Timeout.Value <= 0)
+                throw new InvalidOperationException("Timeout value must be greater than zero");
         }
 
         public override void Run()
@@ -69,11 +71,10 @@ namespace TapExtensions.Steps.FlowControl
                     var dialog = new DialogWindow(msg, Message);
                     try
                     {
-                        var timeout = TimeSpan.FromSeconds(Timeout.Value);
-                        if (timeout == TimeSpan.Zero)
-                            timeout = TimeSpan.FromSeconds(0.001);
-                        if (Timeout.IsEnabled == false)
-                            timeout = TimeSpan.MaxValue;
+                        TimeSpan timeout = TimeSpan.MaxValue;
+                        if (Timeout.IsEnabled && Timeout.Value > 0)
+                            timeout = TimeSpan.FromSeconds(Timeout.Value);
+
                         UserInput.Request(dialog, timeout, true);
                         Log.Debug($"User selected the '{dialog.Response}' button");
 
