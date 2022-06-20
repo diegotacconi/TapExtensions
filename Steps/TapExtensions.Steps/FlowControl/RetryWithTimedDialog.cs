@@ -43,27 +43,14 @@ namespace TapExtensions.Steps.FlowControl
             // Validation rules
             Rules.Add(() => MaxCount >= 1,
                 "Max Count must be greater than or equal to one", nameof(MaxCount));
-            Rules.Add(CheckTimeout,
+            Rules.Add(() => (!Timeout.IsEnabled || Timeout.Value > 0),
                 "When enabled, the timeout value must be greater than zero", nameof(Timeout));
-        }
-
-        private bool CheckTimeout()
-        {
-            if (Timeout.IsEnabled)
-            {
-                if (Timeout.Value > 0)
-                    return true;
-                else
-                    return false;
-            }
-            else
-                return true;
         }
 
         public override void PrePlanRun()
         {
             // Block the test step from being run if there are any validation errors with the current values.
-            ThrowOnValidationError(true);
+            ThrowOnValidationError(false);
         }
 
         public override void Run()
