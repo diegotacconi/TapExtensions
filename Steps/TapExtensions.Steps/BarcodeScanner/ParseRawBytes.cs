@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using OpenTap;
 
@@ -28,8 +29,15 @@ namespace TapExtensions.Steps.BarcodeScanner
                     Log.Debug($"part[{i}] = '{AsciiBytesToString(part)}'");
                 }
 
+                // Product Code
+                var productCodeBytes = GetSection(rawBytes, new byte[] { 0x31, 0x50 });
+                var productCode = AsciiBytesToString(productCodeBytes);
+                Log.Debug($"productCode  = '{productCode}'");
 
-
+                // Serial Number
+                var serialNumberBytes = GetSection(rawBytes, new byte[] { 0x53 });
+                var serialNumber = AsciiBytesToString(serialNumberBytes);
+                Log.Debug($"serialNumber = '{serialNumber}'");
             }
             catch (Exception ex)
             {
@@ -67,6 +75,33 @@ namespace TapExtensions.Steps.BarcodeScanner
                 }
             }
             return msg.ToString();
+        }
+
+        private static byte[] GetSection(byte[] source, byte[] header)
+        {
+            var delimiters = new List<byte>() { 0x1D, 0x1E };
+            var sections = Split(source, delimiters);
+
+            foreach (var section in sections)
+                if (FindPattern(section, header) == 0)
+                {
+                    var sectionWithoutHeader = new byte[section.Length - header.Length];
+                    Array.Copy(section, header.Length, sectionWithoutHeader, 0, section.Length - header.Length);
+                    return sectionWithoutHeader;
+                }
+
+            throw new InvalidOperationException(
+                $"Cannot find section with header of '{AsciiBytesToString(header)}'");
+        }
+
+        private static int FindPattern(byte[] source, byte[] pattern)
+        {
+            var j = -1;
+            for (var i = 0; i < source.Length; i++)
+                if (source.Skip(i).Take(pattern.Length).SequenceEqual(pattern))
+                    j = i;
+
+            return j;
         }
 
         private static List<byte[]> Split(byte[] source, List<byte> delimiters)
