@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using OpenTap;
 
@@ -14,8 +15,18 @@ namespace TapExtensions.Steps.BarcodeScanner
             {
                 // Example parsing the barcode raw bytes
                 var rawBytes = SimulateGetRawBytes();
-                Log.Debug(AsciiBytesToString(rawBytes));
+                Log.Debug($"rawBytes = '{AsciiBytesToString(rawBytes)}'");
 
+                // Split into parts
+                var delimiters = new List<byte>() { 0x1D, 0x1E };
+                var parts = Split(rawBytes, delimiters);
+
+                var i = 0;
+                foreach (var part in parts)
+                {
+                    i++;
+                    Log.Debug($"part[{i}] = '{AsciiBytesToString(part)}'");
+                }
 
 
 
@@ -47,20 +58,53 @@ namespace TapExtensions.Steps.BarcodeScanner
             var msg = new StringBuilder();
             if (bytes != null && bytes.Length != 0)
             {
-                foreach (var c in bytes)
+                foreach (var b in bytes)
                 {
-                    var j = c;
-                    if (j >= 0x20 && j <= 0x7E)
-                    {
-                        msg.Append((char)j);
-                    }
+                    if (b >= 0x20 && b <= 0x7E)
+                        msg.Append((char)b);
                     else
-                    {
-                        msg.Append("{" + c.ToString("X2") + "}");
-                    }
+                        msg.Append("{" + b.ToString("X2") + "}");
                 }
             }
             return msg.ToString();
+        }
+
+        private static List<byte[]> Split(byte[] source, List<byte> delimiters)
+        {
+            var parts = new List<byte[]>();
+            var startIndex = 0;
+            byte[] part;
+
+            // Find delimiters
+            for (var i = 0; i < source.Length; i++)
+            {
+                if (Equals(source[i], delimiters))
+                {
+                    part = new byte[i - startIndex];
+                    Array.Copy(source, startIndex, part, 0, part.Length);
+                    parts.Add(part);
+                    startIndex = i + 1;
+                }
+            }
+
+            // Remaining part
+            part = new byte[source.Length - startIndex];
+            Array.Copy(source, startIndex, part, 0, part.Length);
+            parts.Add(part);
+
+            // Remove empty parts
+            parts.RemoveAll(b => b.Length == 0);
+
+            return parts;
+        }
+
+        private static bool Equals(byte source, List<byte> delimiters)
+        {
+            foreach (var delimiter in delimiters)
+                if (source == delimiter)
+                    return true;
+
+            return false;
         }
     }
 }
