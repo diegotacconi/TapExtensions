@@ -10,14 +10,13 @@ using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using OpenTap;
-using TapExtensions.Interfaces.BarcodeScanner;
 
 namespace TapExtensions.Instruments.BarcodeScanner
 {
     [Display("Rakinda LV3000",
         Groups: new[] { "TapExtensions", "Instruments", "BarcodeScanner" },
         Description: "Rakinda LV3000U or LV3000H Fixed Mount Scanner")]
-    public class RakindaLV3000 : Instrument, IBarcodeScanner
+    public class RakindaLV3000 : BarcodeScannerBase
     {
         #region Settings
 
@@ -85,7 +84,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
                 StopBits = StopBits.One,
                 Handshake = Handshake.None,
                 ReadTimeout = 1000, // 1 second
-                WriteTimeout = 1000, // 1 second
+                WriteTimeout = 1000 // 1 second
             };
 
             // Close serial port if already opened
@@ -128,21 +127,21 @@ namespace TapExtensions.Instruments.BarcodeScanner
             }
         }
 
-        public byte[] GetRawBytes()
+        public override byte[] GetRawBytes()
         {
             const int timeout = 5;
 
             OpenSerialPort();
 
             // Start Scanning
-            WriteRead(new byte[] { 0x1B, 0x31 }, new byte[] { 0x06 }, timeout);
+            StartSession();
 
             // Attempt to read the barcode label
             var expectedEndOfBarcodeLabel = new byte[] { 0x0D, 0x0A };
             var rawBarcodeLabel = Read(expectedEndOfBarcodeLabel, timeout);
 
             // Stop Scanning
-            WriteRead(new byte[] { 0x1B, 0x30 }, new byte[] { 0x06 }, timeout);
+            StopSession();
 
             CloseSerialPort();
 
@@ -252,6 +251,20 @@ namespace TapExtensions.Instruments.BarcodeScanner
             var cmdBytes = Encoding.ASCII.GetBytes(command);
             var expectedSuccessfulReply = new byte[] { 0x06 };
             WriteRead(cmdBytes, expectedSuccessfulReply, timeout);
+        }
+
+        private void StartSession()
+        {
+            // Tells the decoder to start a scan session
+            const int timeout = 5;
+            WriteRead(new byte[] { 0x1B, 0x31 }, new byte[] { 0x06 }, timeout);
+        }
+
+        private void StopSession()
+        {
+            // Tells the decoder to abort a decode attempt or video transmission
+            const int timeout = 5;
+            WriteRead(new byte[] { 0x1B, 0x30 }, new byte[] { 0x06 }, timeout);
         }
     }
 }

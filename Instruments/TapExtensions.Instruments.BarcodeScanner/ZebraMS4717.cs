@@ -13,14 +13,13 @@ using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using OpenTap;
-using TapExtensions.Interfaces.BarcodeScanner;
 
 namespace TapExtensions.Instruments.BarcodeScanner
 {
     [Display("Zebra MS4717",
         Groups: new[] { "TapExtensions", "Instruments", "BarcodeScanner" },
         Description: "Zebra MS4717 Fixed Mount Imager")]
-    public class ZebraMS4717 : Instrument, IBarcodeScanner
+    public class ZebraMS4717 : BarcodeScannerBase
     {
         #region Settings
 
@@ -73,7 +72,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
                 StopBits = StopBits.One,
                 Handshake = Handshake.RequestToSend,
                 ReadTimeout = 1000, // 1 second
-                WriteTimeout = 1000, // 1 second
+                WriteTimeout = 1000 // 1 second
             };
 
             // Close serial port if already opened
@@ -116,7 +115,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
             }
         }
 
-        public byte[] GetRawBytes()
+        public override byte[] GetRawBytes()
         {
             const int timeout = 5;
 
@@ -234,12 +233,12 @@ namespace TapExtensions.Instruments.BarcodeScanner
             }
         }
 
-        protected virtual byte[] Query(byte opCode, byte expectedByte)
+        private byte[] Query(byte opCode, byte expectedByte)
         {
             return Query(opCode, new byte[0], expectedByte);
         }
 
-        protected virtual byte[] Query(byte opCode, byte[] parameters, byte expectedByte, int timeout = 1)
+        private byte[] Query(byte opCode, byte[] parameters, byte expectedByte, int timeout = 1)
         {
             // Packet Format: <Length> <Opcode> <Message Source> <Status> <Data....> <Checksum>
 
@@ -252,21 +251,19 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
             // Add parameters, if any
             foreach (var parameter in parameters)
-            {
                 message.Add(parameter);
-            }
 
             // Prepend length (1 Byte)
             // Length of message not including the check sum bytes. Maximum value is 0xFF.
             message.Insert(0, BitConverter.GetBytes(message.Count + 1)[0]);
 
             // Add checksum (2 Bytes)
-            byte[] checksum = CalculateChecksum(message.ToArray());
+            var checksum = CalculateChecksum(message.ToArray());
             message.Add(checksum[1]); // High byte
             message.Add(checksum[0]); // Low byte
 
             // Send message
-            var response = WriteRead(message.ToArray(), new byte[] { expectedByte }, timeout);
+            var response = WriteRead(message.ToArray(), new[] { expectedByte }, timeout);
             return response;
         }
 
@@ -283,66 +280,66 @@ namespace TapExtensions.Instruments.BarcodeScanner
             return checksumBytes;
         }
 
-        #region Zebra’s SSI Commands
+        #region Zebra's SSI Commands
 
-        protected const byte CmdAck = 0xD0;
-        protected const byte CmdNak = 0xD1;
+        private const byte CmdAck = 0xD0;
+        private const byte CmdNak = 0xD1;
 
-        protected virtual void AimOff()
+        private void AimOff()
         {
             // Deactivate aim pattern
             Query(0xC4, CmdAck);
         }
 
-        protected virtual void AimOn()
+        private void AimOn()
         {
             // Activate aim pattern
             Query(0xC5, CmdAck);
         }
 
-        protected virtual void Beep(byte beepCode)
+        private void Beep(byte beepCode)
         {
             // Sound the beeper
-            Query(0xE6, new byte[] { beepCode }, CmdAck);
+            Query(0xE6, new[] { beepCode }, CmdAck);
         }
 
-        protected virtual void LedOff()
+        private void LedOff()
         {
             // Turn off the specified decoder LEDs
             Query(0xE8, new byte[] { 0x00 }, CmdAck);
         }
 
-        protected virtual void LedOn()
+        private void LedOn()
         {
             // Turn on the specified decoder LEDs
             Query(0xE7, new byte[] { 0x00 }, CmdAck);
         }
 
-        protected virtual void ParamDefaults()
+        private void ParamDefaults()
         {
             // Set all parameters to their default values
             Query(0xC8, CmdAck);
         }
 
-        protected virtual void ParamRequest(byte parameterNumber = 0xFE)
+        private void ParamRequest(byte parameterNumber = 0xFE)
         {
             // Request values of certain parameters
-            Query(0xC7, new byte[] { parameterNumber }, CmdAck);
+            Query(0xC7, new[] { parameterNumber }, CmdAck);
         }
 
-        protected virtual void StartSession()
+        private void StartSession()
         {
             // Tells the decoder to start a scan session
             Query(0xE4, CmdAck);
         }
 
-        protected virtual void StopSession()
+        private void StopSession()
         {
             // Tells the decoder to abort a decode attempt or video transmission
             Query(0xE5, CmdAck);
         }
 
-        protected virtual void Wakeup()
+        private void Wakeup()
         {
             Write(new byte[] { 0x00 });
             TapThread.Sleep(100);
