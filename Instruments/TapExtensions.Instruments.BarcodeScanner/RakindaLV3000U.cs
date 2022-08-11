@@ -50,25 +50,31 @@ namespace TapExtensions.Instruments.BarcodeScanner
         {
             base.Open();
 
+            // Check if barcode scanner is available
             OpenSerialPort();
-            const int timeout = 5;
+            try
+            {
+                const int timeout = 5;
 
-            // Send "?" and expect the response to be "!"
-            WriteRead(new byte[] { 0x3F }, new byte[] { 0x21 }, timeout);
+                // Send "?" and expect the response to be "!"
+                WriteRead(new byte[] { 0x3F }, new byte[] { 0x21 }, timeout);
 
-            // Default all commands
-            SetCommand("NLS0001000;", timeout);
+                // Default all commands
+                SetCommand("NLS0001000;", timeout);
 
-            // Reading mode = Trigger
-            SetCommand("NLS0302000;", timeout);
+                // Reading mode = Trigger
+                SetCommand("NLS0302000;", timeout);
 
-            // Enable command programming
-            SetCommand("NLS0006010;", timeout);
+                // Enable command programming
+                SetCommand("NLS0006010;", timeout);
 
-            // Enable all bar codes
-            SetCommand("NLS0001020;", timeout);
-
-            CloseSerialPort();
+                // Enable all bar codes
+                SetCommand("NLS0001020;", timeout);
+            }
+            finally
+            {
+                CloseSerialPort();
+            }
         }
 
         private void SetCommand(string command, int timeout)

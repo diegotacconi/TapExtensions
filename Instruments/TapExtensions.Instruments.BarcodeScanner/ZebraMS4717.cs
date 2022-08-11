@@ -54,9 +54,16 @@ namespace TapExtensions.Instruments.BarcodeScanner
             base.Open();
 
             // Check if barcode scanner is available
-            // OpenSerialPort();
-            // ParamDefaults();
-            // CloseSerialPort();
+            OpenSerialPort();
+            try
+            {
+                Wakeup();
+                ParamDefaults();
+            }
+            finally
+            {
+                CloseSerialPort();
+            }
         }
 
         private void OpenSerialPort()
