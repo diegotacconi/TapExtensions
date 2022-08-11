@@ -13,7 +13,7 @@ using OpenTap;
 
 namespace TapExtensions.Instruments.BarcodeScanner
 {
-    [Display("Rakinda LV3000",
+    [Display("Rakinda LV3000U",
         Groups: new[] { "TapExtensions", "Instruments", "BarcodeScanner" },
         Description: "Rakinda LV3000U or LV3000H Fixed Mount Scanner")]
     public class RakindaLV3000U : BarcodeScannerBase
@@ -42,7 +42,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
         {
             // Default values
             Name = nameof(RakindaLV3000U);
-            SerialPortName = "COM5";
+            SerialPortName = "COM6";
             LoggingLevel = ELoggingLevel.Normal;
         }
 
@@ -139,20 +139,25 @@ namespace TapExtensions.Instruments.BarcodeScanner
         public override byte[] GetRawBytes()
         {
             const int timeout = 5;
+            byte[] rawBarcodeLabel;
 
             OpenSerialPort();
+            try
+            {
+                // Start Scanning
+                WriteRead(new byte[] { 0x1B, 0x31 }, new byte[] { 0x06 }, timeout);
 
-            // Start Scanning
-            WriteRead(new byte[] { 0x1B, 0x31 }, new byte[] { 0x06 }, timeout);
+                // Attempt to read the barcode label
+                var expectedEndOfBarcodeLabel = new byte[] { 0x0D, 0x0A };
+                rawBarcodeLabel = Read(expectedEndOfBarcodeLabel, timeout);
 
-            // Attempt to read the barcode label
-            var expectedEndOfBarcodeLabel = new byte[] { 0x0D, 0x0A };
-            var rawBarcodeLabel = Read(expectedEndOfBarcodeLabel, timeout);
-
-            // Stop Scanning
-            WriteRead(new byte[] { 0x1B, 0x30 }, new byte[] { 0x06 }, timeout);
-
-            CloseSerialPort();
+                // Stop Scanning
+                WriteRead(new byte[] { 0x1B, 0x30 }, new byte[] { 0x06 }, timeout);
+            }
+            finally
+            {
+                CloseSerialPort();
+            }
 
             return rawBarcodeLabel;
         }

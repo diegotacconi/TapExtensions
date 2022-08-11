@@ -118,21 +118,26 @@ namespace TapExtensions.Instruments.BarcodeScanner
         public override byte[] GetRawBytes()
         {
             const int timeout = 5;
+            byte[] rawBarcodeLabel;
 
             OpenSerialPort();
+            try
+            {
+                Wakeup();
 
-            Wakeup();
+                // Start Scanning
+                StartSession();
 
-            // Start Scanning
-            StartSession();
+                // Attempt to read the barcode label
+                rawBarcodeLabel = Read(new byte[0], timeout);
 
-            // Attempt to read the barcode label
-            var rawBarcodeLabel = Read(new byte[0], timeout);
-
-            // Stop Scanning
-            StopSession();
-
-            CloseSerialPort();
+                // Stop Scanning
+                StopSession();
+            }
+            finally
+            {
+                CloseSerialPort();
+            }
 
             return rawBarcodeLabel;
         }
