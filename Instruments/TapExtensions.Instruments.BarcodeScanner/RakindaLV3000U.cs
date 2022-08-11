@@ -16,7 +16,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
     [Display("Rakinda LV3000",
         Groups: new[] { "TapExtensions", "Instruments", "BarcodeScanner" },
         Description: "Rakinda LV3000U or LV3000H Fixed Mount Scanner")]
-    public class RakindaLV3000 : BarcodeScannerBase
+    public class RakindaLV3000U : BarcodeScannerBase
     {
         #region Settings
 
@@ -38,10 +38,10 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
         private SerialPort _sp;
 
-        public RakindaLV3000()
+        public RakindaLV3000U()
         {
             // Default values
-            Name = nameof(RakindaLV3000);
+            Name = nameof(RakindaLV3000U);
             SerialPortName = "COM5";
             LoggingLevel = ELoggingLevel.Normal;
         }
@@ -69,6 +69,15 @@ namespace TapExtensions.Instruments.BarcodeScanner
             SetCommand("NLS0001020;", timeout);
 
             CloseSerialPort();
+        }
+
+        private void SetCommand(string command, int timeout)
+        {
+            // When received a set command, the scanner would process it and returned a byte of response data.
+            // The scanner returns '0x06' if successfully set, or '0x15' if failure.
+            var cmdBytes = Encoding.ASCII.GetBytes(command);
+            var expectedSuccessfulReply = new byte[] { 0x06 };
+            WriteRead(cmdBytes, expectedSuccessfulReply, timeout);
         }
 
         private void OpenSerialPort()
@@ -134,14 +143,14 @@ namespace TapExtensions.Instruments.BarcodeScanner
             OpenSerialPort();
 
             // Start Scanning
-            StartSession();
+            WriteRead(new byte[] { 0x1B, 0x31 }, new byte[] { 0x06 }, timeout);
 
             // Attempt to read the barcode label
             var expectedEndOfBarcodeLabel = new byte[] { 0x0D, 0x0A };
             var rawBarcodeLabel = Read(expectedEndOfBarcodeLabel, timeout);
 
             // Stop Scanning
-            StopSession();
+            WriteRead(new byte[] { 0x1B, 0x30 }, new byte[] { 0x06 }, timeout);
 
             CloseSerialPort();
 
@@ -242,29 +251,6 @@ namespace TapExtensions.Instruments.BarcodeScanner
                     Log.Debug($"{serialPortName} {direction} Ascii: {ascii}");
                     break;
             }
-        }
-
-        private void SetCommand(string command, int timeout)
-        {
-            // When received a set command, the scanner would process it and returned a byte of response data.
-            // The scanner returns '0x06' if successfully set, or '0x15' if failure.
-            var cmdBytes = Encoding.ASCII.GetBytes(command);
-            var expectedSuccessfulReply = new byte[] { 0x06 };
-            WriteRead(cmdBytes, expectedSuccessfulReply, timeout);
-        }
-
-        private void StartSession()
-        {
-            // Tells the decoder to start a scan session
-            const int timeout = 5;
-            WriteRead(new byte[] { 0x1B, 0x31 }, new byte[] { 0x06 }, timeout);
-        }
-
-        private void StopSession()
-        {
-            // Tells the decoder to abort a decode attempt or video transmission
-            const int timeout = 5;
-            WriteRead(new byte[] { 0x1B, 0x30 }, new byte[] { 0x06 }, timeout);
         }
     }
 }

@@ -2,7 +2,7 @@
 // https://www.zebra.com/ms4717
 // https://www.zebra.com/content/dam/zebra_new_ia/en-us/manuals/oem/ms4717-ig-en.pdf
 //
-// This instrument driver implements parts of the Zebra’s Simple Serial Interface (SSI),
+// This instrument driver implements parts of the Zebra's Simple Serial Interface (SSI),
 // which enables barcode scanners to communicate with a host over a serial port (UART).
 // https://www.google.com/search?q=zebra+simple+serial+interface+programmer+guide
 
