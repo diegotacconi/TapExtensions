@@ -10,5 +10,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
         {
             throw new NotImplementedException();
         }
+
+        // ToDo: implement parsing of barcode label
     }
 }
