@@ -1,4 +1,9 @@
-﻿// For barcode labels using the data structure syntax of ISO 15434 and ISO 15418 standards
+﻿// Methods for parsing barcode labels using the data structure syntax of ISO 15434 and ISO 15418 standards
+//
+// Example:
+//   rawBytes = [)>{1E}06{1D}1P089659A.X12{1D}SL1194215398{1D}1T1RK6EUCJ{1E}{04}
+//   GetProductCode(rawBytes) = 089659A.X12
+//   GetSerialNumber(rawBytes) = L1194215398
 
 using System;
 using System.Collections.Generic;
@@ -11,21 +16,64 @@ namespace TapExtensions.Instruments.BarcodeScanner
     {
         public static string GetProductCode(byte[] rawBytes)
         {
-            var header = new byte[] { 0x31, 0x50 }; // Manufacturer Partnumber Data Identifiers. 0x31 0x50 = 1P
-            return SectionToString(rawBytes, header);
+            return SectionToString(rawBytes, EHeader.ProductCode);
         }
 
         public static string GetSerialNumber(byte[] rawBytes)
         {
-            var header = new byte[] { 0x53 }; // Serial Number Data Identifiers. 0x53 = S
-            return SectionToString(rawBytes, header);
+            return SectionToString(rawBytes, EHeader.SerialNumber);
         }
 
-        public static string SectionToString(byte[] rawBytes, byte[] headerIdentifier)
+        private enum EHeader
+        {
+            ProductCode,     // 1P
+            SerialNumber,    // S
+            Company,         // 18V
+            Date,            // 10D
+            Traceability,    // 1T
+            CountryOfOrigin, // 4L
+            Quantity         // Q
+        }
+
+        private static byte[] GetHeaderIdentifier(EHeader header)
+        {
+            byte[] identifier;
+            switch (header)
+            {
+                case EHeader.ProductCode:
+                    identifier = new byte[] { 0x31, 0x50 }; // 1P = Manufacturer Product Code
+                    break;
+                case EHeader.SerialNumber:
+                    identifier = new byte[] { 0x53 }; // S = Serial Number
+                    break;
+                case EHeader.Company:
+                    identifier = new byte[] { 0x31, 0x38, 0x56 }; // 18V = Company Identification Number (CIN)
+                    break;
+                case EHeader.Date:
+                    identifier = new byte[] { 0x31, 0x30, 0x44 }; // 10D = Date (Format YYWW)
+                    break;
+                case EHeader.Traceability:
+                    identifier = new byte[] { 0x31, 0x54 };// 1T = Traceability Number (Lot/Batch Number)
+                    break;
+                case EHeader.CountryOfOrigin:
+                    identifier = new byte[] { 0x34, 0x4c }; // 4L = Country of Origin, two-character ISO 3166 country code
+                    break;
+                case EHeader.Quantity:
+                    identifier = new byte[] { 0x51 }; // Q = Quantity, Number of Pieces, or Amount (numeric only)
+                    break;
+                default:
+                    throw new ArgumentException(
+                        $"Case not found for {nameof(header)}={header}");
+            }
+            return identifier;
+        }
+
+        private static string SectionToString(byte[] rawBytes, EHeader header)
         {
             if (rawBytes == null || rawBytes.Length == 0)
                 throw new InvalidOperationException($"{nameof(rawBytes)} is null or empty");
 
+            var headerIdentifier = GetHeaderIdentifier(header);
             var sectionBytes = GetSection(rawBytes, headerIdentifier);
             var section = AsciiBytesToString(sectionBytes);
             return section;
