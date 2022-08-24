@@ -1,9 +1,9 @@
 ﻿// Methods for parsing barcode labels using the data structure syntax of ISO 15434 and ISO 15418 standards
 //
 // Example:
-//   rawBytes = [)>{1E}06{1D}1P089659A.X12{1D}SL1194215398{1D}1T1RK6EUCJ{1E}{04}
-//   GetProductCode(rawBytes) = 089659A.X12
-//   GetSerialNumber(rawBytes) = L1194215398
+//   rawBytes = [)>{1E}06{1D}1P092405A.105{1D}SBL2231X40F3{1D}18VLENSN{1E}{04}
+//   GetProductCode(rawBytes) = 092405A.105
+//   GetSerialNumber(rawBytes) = BL2231X40F3
 
 using System;
 using System.Collections.Generic;
@@ -53,7 +53,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
                     identifier = new byte[] { 0x31, 0x30, 0x44 }; // 10D = Date (Format YYWW)
                     break;
                 case EHeader.Traceability:
-                    identifier = new byte[] { 0x31, 0x54 };// 1T = Traceability Number (Lot/Batch Number)
+                    identifier = new byte[] { 0x31, 0x54 }; // 1T = Traceability Number (Lot/Batch Number)
                     break;
                 case EHeader.CountryOfOrigin:
                     identifier = new byte[] { 0x34, 0x4c }; // 4L = Country of Origin, two-character ISO 3166 country code
@@ -65,6 +65,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
                     throw new ArgumentException(
                         $"Case not found for {nameof(header)}={header}");
             }
+
             return identifier;
         }
 
@@ -99,7 +100,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
         {
             const byte gs = 0x1D; // Group Separator
             const byte rs = 0x1E; // Record Separator
-            var delimiters = new List<byte>() { gs, rs };
+            var delimiters = new List<byte> { gs, rs };
             var sections = Split(source, delimiters);
 
             foreach (var section in sections)
