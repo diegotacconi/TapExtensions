@@ -4,9 +4,9 @@ using TapExtensions.Interfaces.BarcodeScanner;
 
 namespace TapExtensions.Steps.BarcodeScanner
 {
-    [Display("GetBarcodeLabel",
+    [Display("GetSerialNumberAndProductCode",
         Groups: new[] { "TapExtensions", "Steps", "BarcodeScanner" })]
-    public class GetBarcodeLabel : TestStep
+    public class GetSerialNumberAndProductCode : TestStep
     {
         [Display("BarcodeScanner")]
         public IBarcodeScanner BarcodeScanner { get; set; }
@@ -15,7 +15,7 @@ namespace TapExtensions.Steps.BarcodeScanner
         {
             try
             {
-                var (serialNumber, productCode) = BarcodeScanner.GetBarcodeLabel();
+                var (serialNumber, productCode) = BarcodeScanner.GetSerialNumberAndProductCode();
                 Log.Debug($"productCode  = '{productCode}'");
                 Log.Debug($"serialNumber = '{serialNumber}'");
             }

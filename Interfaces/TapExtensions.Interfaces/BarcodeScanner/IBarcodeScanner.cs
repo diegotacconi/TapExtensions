@@ -5,6 +5,6 @@ namespace TapExtensions.Interfaces.BarcodeScanner
     public interface IBarcodeScanner : IInstrument
     {
         byte[] GetRawBytes();
-        (string serialNumber, string productCode) GetBarcodeLabel();
+        (string serialNumber, string productCode) GetSerialNumberAndProductCode();
     }
 }

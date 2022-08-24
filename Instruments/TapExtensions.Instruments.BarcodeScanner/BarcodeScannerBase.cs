@@ -29,7 +29,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
             throw new NotImplementedException();
         }
 
-        public virtual (string serialNumber, string productCode) GetBarcodeLabel()
+        public virtual (string serialNumber, string productCode) GetSerialNumberAndProductCode()
         {
             var serialNumber = "";
             var productCode = "";
@@ -50,8 +50,8 @@ namespace TapExtensions.Instruments.BarcodeScanner
                     var rawBytes = GetRawBytes();
 
                     // Parse the barcode label
-                    serialNumber = BarcodeLabelUtility.GetSerialNumber(rawBytes);
                     productCode = BarcodeLabelUtility.GetProductCode(rawBytes);
+                    serialNumber = BarcodeLabelUtility.GetSerialNumber(rawBytes);
 
                     // Exit loop if no exceptions
                     keepOnRetrying = false;
