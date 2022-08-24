@@ -50,8 +50,8 @@ namespace TapExtensions.Instruments.BarcodeScanner
                     var rawBytes = GetRawBytes();
 
                     // Parse the barcode label
-                    serialNumber = BarcodeUtility.GetSerialNumber(rawBytes);
-                    productCode = BarcodeUtility.GetProductCode(rawBytes);
+                    serialNumber = BarcodeLabelUtility.GetSerialNumber(rawBytes);
+                    productCode = BarcodeLabelUtility.GetProductCode(rawBytes);
 
                     // Exit loop if no exceptions
                     keepOnRetrying = false;

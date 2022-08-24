@@ -12,7 +12,7 @@ using System.Text;
 
 namespace TapExtensions.Instruments.BarcodeScanner
 {
-    public class BarcodeUtility
+    public class BarcodeLabelUtility
     {
         public static string GetProductCode(byte[] rawBytes)
         {

@@ -42,7 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BarcodeScannerBase.cs" />
-    <Compile Include="BarcodeUtility.cs" />
+    <Compile Include="BarcodeLabelUtility.cs" />
     <Compile Include="RakindaLV3000U.cs" />
     <Compile Include="ZebraMS4717.cs" />
   </ItemGroup>
