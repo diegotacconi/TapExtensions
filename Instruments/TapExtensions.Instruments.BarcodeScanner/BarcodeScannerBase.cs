@@ -21,7 +21,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
             // Validation rules
             Rules.Add(() => MaxIterationCount.Value > 0,
-                "Must be greater than zero", nameof(MaxIterationCount.Value));
+                "Must be greater than zero", nameof(MaxIterationCount));
         }
 
         public virtual byte[] GetRawBytes()
