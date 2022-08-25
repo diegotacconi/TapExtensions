@@ -1,9 +1,4 @@
 ﻿// Methods for parsing barcode labels using the data structure syntax of ISO 15434 and ISO 15418 standards
-//
-// Example:
-//   rawBytes = [)>{1E}06{1D}1P092405A.105{1D}SBL2231X40F3{1D}18VLENSN{1E}{04}
-//   GetProductCode(rawBytes) = 092405A.105
-//   GetSerialNumber(rawBytes) = BL2231X40F3
 
 using System;
 using System.Collections.Generic;
