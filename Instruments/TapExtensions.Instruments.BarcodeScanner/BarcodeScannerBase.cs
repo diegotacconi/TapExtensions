@@ -26,25 +26,22 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
         public virtual byte[] GetRawBytes()
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("Please override in subclasses");
         }
 
         public virtual (string serialNumber, string productCode) GetSerialNumberAndProductCode()
         {
             var serialNumber = "";
             var productCode = "";
-            var keepOnRetrying = true;
-            var iteration = 0;
+            var maxCount = MaxIterationCount.IsEnabled ? MaxIterationCount.Value : 1;
 
             // Retry loop
-            do
+            for (var iteration = 1; iteration <= maxCount; iteration++)
             {
                 try
                 {
-                    iteration++;
-
                     if (iteration > 1)
-                        Log.Warning($"Retrying attempt {iteration} of {MaxIterationCount.Value} ...");
+                        Log.Warning($"Retrying attempt {iteration} of {maxCount} ...");
 
                     // Try to scan the barcode label
                     var rawBytes = GetRawBytes();
@@ -54,19 +51,16 @@ namespace TapExtensions.Instruments.BarcodeScanner
                     serialNumber = BarcodeLabelUtility.GetSerialNumber(rawBytes);
 
                     // Exit loop if no exceptions
-                    keepOnRetrying = false;
+                    break;
                 }
                 catch (Exception ex)
                 {
-                    if (!MaxIterationCount.IsEnabled)
+                    if (iteration < maxCount)
+                        Log.Debug($"IgnoreException: {ex.Message}");
+                    else
                         throw;
-
-                    if (iteration >= MaxIterationCount.Value)
-                        throw;
-
-                    Log.Warning(ex.Message);
                 }
-            } while (keepOnRetrying);
+            }
 
             return (serialNumber, productCode);
         }
