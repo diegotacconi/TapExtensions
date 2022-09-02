@@ -149,11 +149,10 @@ namespace TapExtensions.Instruments.BarcodeScanner
             return rawBarcodeLabel;
         }
 
-        private byte[] WriteRead(byte[] command, byte[] expectedEndOfMessage, int timeout)
+        private void WriteRead(byte[] command, byte[] expectedEndOfMessage, int timeout)
         {
             Write(command);
-            var response = Read(expectedEndOfMessage, timeout);
-            return response;
+            Read(expectedEndOfMessage, timeout);
         }
 
         private void Write(byte[] command)
@@ -245,12 +244,12 @@ namespace TapExtensions.Instruments.BarcodeScanner
             }
         }
 
-        private byte[] Query(byte opCode, byte expectedByte)
+        private void Query(byte opCode, byte expectedByte)
         {
-            return Query(opCode, new byte[0], expectedByte);
+            Query(opCode, new byte[0], expectedByte);
         }
 
-        private byte[] Query(byte opCode, byte[] parameters, byte expectedByte, int timeout = 1)
+        private void Query(byte opCode, byte[] parameters, byte expectedByte, int timeout = 1)
         {
             // Packet Format: <Length> <Opcode> <Message Source> <Status> <Data....> <Checksum>
 
@@ -275,8 +274,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
             message.Add(checksum[0]); // Low byte
 
             // Send message
-            var response = WriteRead(message.ToArray(), new[] { expectedByte }, timeout);
-            return response;
+            WriteRead(message.ToArray(), new[] { expectedByte }, timeout);
         }
 
         private byte[] CalculateChecksum(byte[] bytes)

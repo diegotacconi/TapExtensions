@@ -168,11 +168,10 @@ namespace TapExtensions.Instruments.BarcodeScanner
             return rawBarcodeLabel;
         }
 
-        private byte[] WriteRead(byte[] command, byte[] expectedEndOfMessage, int timeout)
+        private void WriteRead(byte[] command, byte[] expectedEndOfMessage, int timeout)
         {
             Write(command);
-            var response = Read(expectedEndOfMessage, timeout);
-            return response;
+            Read(expectedEndOfMessage, timeout);
         }
 
         private void Write(byte[] command)
