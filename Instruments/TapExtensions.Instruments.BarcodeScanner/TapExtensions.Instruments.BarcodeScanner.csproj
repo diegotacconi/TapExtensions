@@ -59,5 +59,11 @@
       <IncludeAssets>compile</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="ConfigDocs\RakindaLV3000U_Communicate_over_USB_Serial_Port.png" />
+    <Content Include="ConfigDocs\RakindaLV3000U_Set_as_USB_Keyboard_input.png" />
+    <Content Include="ConfigDocs\ZebraMS4717_Communicate_over_USB_Serial_Port.png" />
+    <Content Include="ConfigDocs\ZebraMS4717_Restore_Factory_Defaults.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
