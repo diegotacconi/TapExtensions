@@ -2,11 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>net462</TargetFramework>
-    <RuntimeIdentifier>win</RuntimeIdentifier>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <OutputPath>..\..\bin\$(Configuration)</OutputPath>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenTAP" Version="9.16.4" />
+    <PackageReference Include="OpenTAP">
+      <Version>9.16.4</Version>
+      <PrivateAssets>compile</PrivateAssets>
+      <IncludeAssets>compile</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="System.IO.Ports" Version="6.0.0" />
   </ItemGroup>
 
