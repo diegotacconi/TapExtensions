@@ -33,7 +33,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapPackager", ".build\TapPa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Results", "Results\TapExtensions.Results\TapExtensions.Results.csproj", "{9E74C93F-5372-4978-B6D9-03CF47627587}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TapExtensions.Instruments.BarcodeScanner", "Instruments\TapExtensions.Instruments.BarcodeScanner\TapExtensions.Instruments.BarcodeScanner.csproj", "{B63EB3F6-8C83-4B68-96B0-D4DAE41EA425}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Instruments.BarcodeScanner", "Instruments\TapExtensions.Instruments.BarcodeScanner\TapExtensions.Instruments.BarcodeScanner.csproj", "{B63EB3F6-8C83-4B68-96B0-D4DAE41EA425}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
