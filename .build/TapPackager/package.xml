@@ -1,9 +1,11 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <Package Name="TapExtensions"
          xmlns="http://opentap.io/schemas/package"
+         InfoLink="https://github.com/diegotacconi/TapExtensions"
          Version="$(GitVersion)">
   <Description>TapExtensions package</Description>
   <SourceUrl>https://github.com/diegotacconi/TapExtensions</SourceUrl>
+
   <Files>
 
     <File Path="Packages/TapExtensions/TapExtensions.Duts.Ssh.dll" SourcePath="TapExtensions.Duts.Ssh.dll">
@@ -39,4 +41,5 @@
     </File>
 
   </Files>
+
 </Package>
