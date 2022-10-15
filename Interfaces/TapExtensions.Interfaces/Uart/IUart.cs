@@ -2,7 +2,7 @@
 
 namespace TapExtensions.Interfaces.Uart
 {
-    public interface IUart : IDut, IInstrument
+    public interface IUart : IDut
     {
         bool Expect(string expectedResponse, int timeout);
 

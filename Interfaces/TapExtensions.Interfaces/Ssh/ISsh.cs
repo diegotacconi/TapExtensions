@@ -3,7 +3,7 @@ using OpenTap;
 
 namespace TapExtensions.Interfaces.Ssh
 {
-    public interface ISsh : IDut, IInstrument
+    public interface ISsh : IDut
     {
         void Connect();
 
