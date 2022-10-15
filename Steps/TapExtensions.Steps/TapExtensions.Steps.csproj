@@ -8,6 +8,11 @@
     <Deterministic>true</Deterministic>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <StartAction>Program</StartAction>
+    <StartProgram>C:\OpenTap\Editor.exe</StartProgram>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="OpenTAP">
       <Version>9.16.4</Version>
