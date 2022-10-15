@@ -21,6 +21,10 @@
     </PackageReference>
   </ItemGroup>
 
+  <PropertyGroup>
+    <MSBuildWarningsAsMessages>NU1702</MSBuildWarningsAsMessages>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\Duts\TapExtensions.Duts.Ssh\TapExtensions.Duts.Ssh.csproj" />
     <ProjectReference Include="..\..\Duts\TapExtensions.Duts.Uart\TapExtensions.Duts.Uart.csproj" />
