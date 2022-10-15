@@ -8,10 +8,13 @@
     <Deterministic>true</Deterministic>
   </PropertyGroup>
 
+  <!--
   <PropertyGroup>
     <StartAction>Program</StartAction>
     <StartProgram>C:\OpenTap\Editor.exe</StartProgram>
+    <StartWorkingDirectory>C:\OpenTap</StartWorkingDirectory>
   </PropertyGroup>
+  -->
 
   <ItemGroup>
     <PackageReference Include="OpenTAP">
