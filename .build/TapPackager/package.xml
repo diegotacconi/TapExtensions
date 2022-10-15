@@ -8,38 +8,43 @@
 
   <Files>
 
+    <!-- DLL files -->
     <File Path="Packages/TapExtensions/TapExtensions.Duts.Ssh.dll" SourcePath="TapExtensions.Duts.Ssh.dll">
       <SetAssemblyInfo Attributes="Version"/>
     </File>
-
     <File Path="Packages/TapExtensions/TapExtensions.Duts.Uart.dll" SourcePath="TapExtensions.Duts.Uart.dll">
       <SetAssemblyInfo Attributes="Version"/>
     </File>
-
     <File Path="Packages/TapExtensions/TapExtensions.Gui.Wpf.dll" SourcePath="TapExtensions.Gui.Wpf.dll">
       <SetAssemblyInfo Attributes="Version"/>
     </File>
-
     <File Path="Packages/TapExtensions/TapExtensions.Instruments.BarcodeScanner.dll" SourcePath="TapExtensions.Instruments.BarcodeScanner.dll">
       <SetAssemblyInfo Attributes="Version"/>
     </File>
-
     <File Path="Packages/TapExtensions/TapExtensions.Instruments.DcPwr.dll" SourcePath="TapExtensions.Instruments.DcPwr.dll">
       <SetAssemblyInfo Attributes="Version"/>
     </File>
-
     <File Path="Packages/TapExtensions/TapExtensions.Interfaces.dll" SourcePath="TapExtensions.Interfaces.dll">
       <SetAssemblyInfo Attributes="Version"/>
     </File>
-
     <File Path="Packages/TapExtensions/TapExtensions.Results.dll" SourcePath="TapExtensions.Results.dll">
       <SetAssemblyInfo Attributes="Version"/>
     </File>
-
     <File Path="Packages/TapExtensions/TapExtensions.Steps.dll" SourcePath="TapExtensions.Steps.dll">
       <SetAssemblyInfo Attributes="Version"/>
     </File>
 
+    <!-- PDB files -->
+    <!--
+    <File Path="Packages/TapExtensions/TapExtensions.Duts.Ssh.pdb" SourcePath="TapExtensions.Duts.Ssh.pdb" />
+    <File Path="Packages/TapExtensions/TapExtensions.Duts.Uart.pdb" SourcePath="TapExtensions.Duts.Uart.pdb" />
+    <File Path="Packages/TapExtensions/TapExtensions.Gui.Wpf.pdb" SourcePath="TapExtensions.Gui.Wpf.pdb" />
+    <File Path="Packages/TapExtensions/TapExtensions.Instruments.BarcodeScanner.pdb" SourcePath="TapExtensions.Instruments.BarcodeScanner.pdb" />
+    <File Path="Packages/TapExtensions/TapExtensions.Instruments.DcPwr.pdb" SourcePath="TapExtensions.Instruments.DcPwr.pdb" />
+    <File Path="Packages/TapExtensions/TapExtensions.Interfaces.pdb" SourcePath="TapExtensions.Interfaces.pdb" />
+    <File Path="Packages/TapExtensions/TapExtensions.Results.pdb" SourcePath="TapExtensions.Results.pdb" />
+    <File Path="Packages/TapExtensions/TapExtensions.Steps.pdb" SourcePath="TapExtensions.Steps.pdb" />
+    -->
   </Files>
 
 </Package>
