@@ -100,7 +100,8 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
             foreach (var section in sections)
             {
-                if (FindPattern(section, header) == 0)
+                var beginningSection = section.Take(header.Length).ToArray();
+                if (beginningSection.SequenceEqual(header))
                 {
                     var sectionWithoutHeader = new byte[section.Length - header.Length];
                     Array.Copy(section, header.Length, sectionWithoutHeader, 0, section.Length - header.Length);
@@ -110,16 +111,6 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
             throw new InvalidOperationException(
                 $"Cannot find section with header of '{AsciiBytesToString(header)}'");
-        }
-
-        private static int FindPattern(byte[] source, byte[] pattern)
-        {
-            var j = -1;
-            for (var i = 0; i < source.Length; i++)
-                if (source.Skip(i).Take(pattern.Length).SequenceEqual(pattern))
-                    j = i;
-
-            return j;
         }
 
         private static List<byte[]> Split(byte[] source, List<byte> delimiters)
