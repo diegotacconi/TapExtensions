@@ -34,4 +34,4 @@ jobs:
       run: nuget restore TapExtensions.sln
 
     - name: Build the Solution
-      run: msbuild TapExtensions.sln
+      run: msbuild TapExtensions.sln /property:Configuration=Release
