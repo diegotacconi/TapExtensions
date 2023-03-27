@@ -15,13 +15,11 @@
     <OutputPath>..\..\bin\$(Configuration)</OutputPath>
   </PropertyGroup>
 
-  <!--
-  <PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <StartAction>Program</StartAction>
     <StartProgram>C:\OpenTap\Editor.exe</StartProgram>
     <StartWorkingDirectory>C:\OpenTap</StartWorkingDirectory>
   </PropertyGroup>
-  -->
 
   <ItemGroup>
     <PackageReference Include="OpenTAP">
