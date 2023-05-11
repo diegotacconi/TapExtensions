@@ -1,11 +1,12 @@
-﻿using OpenTap;
+﻿using System;
+using OpenTap;
 
 namespace TapExtensions.Instruments.DcPwr
 {
     [Display("Keysight E3634A",
         Groups: new[] { "TapExtensions", "Instruments", "DcPwr" },
         Description: "Keysight E3634A Single-output Dual-range DC Power Supply")]
-    public class KeysightE3634A : KeysightE3630Base
+    public class KeysightE3634A : KeysightDcPwr
     {
         public enum EVoltageRange
         {
@@ -20,12 +21,28 @@ namespace TapExtensions.Instruments.DcPwr
         {
             // Default values
             Name = nameof(KeysightE3634A);
+            VerboseLoggingEnabled = true;
             VoltageRangeChoice = EVoltageRange.P50V;
         }
 
         public override void Open()
         {
-            Open("E3634A", Name, VoltageRangeChoice.ToString());
+            Open("E3634A", Name);
+
+            // Check voltage range
+            var voltageRangeChoice = VoltageRangeChoice.ToString();
+            var voltageRange = ScpiQuery<string>("VOLTage:RANGe?");
+
+            if (voltageRange != voltageRangeChoice)
+            {
+                // Select voltage range
+                ScpiCommand($"VOLTage:RANGe {voltageRangeChoice}");
+
+                // Verify voltage range selection
+                voltageRange = ScpiQuery<string>("VOLTage:RANGe?");
+                if (voltageRange != voltageRangeChoice)
+                    throw new InvalidOperationException("Unable to select desired voltage range.");
+            }
         }
     }
 }

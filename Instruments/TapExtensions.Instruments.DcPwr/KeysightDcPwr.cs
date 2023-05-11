@@ -7,20 +7,14 @@ using TapExtensions.Interfaces.DcPwr;
 
 namespace TapExtensions.Instruments.DcPwr
 {
-    public abstract class KeysightE3630Base : ScpiInstrument, IDcPwr
+    public abstract class KeysightDcPwr : ScpiInstrument, IDcPwr
     {
         protected double MaxCurrentA;
         protected double MaxVoltageV;
         protected double MinCurrentA;
         protected double MinVoltageV;
 
-        protected KeysightE3630Base()
-        {
-            // Default values
-            VerboseLoggingEnabled = true;
-        }
-
-        protected void Open(string expectedIdn, string resourceName, string voltageRangeChoice)
+        protected void Open(string expectedIdn, string resourceName)
         {
             base.Open();
 
@@ -30,20 +24,6 @@ namespace TapExtensions.Instruments.DcPwr
                           $"with IDN of {IdnString}.";
                 Log.Error(msg);
                 throw new InvalidOperationException(msg);
-            }
-
-            // Check voltage range
-            var voltageRange = ScpiQuery<string>("VOLTage:RANGe?");
-
-            if (voltageRange != voltageRangeChoice)
-            {
-                // Select voltage range
-                ScpiCommand($"VOLTage:RANGe {voltageRangeChoice}");
-
-                // Verify voltage range selection
-                voltageRange = ScpiQuery<string>("VOLTage:RANGe?");
-                if (voltageRange != voltageRangeChoice)
-                    throw new InvalidOperationException("Unable to select desired voltage range.");
             }
 
             // Query max and min values
@@ -56,7 +36,7 @@ namespace TapExtensions.Instruments.DcPwr
         public override void Close()
         {
             // Check for errors
-            PsuQueryErrors();
+            DcPwrQueryErrors();
 
             base.Close();
         }
@@ -107,7 +87,7 @@ namespace TapExtensions.Instruments.DcPwr
             ScpiCommand(EState.On == state ? "OUTP:STAT ON" : "OUTP:STAT OFF");
         }
 
-        private void PsuQueryErrors(int maxErrors = 1000)
+        private void DcPwrQueryErrors(int maxErrors = 1000)
         {
             IList<ScpiError> errors = Array.Empty<ScpiError>();
             while (errors.Count < maxErrors)
