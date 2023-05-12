@@ -31,15 +31,15 @@ namespace TapExtensions.Instruments.DcPwr
 
             // Check voltage range
             var voltageRangeChoice = VoltageRangeChoice.ToString();
-            var voltageRange = ScpiQuery<string>("VOLTage:RANGe?");
+            var voltageRange = ScpiQuery<string>("VOLT:RANG?");
 
             if (voltageRange != voltageRangeChoice)
             {
                 // Select voltage range
-                ScpiCommand($"VOLTage:RANGe {voltageRangeChoice}");
+                ScpiCommand($"VOLT:RANG {voltageRangeChoice}");
 
                 // Verify voltage range selection
-                voltageRange = ScpiQuery<string>("VOLTage:RANGe?");
+                voltageRange = ScpiQuery<string>("VOLT:RANG?");
                 if (voltageRange != voltageRangeChoice)
                     throw new InvalidOperationException("Unable to select desired voltage range.");
             }
