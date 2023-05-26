@@ -1,5 +1,4 @@
-﻿using System;
-using OpenTap;
+﻿using OpenTap;
 
 namespace TapExtensions.Instruments.DcPwr
 {
@@ -28,21 +27,8 @@ namespace TapExtensions.Instruments.DcPwr
         public override void Open()
         {
             Open("E3633A", Name);
-
-            // Check voltage range
-            var voltageRangeChoice = VoltageRangeChoice.ToString();
-            var voltageRange = ScpiQuery<string>("VOLT:RANG?");
-
-            if (voltageRange != voltageRangeChoice)
-            {
-                // Select voltage range
-                ScpiCommand($"VOLT:RANG {voltageRangeChoice}");
-
-                // Verify voltage range selection
-                voltageRange = ScpiQuery<string>("VOLT:RANG?");
-                if (voltageRange != voltageRangeChoice)
-                    throw new InvalidOperationException("Unable to select desired voltage range.");
-            }
+            SetVoltageRange(VoltageRangeChoice.ToString());
+            GetMaxMinValues();
         }
     }
 }

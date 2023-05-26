@@ -17,6 +17,7 @@ namespace TapExtensions.Instruments.DcPwr
         public override void Open()
         {
             Open("6032A", Name);
+            GetMaxMinValues();
         }
     }
 }

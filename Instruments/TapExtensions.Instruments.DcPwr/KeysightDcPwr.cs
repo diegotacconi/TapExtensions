@@ -25,12 +25,19 @@ namespace TapExtensions.Instruments.DcPwr
                 Log.Error(msg);
                 throw new InvalidOperationException(msg);
             }
+        }
 
-            // Query max and min values
+        protected void GetMaxMinValues()
+        {
             MaxVoltageV = ScpiQuery<double>("VOLT? MAX");
             MaxCurrentA = ScpiQuery<double>("CURR? MAX");
             MinVoltageV = ScpiQuery<double>("VOLT? MIN");
             MinCurrentA = ScpiQuery<double>("CURR? MIN");
+        }
+
+        protected void SetVoltageRange(string voltageRange)
+        {
+            ScpiCommand($"VOLT:RANG {voltageRange}");
         }
 
         public override void Close()
