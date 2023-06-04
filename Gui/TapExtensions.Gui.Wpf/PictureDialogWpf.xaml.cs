@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Windows;
-using System.Windows.Threading;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using TapExtensions.Interfaces.Gui;
 
 namespace TapExtensions.Gui.Wpf
@@ -19,7 +19,7 @@ namespace TapExtensions.Gui.Wpf
         internal double WindowMaxWidth { get; set; } = 0;
         internal double WindowMaxHeight { get; set; } = 0;
         internal bool IsWindowResizable { get; set; } = true;
-        public EBorderStyle BorderStyle { get; set; } = EBorderStyle.None;
+        internal EBorderStyle BorderStyle { get; set; } = EBorderStyle.None;
 
         private DateTime _StartTime;
         private DispatcherTimer _Timer;
@@ -42,6 +42,20 @@ namespace TapExtensions.Gui.Wpf
         }
 
         internal bool? ShowWindow()
+        {
+            SetDialogWindowStyle();
+            SetDialogWindowControls();
+            SetDialogWindowProperties();
+
+            // Start the countdown timer
+            if (Timeout > 0)
+                StartTimer();
+
+            // Call the base class to show the dialog window
+            return ShowDialog();
+        }
+
+        private void SetDialogWindowStyle()
         {
             // Change style
             DialogWindow.Style = GetApplicationStyle<Window>();
@@ -97,7 +111,10 @@ namespace TapExtensions.Gui.Wpf
                     throw new ArgumentException(
                         $"Case not found for {nameof(BorderStyle)}={BorderStyle}");
             }
+        }
 
+        private void SetDialogWindowControls()
+        {
             // Show message
             if (!string.IsNullOrWhiteSpace(WindowMessage))
             {
@@ -142,7 +159,10 @@ namespace TapExtensions.Gui.Wpf
                     throw new ArgumentException(
                         $"Case not found for {nameof(Buttons)}={Buttons}");
             }
+        }
 
+        private void SetDialogWindowProperties()
+        {
             // Change fontSize
             if (WindowFontSize > 0)
                 DialogWindow.FontSize = WindowFontSize;
@@ -157,13 +177,6 @@ namespace TapExtensions.Gui.Wpf
 
             // Change resize mode
             DialogWindow.ResizeMode = IsWindowResizable ? ResizeMode.CanResize : ResizeMode.NoResize;
-
-            // Start the countdown timer
-            if (Timeout > 0)
-                StartTimer();
-
-            // Call the base class to show the dialog window
-            return ShowDialog();
         }
 
         private void CloseWindow()
@@ -226,12 +239,6 @@ namespace TapExtensions.Gui.Wpf
                 DialogResult = false;
                 CloseWindow();
             }
-            /*
-            else
-            {
-                _Log.Debug($"{remainingDuration.TotalSeconds:0.#} s");
-            }
-            */
         }
 
         private Style GetApplicationStyle<T>()
