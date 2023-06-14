@@ -71,11 +71,11 @@ namespace TapExtensions.Steps.BarcodeScanner
 
             var headerIdentifier = GetHeaderIdentifier(header);
             var sectionBytes = GetSection(rawBytes, headerIdentifier);
-            var section = AsciiBytesToString(sectionBytes);
+            var section = BytesToString(sectionBytes);
             return section;
         }
 
-        private static string AsciiBytesToString(byte[] bytes)
+        public static string BytesToString(byte[] bytes)
         {
             var msg = new StringBuilder();
             if (bytes != null && bytes.Length != 0)
@@ -91,17 +91,51 @@ namespace TapExtensions.Steps.BarcodeScanner
             return msg.ToString();
         }
 
+        public static string BytesToHex(byte[] bytes)
+        {
+            var hex = new StringBuilder();
+            if (bytes != null && bytes.Length != 0)
+                foreach (var b in bytes)
+                    hex.Append(b.ToString("X2") + " ");
+
+            return hex.ToString();
+        }
+
+        public static string BytesToAscii(byte[] bytes)
+        {
+            var ascii = new StringBuilder();
+            if (bytes != null && bytes.Length != 0)
+            {
+                foreach (var b in bytes)
+                {
+                    if (b >= 0x20 && b <= 0x7E)
+                        ascii.Append((char)b + "  ");
+                    else
+                        ascii.Append('.' + "  ");
+                }
+            }
+            return ascii.ToString();
+        }
+
         private static byte[] GetSection(byte[] source, byte[] header)
         {
             var gsBytes = new byte[] { 0x5B, 0x47, 0x53, 0x5D }; // Group Separator (as an array or ASCII characters) [GS]
+            var gsByte = new byte[] { 0x1D }; // Group Separator (as a single byte)
             var rsBytes = new byte[] { 0x5B, 0x52, 0x53, 0x5D }; // Record Separator (as an array or ASCII characters) [RS]
+            var rsByte = new byte[] { 0x1E }; // Record Separator (as a single byte)
             var eofBytes = new byte[] { 0x5B, 0x45, 0x4F, 0x54, 0x5D }; // End of Transmission (as an array or ASCII characters) [EOT]
+            var eofByte = new byte[] { 0x04 }; // End of Transmission (as a single byte)
+
+            var temp1 = Replace(source, eofBytes, eofByte);
+            var temp2 = Replace(temp1, gsBytes, gsByte);
+            var temp3 = Replace(temp2, rsBytes, rsByte);
 
             const byte gs = 0x1D; // Group Separator (as a single byte)
             const byte rs = 0x1E; // Record Separator (as a single byte)
             const byte eof = 0x04; // End of Transmission (as a single byte)
+
             var delimiters = new List<byte> { gs, rs, eof };
-            var sections = Split(source, delimiters);
+            var sections = Split(temp3, delimiters);
 
             foreach (var section in sections)
             {
@@ -115,7 +149,60 @@ namespace TapExtensions.Steps.BarcodeScanner
             }
 
             throw new InvalidOperationException(
-                $"Cannot find section with header of '{AsciiBytesToString(header)}'");
+                $"Cannot find section with header of '{BytesToString(header)}'");
+        }
+
+        private static int IndexOf(byte[] source, byte[] find)
+        {
+            if (source == null || find == null || source.Length == 0 || find.Length == 0 || find.Length > source.Length)
+                return -1;
+
+            for (int i = 0; i < source.Length - find.Length + 1; i++)
+            {
+                if (source[i] != find[0]) // compare only first byte
+                    continue;
+
+                // found a match on first byte, now try to match rest of the pattern
+                for (int j = find.Length - 1; j >= 1; j--)
+                {
+                    if (source[i + j] != find[j]) break;
+                    if (j == 1) return i;
+                }
+            }
+            return -1;
+        }
+
+        private static byte[] Replace(byte[] source, byte[] find, byte[] replace)
+        {
+            byte[] destination = source;
+            byte[] temp = null;
+            int index = IndexOf(source, find);
+            while (index >= 0)
+            {
+                if (temp == null)
+                    temp = source;
+                else
+                    temp = destination;
+
+                destination = new byte[temp.Length - find.Length + replace.Length];
+
+                // before found array
+                Buffer.BlockCopy(temp, 0, destination, 0, index);
+
+                // replace copy
+                Buffer.BlockCopy(replace, 0, destination, index, replace.Length);
+
+                // rest of source array
+                Buffer.BlockCopy(
+                    temp,
+                    index + find.Length,
+                    destination,
+                    index + replace.Length,
+                    temp.Length - (index + find.Length));
+
+                index = IndexOf(destination, find);
+            }
+            return destination;
         }
 
         private static List<byte[]> Split(byte[] source, List<byte> delimiters)
