@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -6,6 +7,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using TapExtensions.Interfaces.Gui;
+using TapExtensions.Shared;
 
 namespace TapExtensions.Gui.Wpf
 {
@@ -281,19 +283,36 @@ namespace TapExtensions.Gui.Wpf
             return tempStyle;
         }
 
-        private void OnTextBoxChanged(object sender, TextChangedEventArgs e)
+        private void OnTextBoxSerialNumberChanged(object sender, TextChangedEventArgs e)
         {
             // ToDo: Try to parse barcode from hand-held scanner configured in keyboard emulation mode
-
-            /*
-            const string searchString = "[)>[RS]06[GS]1P092405A.107[GS]SBL2310Z50XH[GS]18VLENSN[RS][EOT]";
-            if (TextBoxSerialNumber.Text == searchString ||
-                TextBoxProductCode.Text == searchString)
+            if (!string.IsNullOrEmpty(TextBoxSerialNumber.Text))
             {
-                TextBoxSerialNumber.Text = "BL2310Z50XH";
-                TextBoxProductCode.Text = "092405A.107";
+                var bytes = Encoding.ASCII.GetBytes(TextBoxSerialNumber.Text);
+                var serialNumber = BarcodeLabelParser.GetSerialNumber(bytes);
+                if (!string.IsNullOrEmpty(serialNumber))
+                    TextBoxSerialNumber.Text = serialNumber;
+
+                var productCode = BarcodeLabelParser.GetProductCode(bytes);
+                if (!string.IsNullOrEmpty(productCode))
+                    TextBoxProductCode.Text = productCode;
             }
-            */
+        }
+
+        private void OnTextBoxProductCodeChanged(object sender, TextChangedEventArgs e)
+        {
+            // ToDo: Try to parse barcode from hand-held scanner configured in keyboard emulation mode
+            if (!string.IsNullOrEmpty(TextBoxProductCode.Text))
+            {
+                var bytes = Encoding.ASCII.GetBytes(TextBoxProductCode.Text);
+                var serialNumber = BarcodeLabelParser.GetSerialNumber(bytes);
+                if (!string.IsNullOrEmpty(serialNumber))
+                    TextBoxSerialNumber.Text = serialNumber;
+
+                var productCode = BarcodeLabelParser.GetProductCode(bytes);
+                if (!string.IsNullOrEmpty(productCode))
+                    TextBoxProductCode.Text = productCode;
+            }
         }
     }
 }

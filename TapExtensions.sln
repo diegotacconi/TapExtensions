@@ -11,11 +11,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Duts", "Duts", "{A21FD5A5-C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Duts.Ssh", "Duts\TapExtensions.Duts.Ssh\TapExtensions.Duts.Ssh.csproj", "{A96C8400-9CA8-4CAE-918B-6BB0F68F0C51}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TapExtensions.Duts.Uart", "Duts\TapExtensions.Duts.Uart\TapExtensions.Duts.Uart.csproj", "{F9CF4D4D-752C-4722-8685-10FC8944C8D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Duts.Uart", "Duts\TapExtensions.Duts.Uart\TapExtensions.Duts.Uart.csproj", "{F9CF4D4D-752C-4722-8685-10FC8944C8D4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gui", "Gui", "{E18976EB-2B40-4CFB-A4E7-73F10F8AC77C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TapExtensions.Gui.Wpf", "Gui\TapExtensions.Gui.Wpf\TapExtensions.Gui.Wpf.csproj", "{C537788C-AEC7-4A8A-83F1-D76FC316533F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Gui.Wpf", "Gui\TapExtensions.Gui.Wpf\TapExtensions.Gui.Wpf.csproj", "{C537788C-AEC7-4A8A-83F1-D76FC316533F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Instruments", "Instruments", "{6536E8DB-FFA1-4E97-91E7-DBA37839B386}"
 EndProject
@@ -34,6 +34,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Results", "Results\TapExtensions.Results\TapExtensions.Results.csproj", "{9E74C93F-5372-4978-B6D9-03CF47627587}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Instruments.BarcodeScanner", "Instruments\TapExtensions.Instruments.BarcodeScanner\TapExtensions.Instruments.BarcodeScanner.csproj", "{B63EB3F6-8C83-4B68-96B0-D4DAE41EA425}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{34D8FC14-432B-43CC-BD77-697BD2B86294}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TapExtensions.Shared", "Shared\TapExtensions.Shared\TapExtensions.Shared.csproj", "{C8F7355B-620A-4BC9-9AE2-483F5169D652}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -77,6 +81,10 @@ Global
 		{B63EB3F6-8C83-4B68-96B0-D4DAE41EA425}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B63EB3F6-8C83-4B68-96B0-D4DAE41EA425}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B63EB3F6-8C83-4B68-96B0-D4DAE41EA425}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8F7355B-620A-4BC9-9AE2-483F5169D652}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8F7355B-620A-4BC9-9AE2-483F5169D652}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8F7355B-620A-4BC9-9AE2-483F5169D652}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8F7355B-620A-4BC9-9AE2-483F5169D652}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -91,6 +99,7 @@ Global
 		{F5AF841C-907C-4F3F-A928-D36CE0DEC8DA} = {4E9CC033-6F93-4532-8202-319CBFF49494}
 		{9E74C93F-5372-4978-B6D9-03CF47627587} = {798B7510-669C-4A94-B74E-ADE8EC0F2319}
 		{B63EB3F6-8C83-4B68-96B0-D4DAE41EA425} = {6536E8DB-FFA1-4E97-91E7-DBA37839B386}
+		{C8F7355B-620A-4BC9-9AE2-483F5169D652} = {34D8FC14-432B-43CC-BD77-697BD2B86294}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4A1F67F2-6AC5-4761-9B2F-17DE13AAFB3B}

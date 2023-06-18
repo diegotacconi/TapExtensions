@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Interfaces\TapExtensions.Interfaces\TapExtensions.Interfaces.csproj" />
+    <ProjectReference Include="..\..\Shared\TapExtensions.Shared\TapExtensions.Shared.csproj" />
   </ItemGroup>
 
 </Project>

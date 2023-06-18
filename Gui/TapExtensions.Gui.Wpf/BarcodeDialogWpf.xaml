@@ -59,12 +59,12 @@
                     <Label x:Name="LabelSerialNumber" Grid.Row="0" Grid.Column="0" Margin="5" Padding="0"
                            Content="Serial Number" Background="Transparent" VerticalAlignment="Center" Height="26" VerticalContentAlignment="Center"/>
                     <TextBox x:Name="TextBoxSerialNumber" Grid.Row="0" Grid.Column="1" Margin="5" MinWidth="150" MinHeight="26"
-                            IsTabStop="True" TabIndex="1" TextChanged="OnTextBoxChanged" VerticalContentAlignment="Center"/>
+                            IsTabStop="True" TabIndex="1" TextChanged="OnTextBoxSerialNumberChanged" VerticalContentAlignment="Center"/>
 
                     <Label x:Name="LabelProductCode" Grid.Row="1" Grid.Column="0" Margin="5" Padding="0"
                            Content="Product Code" Background="Transparent" VerticalAlignment="Center" Height="26" VerticalContentAlignment="Center"/>
                     <TextBox x:Name="TextBoxProductCode" Grid.Row="1" Grid.Column="1" Margin="5" MinWidth="150" MinHeight="26"
-                            IsTabStop="True" TabIndex="2" TextChanged="OnTextBoxChanged" VerticalContentAlignment="Center"/>
+                            IsTabStop="True" TabIndex="2" TextChanged="OnTextBoxProductCodeChanged" VerticalContentAlignment="Center"/>
                 </Grid>
 
                 <StackPanel Grid.Row="3" Margin="5" HorizontalAlignment="Right" Orientation="Horizontal" Width="Auto">

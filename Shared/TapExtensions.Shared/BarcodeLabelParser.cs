@@ -5,18 +5,36 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace TapExtensions.Steps.BarcodeScanner
+namespace TapExtensions.Shared
 {
-    public class BarcodeLabelUtility
+    public static class BarcodeLabelParser
     {
-        public static string GetProductCode(byte[] rawBytes)
+        public static string GetProductCode(byte[] bytes)
         {
-            return SectionToString(rawBytes, EHeader.ProductCode);
+            var eofBytes = new byte[] { 0x5B, 0x45, 0x4F, 0x54, 0x5D }; // End of Transmission (as an array or ASCII characters) [EOT]
+
+            if (IndexOf(bytes, eofBytes) >= 0)
+            {
+                return SectionToString(bytes, EHeader.ProductCode);
+            }
+            else
+            {
+                return null;
+            }
         }
 
-        public static string GetSerialNumber(byte[] rawBytes)
+        public static string GetSerialNumber(byte[] bytes)
         {
-            return SectionToString(rawBytes, EHeader.SerialNumber);
+            var eofBytes = new byte[] { 0x5B, 0x45, 0x4F, 0x54, 0x5D }; // End of Transmission (as an array or ASCII characters) [EOT]
+
+            if (IndexOf(bytes, eofBytes) >= 0)
+            {
+                return SectionToString(bytes, EHeader.SerialNumber);
+            }
+            else
+            {
+                return null;
+            }
         }
 
         private enum EHeader
@@ -71,11 +89,11 @@ namespace TapExtensions.Steps.BarcodeScanner
 
             var headerIdentifier = GetHeaderIdentifier(header);
             var sectionBytes = GetSection(rawBytes, headerIdentifier);
-            var section = BytesToString(sectionBytes);
+            var section = AsciiBytesToString(sectionBytes);
             return section;
         }
 
-        public static string BytesToString(byte[] bytes)
+        private static string AsciiBytesToString(byte[] bytes)
         {
             var msg = new StringBuilder();
             if (bytes != null && bytes.Length != 0)
@@ -89,32 +107,6 @@ namespace TapExtensions.Steps.BarcodeScanner
                 }
             }
             return msg.ToString();
-        }
-
-        public static string BytesToHex(byte[] bytes)
-        {
-            var hex = new StringBuilder();
-            if (bytes != null && bytes.Length != 0)
-                foreach (var b in bytes)
-                    hex.Append(b.ToString("X2") + " ");
-
-            return hex.ToString();
-        }
-
-        public static string BytesToAscii(byte[] bytes)
-        {
-            var ascii = new StringBuilder();
-            if (bytes != null && bytes.Length != 0)
-            {
-                foreach (var b in bytes)
-                {
-                    if (b >= 0x20 && b <= 0x7E)
-                        ascii.Append((char)b + "  ");
-                    else
-                        ascii.Append('.' + "  ");
-                }
-            }
-            return ascii.ToString();
         }
 
         private static byte[] GetSection(byte[] source, byte[] header)
@@ -149,7 +141,7 @@ namespace TapExtensions.Steps.BarcodeScanner
             }
 
             throw new InvalidOperationException(
-                $"Cannot find section with header of '{BytesToString(header)}'");
+                $"Cannot find section with header of '{AsciiBytesToString(header)}'");
         }
 
         private static int IndexOf(byte[] source, byte[] find)
