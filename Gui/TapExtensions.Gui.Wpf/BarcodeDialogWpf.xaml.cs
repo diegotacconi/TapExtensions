@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -26,8 +26,8 @@ namespace TapExtensions.Gui.Wpf
         internal bool IsWindowResizable { get; set; } = false;
         internal EBorderStyle BorderStyle { get; set; } = EBorderStyle.None;
 
-        private DateTime _StartTime;
-        private DispatcherTimer _Timer;
+        private DateTime _startTime;
+        private DispatcherTimer _timer;
 
         internal BarcodeDialogWpf(Window windowOwner = null)
         {
@@ -121,7 +121,6 @@ namespace TapExtensions.Gui.Wpf
 
         private void SetDialogWindowControls()
         {
-            // Show message
             if (!string.IsNullOrWhiteSpace(WindowMessage))
             {
                 TextBlockMessage.Text = WindowMessage;
@@ -132,7 +131,6 @@ namespace TapExtensions.Gui.Wpf
                 TextBlockMessage.Visibility = Visibility.Collapsed;
             }
 
-            // Show picture
             if (!string.IsNullOrWhiteSpace(WindowPicture))
             {
                 Image.Source = new BitmapImage(new Uri(WindowPicture));
@@ -143,7 +141,6 @@ namespace TapExtensions.Gui.Wpf
                 Image.Visibility = Visibility.Collapsed;
             }
 
-            // Show serial number
             if (IsSerialNumberVisible)
             {
                 LabelSerialNumber.Visibility = Visibility.Visible;
@@ -155,7 +152,6 @@ namespace TapExtensions.Gui.Wpf
                 TextBoxSerialNumber.Visibility = Visibility.Collapsed;
             }
 
-            // Show product code
             if (IsProductCodeVisible)
             {
                 LabelProductCode.Visibility = Visibility.Visible;
@@ -167,7 +163,6 @@ namespace TapExtensions.Gui.Wpf
                 TextBoxProductCode.Visibility = Visibility.Collapsed;
             }
 
-            // Change buttons
             switch (Buttons)
             {
                 case EInputButtons.StartCancel:
@@ -193,26 +188,22 @@ namespace TapExtensions.Gui.Wpf
 
         private void SetDialogWindowProperties()
         {
-            // Change fontSize
             if (WindowFontSize > 0)
                 DialogWindow.FontSize = WindowFontSize;
 
-            // Change window width
             if (WindowMaxWidth > 0)
                 DialogWindow.MaxWidth = WindowMaxWidth;
 
-            // Change window height
             if (WindowMaxHeight > 0)
                 DialogWindow.MaxHeight = WindowMaxHeight;
 
-            // Change resize mode
             DialogWindow.ResizeMode = IsWindowResizable ? ResizeMode.CanResize : ResizeMode.NoResize;
         }
 
         private void CloseWindow()
         {
-            if (_Timer != null && _Timer.IsEnabled)
-                _Timer.Stop();
+            if (_timer != null && _timer.IsEnabled)
+                _timer.Stop();
             Close();
         }
 
@@ -253,16 +244,16 @@ namespace TapExtensions.Gui.Wpf
 
         private void StartTimer()
         {
-            _StartTime = DateTime.UtcNow;
-            _Timer = new DispatcherTimer();
-            _Timer.Interval = new TimeSpan(0, 0, 0, 0, 100); // Set interval to 100 milliseconds
-            _Timer.Tick += OnTimedEvent;
-            _Timer.Start();
+            _startTime = DateTime.UtcNow;
+            _timer = new DispatcherTimer();
+            _timer.Interval = new TimeSpan(0, 0, 0, 0, 100); // Set interval to 100 milliseconds
+            _timer.Tick += OnTimedEvent;
+            _timer.Start();
         }
 
         private void OnTimedEvent(object sender, EventArgs e)
         {
-            var finishTime = _StartTime + TimeSpan.FromSeconds(Timeout);
+            var finishTime = _startTime + TimeSpan.FromSeconds(Timeout);
             var remainingDuration = finishTime - DateTime.UtcNow;
 
             if (remainingDuration <= TimeSpan.Zero)
@@ -285,34 +276,34 @@ namespace TapExtensions.Gui.Wpf
 
         private void OnTextBoxSerialNumberChanged(object sender, TextChangedEventArgs e)
         {
-            // ToDo: Try to parse barcode from hand-held scanner configured in keyboard emulation mode
-            if (!string.IsNullOrEmpty(TextBoxSerialNumber.Text))
-            {
-                var bytes = Encoding.ASCII.GetBytes(TextBoxSerialNumber.Text);
-                var serialNumber = BarcodeLabelParser.GetSerialNumber(bytes);
-                if (!string.IsNullOrEmpty(serialNumber))
-                    TextBoxSerialNumber.Text = serialNumber;
+            if (string.IsNullOrEmpty(TextBoxSerialNumber.Text))
+                return;
 
-                var productCode = BarcodeLabelParser.GetProductCode(bytes);
-                if (!string.IsNullOrEmpty(productCode))
-                    TextBoxProductCode.Text = productCode;
-            }
+            // Try to parse barcode from hand-held scanner, when configured in keyboard emulation mode
+            var bytes = Encoding.ASCII.GetBytes(TextBoxSerialNumber.Text);
+            var serialNumber = BarcodeLabelParser.GetSerialNumber(bytes);
+            if (!string.IsNullOrEmpty(serialNumber))
+                TextBoxSerialNumber.Text = serialNumber;
+
+            var productCode = BarcodeLabelParser.GetProductCode(bytes);
+            if (!string.IsNullOrEmpty(productCode))
+                TextBoxProductCode.Text = productCode;
         }
 
         private void OnTextBoxProductCodeChanged(object sender, TextChangedEventArgs e)
         {
-            // ToDo: Try to parse barcode from hand-held scanner configured in keyboard emulation mode
-            if (!string.IsNullOrEmpty(TextBoxProductCode.Text))
-            {
-                var bytes = Encoding.ASCII.GetBytes(TextBoxProductCode.Text);
-                var serialNumber = BarcodeLabelParser.GetSerialNumber(bytes);
-                if (!string.IsNullOrEmpty(serialNumber))
-                    TextBoxSerialNumber.Text = serialNumber;
+            if (string.IsNullOrEmpty(TextBoxProductCode.Text))
+                return;
 
-                var productCode = BarcodeLabelParser.GetProductCode(bytes);
-                if (!string.IsNullOrEmpty(productCode))
-                    TextBoxProductCode.Text = productCode;
-            }
+            // Try to parse barcode from hand-held scanner, when configured in keyboard emulation mode
+            var bytes = Encoding.ASCII.GetBytes(TextBoxProductCode.Text);
+            var serialNumber = BarcodeLabelParser.GetSerialNumber(bytes);
+            if (!string.IsNullOrEmpty(serialNumber))
+                TextBoxSerialNumber.Text = serialNumber;
+
+            var productCode = BarcodeLabelParser.GetProductCode(bytes);
+            if (!string.IsNullOrEmpty(productCode))
+                TextBoxProductCode.Text = productCode;
         }
     }
 }
