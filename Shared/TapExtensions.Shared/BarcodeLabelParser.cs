@@ -14,13 +14,9 @@ namespace TapExtensions.Shared
             var eofBytes = new byte[] { 0x5B, 0x45, 0x4F, 0x54, 0x5D }; // End of Transmission (as an array or ASCII characters) [EOT]
 
             if (IndexOf(bytes, eofBytes) >= 0)
-            {
                 return SectionToString(bytes, EHeader.ProductCode);
-            }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         public static string GetSerialNumber(byte[] bytes)
@@ -28,13 +24,9 @@ namespace TapExtensions.Shared
             var eofBytes = new byte[] { 0x5B, 0x45, 0x4F, 0x54, 0x5D }; // End of Transmission (as an array or ASCII characters) [EOT]
 
             if (IndexOf(bytes, eofBytes) >= 0)
-            {
                 return SectionToString(bytes, EHeader.SerialNumber);
-            }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         private enum EHeader
@@ -95,16 +87,16 @@ namespace TapExtensions.Shared
 
         private static string AsciiBytesToString(byte[] bytes)
         {
+            if (bytes == null || bytes.Length == 0)
+                return null;
+
             var msg = new StringBuilder();
-            if (bytes != null && bytes.Length != 0)
+            foreach (var b in bytes)
             {
-                foreach (var b in bytes)
-                {
-                    if (b >= 0x20 && b <= 0x7E)
-                        msg.Append((char)b);
-                    else
-                        msg.Append("{" + b.ToString("X2") + "}");
-                }
+                if (b >= 0x20 && b <= 0x7E)
+                    msg.Append((char)b);
+                else
+                    msg.Append("{" + b.ToString("X2") + "}");
             }
             return msg.ToString();
         }
@@ -149,26 +141,27 @@ namespace TapExtensions.Shared
             if (source == null || find == null || source.Length == 0 || find.Length == 0 || find.Length > source.Length)
                 return -1;
 
-            for (int i = 0; i < source.Length - find.Length + 1; i++)
+            for (var i = 0; i < source.Length - find.Length + 1; i++)
             {
                 if (source[i] != find[0]) // compare only first byte
                     continue;
 
                 // found a match on first byte, now try to match rest of the pattern
-                for (int j = find.Length - 1; j >= 1; j--)
+                for (var j = find.Length - 1; j >= 1; j--)
                 {
                     if (source[i + j] != find[j]) break;
                     if (j == 1) return i;
                 }
             }
+
             return -1;
         }
 
         private static byte[] Replace(byte[] source, byte[] find, byte[] replace)
         {
-            byte[] destination = source;
+            var destination = source;
             byte[] temp = null;
-            int index = IndexOf(source, find);
+            var index = IndexOf(source, find);
             while (index >= 0)
             {
                 if (temp == null)
@@ -194,6 +187,7 @@ namespace TapExtensions.Shared
 
                 index = IndexOf(destination, find);
             }
+
             return destination;
         }
 
