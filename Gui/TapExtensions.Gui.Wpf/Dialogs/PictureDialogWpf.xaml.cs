@@ -42,9 +42,30 @@ namespace TapExtensions.Gui.Wpf.Dialogs
 
         internal bool? ShowWindow()
         {
+            SetDialogWindowStyle();
+            SetDialogWindowControls();
+            SetDialogWindowProperties();
+
+            // Start the countdown timer
+            if (Timeout > 0)
+                StartTimer();
+
+            // Call the base class to show the dialog window
+            return ShowDialog();
+        }
+
+        private void SetDialogWindowStyle()
+        {
+            // Change style
+            DialogWindow.Style = GetApplicationStyle<Window>();
+        }
+
+        private void SetDialogWindowControls()
+        {
             if (!string.IsNullOrWhiteSpace(WindowTitle))
                 DialogWindow.Title = WindowTitle;
 
+            // Show message
             if (!string.IsNullOrWhiteSpace(WindowMessage))
             {
                 TextBlockMessage.Text = WindowMessage;
@@ -55,6 +76,7 @@ namespace TapExtensions.Gui.Wpf.Dialogs
                 TextBlockMessage.Visibility = Visibility.Collapsed;
             }
 
+            // Show picture
             if (!string.IsNullOrWhiteSpace(WindowPicture))
             {
                 Image.Source = new BitmapImage(new Uri(WindowPicture));
@@ -65,45 +87,46 @@ namespace TapExtensions.Gui.Wpf.Dialogs
                 Image.Visibility = Visibility.Collapsed;
             }
 
+            // Change buttons
             switch (Buttons)
             {
                 case EInputButtons.StartCancel:
-                    ButtonOk.Content = "Start";
-                    ButtonCancel.Content = "Cancel";
+                    LeftButton.Content = "Start";
+                    RightButton.Content = "Cancel";
                     break;
 
                 case EInputButtons.OkCancel:
-                    ButtonOk.Content = "OK";
-                    ButtonCancel.Content = "Cancel";
+                    LeftButton.Content = "OK";
+                    RightButton.Content = "Cancel";
                     break;
 
                 case EInputButtons.YesNo:
-                    ButtonOk.Content = "Yes";
-                    ButtonCancel.Content = "No";
+                    LeftButton.Content = "Yes";
+                    RightButton.Content = "No";
                     break;
 
                 default:
                     throw new ArgumentException(
                         $"Case not found for {nameof(Buttons)}={Buttons}");
             }
+        }
 
+        private void SetDialogWindowProperties()
+        {
+            // Change fontSize
             if (WindowFontSize > 0)
                 DialogWindow.FontSize = WindowFontSize;
 
+            // Change window width
             if (WindowMaxWidth > 0)
                 DialogWindow.MaxWidth = WindowMaxWidth;
 
+            // Change window height
             if (WindowMaxHeight > 0)
                 DialogWindow.MaxHeight = WindowMaxHeight;
 
+            // Change resize mode
             DialogWindow.ResizeMode = IsWindowResizable ? ResizeMode.CanResize : ResizeMode.NoResize;
-
-            // Start the countdown timer
-            if (Timeout > 0)
-                StartTimer();
-
-            // Call the base class to show the dialog window
-            return ShowDialog();
         }
 
         private void CloseWindow()
@@ -113,13 +136,18 @@ namespace TapExtensions.Gui.Wpf.Dialogs
             Close();
         }
 
-        private void OnButtonOkClick(object sender, RoutedEventArgs e)
+        private void OnDragMoveWindow(object sender, MouseButtonEventArgs e)
+        {
+            DragMove();
+        }
+
+        private void OnOkButtonClick(object sender, RoutedEventArgs e)
         {
             DialogResult = true;
             CloseWindow();
         }
 
-        private void OnButtonCancelClick(object sender, RoutedEventArgs e)
+        private void OnCancelButtonClick(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
             CloseWindow();
@@ -135,9 +163,9 @@ namespace TapExtensions.Gui.Wpf.Dialogs
             }
         }
 
-        // Resize window to default, on mouse double-click
         private void OnMouseDoubleClick(object sender, MouseButtonEventArgs mouseButtonEventArgs)
         {
+            // Resize window to default, on mouse double-click
             if (IsWindowResizable)
                 SizeToContent = SizeToContent.WidthAndHeight;
         }
@@ -161,6 +189,17 @@ namespace TapExtensions.Gui.Wpf.Dialogs
                 DialogResult = false;
                 CloseWindow();
             }
+        }
+
+        private Style GetApplicationStyle<T>()
+        {
+            Style tempStyle;
+            if (Application.Current.Resources.Contains(typeof(T)))
+                tempStyle = new Style(typeof(T), (Style)Application.Current.Resources[typeof(T)]);
+            else
+                tempStyle = new Style(typeof(T));
+
+            return tempStyle;
         }
     }
 }
