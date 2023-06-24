@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using TapExtensions.Interfaces.Gui;
 
-namespace TapExtensions.Gui.Wpf.DialogsWithBorders
+namespace TapExtensions.Gui.Wpf.Dialogs
 {
     // ReSharper disable once RedundantExtendsListEntry
     internal partial class PictureDialogWpf : Window
     {
+        internal string WindowTitle { get; set; } = "";
         internal string WindowMessage { get; set; } = "";
         internal string WindowPicture { get; set; } = "";
         internal int Timeout { get; set; } = 0;
@@ -19,7 +19,6 @@ namespace TapExtensions.Gui.Wpf.DialogsWithBorders
         internal double WindowMaxWidth { get; set; } = 0;
         internal double WindowMaxHeight { get; set; } = 0;
         internal bool IsWindowResizable { get; set; } = false;
-        internal EBorderStyle BorderStyle { get; set; } = EBorderStyle.None;
 
         private DateTime _StartTime;
         private DispatcherTimer _Timer;
@@ -43,79 +42,9 @@ namespace TapExtensions.Gui.Wpf.DialogsWithBorders
 
         internal bool? ShowWindow()
         {
-            SetDialogWindowStyle();
-            SetDialogWindowControls();
-            SetDialogWindowProperties();
+            if (!string.IsNullOrWhiteSpace(WindowTitle))
+                DialogWindow.Title = WindowTitle;
 
-            // Start the countdown timer
-            if (Timeout > 0)
-                StartTimer();
-
-            // Call the base class to show the dialog window
-            return ShowDialog();
-        }
-
-        private void SetDialogWindowStyle()
-        {
-            // Change style
-            DialogWindow.Style = GetApplicationStyle<Window>();
-            MainWindowBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(76, 142, 255));
-            switch (BorderStyle)
-            {
-                case EBorderStyle.None:
-                    BorderWithStripes.BorderThickness = new Thickness(0);
-                    BorderWithStripes.Margin = new Thickness(0);
-                    break;
-
-                case EBorderStyle.Green:
-                    // Colors.DarkGreen;
-                    Stripe1.Color = Color.FromRgb(46, 204, 113);
-                    Stripe2.Color = Color.FromRgb(46, 204, 113);
-                    break;
-
-                case EBorderStyle.Yellow:
-                    Stripe1.Color = Color.FromRgb(241, 196, 15);
-                    Stripe2.Color = Color.FromRgb(241, 196, 15);
-                    break;
-
-                case EBorderStyle.Orange:
-                    Stripe1.Color = Color.FromRgb(230, 126, 34);
-                    Stripe2.Color = Color.FromRgb(230, 126, 34);
-                    break;
-
-                case EBorderStyle.Red:
-                    Stripe1.Color = Color.FromRgb(231, 76, 60);
-                    Stripe2.Color = Color.FromRgb(231, 76, 60);
-                    break;
-
-                case EBorderStyle.Blue:
-                    Stripe1.Color = Color.FromRgb(76, 142, 255);
-                    Stripe2.Color = Color.FromRgb(76, 142, 255);
-                    break;
-
-                case EBorderStyle.Black:
-                    Stripe1.Color = Colors.Black;
-                    Stripe2.Color = Colors.Black;
-                    break;
-
-                case EBorderStyle.Gray:
-                    Stripe1.Color = Colors.Gray;
-                    Stripe2.Color = Colors.Gray;
-                    break;
-
-                case EBorderStyle.White:
-                    Stripe1.Color = Colors.White;
-                    Stripe2.Color = Colors.White;
-                    break;
-                default:
-                    throw new ArgumentException(
-                        $"Case not found for {nameof(BorderStyle)}={BorderStyle}");
-            }
-        }
-
-        private void SetDialogWindowControls()
-        {
-            // Show message
             if (!string.IsNullOrWhiteSpace(WindowMessage))
             {
                 TextBlockMessage.Text = WindowMessage;
@@ -126,7 +55,6 @@ namespace TapExtensions.Gui.Wpf.DialogsWithBorders
                 TextBlockMessage.Visibility = Visibility.Collapsed;
             }
 
-            // Show picture
             if (!string.IsNullOrWhiteSpace(WindowPicture))
             {
                 Image.Source = new BitmapImage(new Uri(WindowPicture));
@@ -137,7 +65,6 @@ namespace TapExtensions.Gui.Wpf.DialogsWithBorders
                 Image.Visibility = Visibility.Collapsed;
             }
 
-            // Change buttons
             switch (Buttons)
             {
                 case EInputButtons.StartCancel:
@@ -159,24 +86,24 @@ namespace TapExtensions.Gui.Wpf.DialogsWithBorders
                     throw new ArgumentException(
                         $"Case not found for {nameof(Buttons)}={Buttons}");
             }
-        }
 
-        private void SetDialogWindowProperties()
-        {
-            // Change fontSize
             if (WindowFontSize > 0)
                 DialogWindow.FontSize = WindowFontSize;
 
-            // Change window width
             if (WindowMaxWidth > 0)
                 DialogWindow.MaxWidth = WindowMaxWidth;
 
-            // Change window height
             if (WindowMaxHeight > 0)
                 DialogWindow.MaxHeight = WindowMaxHeight;
 
-            // Change resize mode
             DialogWindow.ResizeMode = IsWindowResizable ? ResizeMode.CanResize : ResizeMode.NoResize;
+
+            // Start the countdown timer
+            if (Timeout > 0)
+                StartTimer();
+
+            // Call the base class to show the dialog window
+            return ShowDialog();
         }
 
         private void CloseWindow()
@@ -186,18 +113,13 @@ namespace TapExtensions.Gui.Wpf.DialogsWithBorders
             Close();
         }
 
-        private void OnDragMoveWindow(object sender, MouseButtonEventArgs e)
-        {
-            DragMove();
-        }
-
-        private void OnOkButtonClick(object sender, RoutedEventArgs e)
+        private void OnButtonOkClick(object sender, RoutedEventArgs e)
         {
             DialogResult = true;
             CloseWindow();
         }
 
-        private void OnCancelButtonClick(object sender, RoutedEventArgs e)
+        private void OnButtonCancelClick(object sender, RoutedEventArgs e)
         {
             DialogResult = false;
             CloseWindow();
@@ -239,17 +161,6 @@ namespace TapExtensions.Gui.Wpf.DialogsWithBorders
                 DialogResult = false;
                 CloseWindow();
             }
-        }
-
-        private Style GetApplicationStyle<T>()
-        {
-            Style tempStyle;
-            if (Application.Current.Resources.Contains(typeof(T)))
-                tempStyle = new Style(typeof(T), (Style)Application.Current.Resources[typeof(T)]);
-            else
-                tempStyle = new Style(typeof(T));
-
-            return tempStyle;
         }
     }
 }

@@ -2,10 +2,11 @@
 using System.Windows;
 using TapExtensions.Interfaces.Gui;
 
-namespace TapExtensions.Gui.Wpf.DialogsWithBorders
+namespace TapExtensions.Gui.Wpf.Dialogs
 {
     public class PictureDialogGui : IGui
     {
+        public string Title { get; set; } = "";
         public string Message { get; set; } = "";
         public string Picture { get; set; } = "";
         public int Timeout { get; set; } = 0;
@@ -14,7 +15,6 @@ namespace TapExtensions.Gui.Wpf.DialogsWithBorders
         public double MaxWidth { get; set; } = 0;
         public double MaxHeight { get; set; } = 0;
         public bool IsResizable { get; set; } = false;
-        public EBorderStyle BorderStyle { get; set; } = EBorderStyle.None;
 
         private Application _wpfApp;
 
@@ -60,6 +60,7 @@ namespace TapExtensions.Gui.Wpf.DialogsWithBorders
         {
             var pictureDialogWpf = new PictureDialogWpf(windowOwner)
             {
+                WindowTitle = Title,
                 WindowMessage = Message,
                 WindowPicture = Picture,
                 Timeout = Timeout,
@@ -67,8 +68,7 @@ namespace TapExtensions.Gui.Wpf.DialogsWithBorders
                 WindowFontSize = FontSize,
                 WindowMaxWidth = MaxWidth,
                 WindowMaxHeight = MaxHeight,
-                IsWindowResizable = IsResizable,
-                BorderStyle = BorderStyle
+                IsWindowResizable = IsResizable
             };
             return pictureDialogWpf.ShowWindow() == true;
         }
