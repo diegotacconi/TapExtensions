@@ -8,27 +8,40 @@
         PreviewMouseDoubleClick="OnMouseDoubleClick"
         PreviewKeyDown="OnPreviewKeyDown"
         SnapsToDevicePixels="True"
-        Title=""
         FontSize="14"
         MinWidth="240" MinHeight="120"
         MaxWidth="550" MaxHeight="500"
         SizeToContent="WidthAndHeight"
-        x:ClassModifier="internal">
+        x:ClassModifier="internal"
+        AllowsTransparency="True"
+        WindowStyle="None"
+        BorderBrush="Transparent">
 
-    <Grid Margin="5">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="32" ResizeBorderThickness = "7" />
+    </WindowChrome.WindowChrome>
 
-        <TextBlock x:Name="TextBlockMessage" Grid.Row="0" Margin="5" TextWrapping="Wrap" Text="Message"/>
+    <Border x:Name="MainWindowBorder" BorderThickness="2" BorderBrush="Black" MouseLeftButtonDown="OnDragMoveWindow">
 
-        <Image x:Name="Image" Grid.Row="1" Margin="5" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <Border x:Name="BorderWithStripes" Margin="0" BorderThickness="0">
 
-        <StackPanel Grid.Row="2" Margin="5" HorizontalAlignment="Center" Orientation="Horizontal" Width="Auto">
-            <Button x:Name="LeftButton" Content="OK" MinWidth="70" MinHeight="26" Margin="0,0,5,0" Click="OnOkButtonClick" IsDefault="True"/>
-            <Button x:Name="RightButton" Content="Cancel" MinWidth="70" MinHeight="26" Margin="5,0,0,0" Click="OnCancelButtonClick"/>
-        </StackPanel>
-    </Grid>
+            <Grid Margin="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock x:Name="TextBlockMessage" Grid.Row="0" Margin="5" MinHeight="22" TextWrapping="Wrap" Text="Message"/>
+
+                <Image x:Name="Image" Grid.Row="1" Margin="5" Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                <StackPanel Grid.Row="2" Margin="5" HorizontalAlignment="Center" Orientation="Horizontal" Width="Auto">
+                    <Button x:Name="LeftButton" Content="OK" MinWidth="70" MinHeight="26" Margin="0,0,5,0" Click="OnOkButtonClick" IsDefault="True"/>
+                    <Button x:Name="RightButton" Content="Cancel" MinWidth="70" MinHeight="26" Margin="5,0,0,0" Click="OnCancelButtonClick"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+    </Border>
 </Window>

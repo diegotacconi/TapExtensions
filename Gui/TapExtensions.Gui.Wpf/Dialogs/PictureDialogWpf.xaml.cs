@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using TapExtensions.Interfaces.Gui;
@@ -62,8 +63,8 @@ namespace TapExtensions.Gui.Wpf.Dialogs
 
         private void SetDialogWindowControls()
         {
-            if (!string.IsNullOrWhiteSpace(WindowTitle))
-                DialogWindow.Title = WindowTitle;
+            // if (!string.IsNullOrWhiteSpace(WindowTitle))
+            //     DialogWindow.Title = WindowTitle;
 
             // Show message
             if (!string.IsNullOrWhiteSpace(WindowMessage))
