@@ -6,7 +6,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using TapExtensions.Interfaces.Gui;
 
-namespace TapExtensions.Gui.Wpf
+namespace TapExtensions.Gui.Wpf.DialogsWithBorders
 {
     // ReSharper disable once RedundantExtendsListEntry
     internal partial class PictureDialogWpf : Window

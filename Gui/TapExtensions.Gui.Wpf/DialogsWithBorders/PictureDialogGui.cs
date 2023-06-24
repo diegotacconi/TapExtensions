@@ -2,7 +2,7 @@
 using System.Windows;
 using TapExtensions.Interfaces.Gui;
 
-namespace TapExtensions.Gui.Wpf
+namespace TapExtensions.Gui.Wpf.DialogsWithBorders
 {
     public class PictureDialogGui : IGui
     {
