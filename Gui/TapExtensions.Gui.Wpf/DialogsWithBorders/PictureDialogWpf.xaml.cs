@@ -141,18 +141,18 @@ namespace TapExtensions.Gui.Wpf.DialogsWithBorders
             switch (Buttons)
             {
                 case EInputButtons.StartCancel:
-                    ButtonOk.Content = "Start";
-                    ButtonCancel.Content = "Cancel";
+                    LeftButton.Content = "Start";
+                    RightButton.Content = "Cancel";
                     break;
 
                 case EInputButtons.OkCancel:
-                    ButtonOk.Content = "OK";
-                    ButtonCancel.Content = "Cancel";
+                    LeftButton.Content = "OK";
+                    RightButton.Content = "Cancel";
                     break;
 
                 case EInputButtons.YesNo:
-                    ButtonOk.Content = "Yes";
-                    ButtonCancel.Content = "No";
+                    LeftButton.Content = "Yes";
+                    RightButton.Content = "No";
                     break;
 
                 default:
@@ -213,9 +213,9 @@ namespace TapExtensions.Gui.Wpf.DialogsWithBorders
             }
         }
 
-        // Resize window to default, on mouse double-click
         private void OnMouseDoubleClick(object sender, MouseButtonEventArgs mouseButtonEventArgs)
         {
+            // Resize window to default, on mouse double-click
             if (IsWindowResizable)
                 SizeToContent = SizeToContent.WidthAndHeight;
         }

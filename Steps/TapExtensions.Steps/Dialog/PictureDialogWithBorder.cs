@@ -11,11 +11,11 @@ namespace TapExtensions.Steps.Dialog
     {
         #region Settings
 
-        [Display("Message", Order: 1, Description: "The message shown to the user.")]
+        [Display("Message", Order: 2, Description: "The message shown to the user.")]
         [Layout(LayoutMode.Normal, 2, 6)]
         public string Message { get; set; }
 
-        [Display("Picture", Order: 2, Description: "Path to the picture file such as 'C:\\image.jpg'.")]
+        [Display("Picture", Order: 3, Description: "Path to the picture file such as 'C:\\image.jpg'.")]
         [FilePath]
         public string Picture
         {

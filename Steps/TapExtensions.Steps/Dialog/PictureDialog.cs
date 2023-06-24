@@ -48,28 +48,30 @@ namespace TapExtensions.Steps.Dialog
 
         public PictureDialog()
         {
+            // Default values
             Title = "Title";
             Message = "Message";
             Picture = @"C:\Windows\Web\Screen\img103.png";
             FontSize = new Enabled<double> { IsEnabled = false, Value = 14 };
             MaxWidth = new Enabled<double> { IsEnabled = false, Value = 550 };
             MaxHeight = new Enabled<double> { IsEnabled = false, Value = 500 };
-            IsResizable = false;
+            IsResizable = true;
         }
 
         public override void Run()
         {
             try
             {
+                // Check if picture file exists
                 if (!string.IsNullOrWhiteSpace(Picture) && !File.Exists(Picture))
                     throw new FileNotFoundException($"Cannot find picture file {Picture}");
 
+                // Show dialog window
                 IGui gui = new PictureDialogGui
                 {
                     Title = Title,
                     Message = Message,
                     Picture = Picture,
-                    Buttons = EInputButtons.OkCancel,
                     FontSize = FontSize.IsEnabled ? FontSize.Value : 0,
                     MaxWidth = MaxWidth.IsEnabled ? MaxWidth.Value : 0,
                     MaxHeight = MaxHeight.IsEnabled ? MaxHeight.Value : 0,
@@ -77,6 +79,7 @@ namespace TapExtensions.Steps.Dialog
                 };
                 var result = gui.ShowDialog();
 
+                // Check response from the user
                 if (result)
                     Log.Debug("User approved the dialog window");
                 else
