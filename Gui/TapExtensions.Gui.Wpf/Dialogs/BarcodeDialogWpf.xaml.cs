@@ -14,6 +14,7 @@ namespace TapExtensions.Gui.Wpf.Dialogs
     // ReSharper disable once RedundantExtendsListEntry
     internal partial class BarcodeDialogWpf : Window
     {
+        internal string WindowTitle { get; set; } = "";
         internal string WindowMessage { get; set; } = "";
         internal string WindowPicture { get; set; } = "";
         internal int Timeout { get; set; } = 0;
@@ -49,9 +50,10 @@ namespace TapExtensions.Gui.Wpf.Dialogs
         internal bool? ShowWindow()
         {
             SetDialogWindowStyle();
+            SetDialogWindowBorders();
             SetDialogWindowControls();
             SetDialogWindowProperties();
-            TextBoxSerialNumber.Focus();
+            SerialNumberTextBox.Focus();
 
             // Start the countdown timer
             if (Timeout > 0)
@@ -61,16 +63,14 @@ namespace TapExtensions.Gui.Wpf.Dialogs
             return ShowDialog();
         }
 
-        private void SetDialogWindowStyle()
+        private void SetDialogWindowBorders()
         {
-            // Change style
-            DialogWindow.Style = GetApplicationStyle<Window>();
-            MainWindowBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(76, 142, 255));
             switch (BorderStyle)
             {
                 case EBorderStyle.None:
-                    BorderWithStripes.BorderThickness = new Thickness(0);
                     BorderWithStripes.Margin = new Thickness(0);
+                    BorderWithStripes.BorderThickness = new Thickness(0);
+                    BorderWithStripes.Padding = new Thickness(0);
                     break;
 
                 case EBorderStyle.Green:
@@ -121,16 +121,29 @@ namespace TapExtensions.Gui.Wpf.Dialogs
 
         private void SetDialogWindowControls()
         {
-            if (!string.IsNullOrWhiteSpace(WindowMessage))
+            // Shot title
+            if (!string.IsNullOrWhiteSpace(WindowTitle))
             {
-                TextBlockMessage.Text = WindowMessage;
-                TextBlockMessage.Visibility = Visibility.Visible;
+                TitleTextBlock.Text = WindowTitle;
+                TitleBar.Visibility = Visibility.Visible;
             }
             else
             {
-                TextBlockMessage.Visibility = Visibility.Collapsed;
+                TitleBar.Visibility = Visibility.Collapsed;
             }
 
+            // Show message
+            if (!string.IsNullOrWhiteSpace(WindowMessage))
+            {
+                MessageTextBlock.Text = WindowMessage;
+                MessageTextBlock.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                MessageTextBlock.Visibility = Visibility.Collapsed;
+            }
+
+            // Show picture
             if (!string.IsNullOrWhiteSpace(WindowPicture))
             {
                 Image.Source = new BitmapImage(new Uri(WindowPicture));
@@ -141,43 +154,46 @@ namespace TapExtensions.Gui.Wpf.Dialogs
                 Image.Visibility = Visibility.Collapsed;
             }
 
+            // Show serial number
             if (IsSerialNumberVisible)
             {
-                LabelSerialNumber.Visibility = Visibility.Visible;
-                TextBoxSerialNumber.Visibility = Visibility.Visible;
+                SerialNumberLabel.Visibility = Visibility.Visible;
+                SerialNumberTextBox.Visibility = Visibility.Visible;
             }
             else
             {
-                LabelSerialNumber.Visibility = Visibility.Collapsed;
-                TextBoxSerialNumber.Visibility = Visibility.Collapsed;
+                SerialNumberLabel.Visibility = Visibility.Collapsed;
+                SerialNumberTextBox.Visibility = Visibility.Collapsed;
             }
 
+            // Show product code
             if (IsProductCodeVisible)
             {
-                LabelProductCode.Visibility = Visibility.Visible;
-                TextBoxProductCode.Visibility = Visibility.Visible;
+                ProductCodeLabel.Visibility = Visibility.Visible;
+                ProductCodeTextBox.Visibility = Visibility.Visible;
             }
             else
             {
-                LabelProductCode.Visibility = Visibility.Collapsed;
-                TextBoxProductCode.Visibility = Visibility.Collapsed;
+                ProductCodeLabel.Visibility = Visibility.Collapsed;
+                ProductCodeTextBox.Visibility = Visibility.Collapsed;
             }
 
+            // Change buttons
             switch (Buttons)
             {
                 case EInputButtons.StartCancel:
-                    ButtonStart.Content = "Start";
-                    ButtonCancel.Content = "Cancel";
+                    LeftButton.Content = "Start";
+                    RightButton.Content = "Cancel";
                     break;
 
                 case EInputButtons.OkCancel:
-                    ButtonStart.Content = "OK";
-                    ButtonCancel.Content = "Cancel";
+                    LeftButton.Content = "OK";
+                    RightButton.Content = "Cancel";
                     break;
 
                 case EInputButtons.YesNo:
-                    ButtonStart.Content = "Yes";
-                    ButtonCancel.Content = "No";
+                    LeftButton.Content = "Yes";
+                    RightButton.Content = "No";
                     break;
 
                 default:
@@ -188,15 +204,19 @@ namespace TapExtensions.Gui.Wpf.Dialogs
 
         private void SetDialogWindowProperties()
         {
+            // Change fontSize
             if (WindowFontSize > 0)
                 DialogWindow.FontSize = WindowFontSize;
 
+            // Change window width
             if (WindowMaxWidth > 0)
                 DialogWindow.MaxWidth = WindowMaxWidth;
 
+            // Change window height
             if (WindowMaxHeight > 0)
                 DialogWindow.MaxHeight = WindowMaxHeight;
 
+            // Change resize mode
             DialogWindow.ResizeMode = IsWindowResizable ? ResizeMode.CanResize : ResizeMode.NoResize;
         }
 
@@ -215,14 +235,14 @@ namespace TapExtensions.Gui.Wpf.Dialogs
         private void OnStartButtonClick(object sender, RoutedEventArgs e)
         {
             // Check and update SerialNumber
-            if (TextBoxSerialNumber.Visibility == Visibility.Visible)
-                //Dut.SerialNumber = TextBoxSerialNumber.Text.ToUpper().Trim();
+            // if (SerialNumberTextBox.Visibility == Visibility.Visible)
+            //     Dut.SerialNumber = TextBoxSerialNumber.Text.ToUpper().Trim();
 
-                // Check and update ProductCode
-                if (TextBoxProductCode.Visibility == Visibility.Visible)
-                    //Dut.ProductCode = TextBoxProductCode.Text.ToUpper().Trim();
+            // Check and update ProductCode
+            // if (ProductCodeTextBox.Visibility == Visibility.Visible)
+            //     Dut.ProductCode = TextBoxProductCode.Text.ToUpper().Trim();
 
-                    DialogResult = true;
+            DialogResult = true;
             CloseWindow();
         }
 
@@ -232,9 +252,9 @@ namespace TapExtensions.Gui.Wpf.Dialogs
             CloseWindow();
         }
 
-        // Close window when escape key is pressed
         private void OnPreviewKeyDown(object sender, KeyEventArgs keyEventArgs)
         {
+            // Close window if escape key is pressed
             if (keyEventArgs.Key == Key.Escape)
             {
                 DialogResult = false;
@@ -263,6 +283,36 @@ namespace TapExtensions.Gui.Wpf.Dialogs
             }
         }
 
+        private void SetDialogWindowStyle()
+        {
+            // Change style
+            DialogWindow.Style = GetApplicationStyle<Window>();
+
+            try
+            {
+                // OuterBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(76, 142, 255));
+                // TitleTextBlock.Foreground = new SolidColorBrush(Color.FromRgb(76, 142, 255));
+
+                var b1 = GetApplicationResource<SolidColorBrush>("Tap.Highlight");
+                OuterBorder.BorderBrush = b1;
+                TitleTextBlock.Foreground = b1;
+
+                // TitleBar.Background = new SolidColorBrush(Color.FromRgb(40, 40, 46));
+                // TitleBar.Background = new SolidColorBrush(Color.FromRgb(220, 223, 236));
+                // var a2 = GetApplicationResource<ImageBrush>("Window.TitleBar.Static.Background");
+
+                var a1 = GetApplicationResource<LinearGradientBrush>("Tap.Header");
+                TitleBar.Background = a1;
+            }
+            catch
+            { }
+        }
+
+        private static T GetApplicationResource<T>(string resourceKey)
+        {
+            return (T)Application.Current.FindResource(resourceKey);
+        }
+
         private Style GetApplicationStyle<T>()
         {
             Style tempStyle;
@@ -274,36 +324,36 @@ namespace TapExtensions.Gui.Wpf.Dialogs
             return tempStyle;
         }
 
-        private void OnTextBoxSerialNumberChanged(object sender, TextChangedEventArgs e)
+        private void OnSerialNumberTextBoxChanged(object sender, TextChangedEventArgs e)
         {
-            if (string.IsNullOrEmpty(TextBoxSerialNumber.Text))
+            if (string.IsNullOrEmpty(SerialNumberTextBox.Text))
                 return;
 
             // Try to parse barcode from hand-held scanner, when configured in keyboard emulation mode
-            var bytes = Encoding.ASCII.GetBytes(TextBoxSerialNumber.Text);
+            var bytes = Encoding.ASCII.GetBytes(SerialNumberTextBox.Text);
             var serialNumber = BarcodeLabelParser.GetSerialNumber(bytes);
             if (!string.IsNullOrEmpty(serialNumber))
-                TextBoxSerialNumber.Text = serialNumber;
+                SerialNumberTextBox.Text = serialNumber;
 
             var productCode = BarcodeLabelParser.GetProductCode(bytes);
             if (!string.IsNullOrEmpty(productCode))
-                TextBoxProductCode.Text = productCode;
+                ProductCodeTextBox.Text = productCode;
         }
 
-        private void OnTextBoxProductCodeChanged(object sender, TextChangedEventArgs e)
+        private void OnProductCodeTextBoxChanged(object sender, TextChangedEventArgs e)
         {
-            if (string.IsNullOrEmpty(TextBoxProductCode.Text))
+            if (string.IsNullOrEmpty(ProductCodeTextBox.Text))
                 return;
 
             // Try to parse barcode from hand-held scanner, when configured in keyboard emulation mode
-            var bytes = Encoding.ASCII.GetBytes(TextBoxProductCode.Text);
+            var bytes = Encoding.ASCII.GetBytes(ProductCodeTextBox.Text);
             var serialNumber = BarcodeLabelParser.GetSerialNumber(bytes);
             if (!string.IsNullOrEmpty(serialNumber))
-                TextBoxSerialNumber.Text = serialNumber;
+                SerialNumberTextBox.Text = serialNumber;
 
             var productCode = BarcodeLabelParser.GetProductCode(bytes);
             if (!string.IsNullOrEmpty(productCode))
-                TextBoxProductCode.Text = productCode;
+                ProductCodeTextBox.Text = productCode;
         }
     }
 }

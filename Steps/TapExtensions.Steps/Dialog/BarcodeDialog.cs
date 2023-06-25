@@ -12,12 +12,16 @@ namespace TapExtensions.Steps.Dialog
     {
         #region Settings
 
-        [Display("Message", Order: 1, Group: "Visible Controls",
+        [Display("Title", Order: 1, Group: "Visible Controls",
+            Description: "The title of the dialog window.")]
+        public string Title { get; set; }
+
+        [Display("Message", Order: 2, Group: "Visible Controls",
             Description: "The message shown to the user.")]
         [Layout(LayoutMode.Normal, 2, 6)]
         public string Message { get; set; }
 
-        [Display("Picture", Order: 2, Group: "Visible Controls",
+        [Display("Picture", Order: 3, Group: "Visible Controls",
             Description: "Path to the picture file such as 'C:\\image.jpg'.")]
         [FilePath]
         public string Picture
@@ -28,10 +32,10 @@ namespace TapExtensions.Steps.Dialog
 
         private string _fullPath;
 
-        [Display("Serial Number", Order: 3, Group: "Visible Controls")]
+        [Display("Serial Number", Order: 4, Group: "Visible Controls")]
         public bool IsSerialNumberVisible { get; set; }
 
-        [Display("Product Code", Order: 4, Group: "Visible Controls")]
+        [Display("Product Code", Order: 5, Group: "Visible Controls")]
         public bool IsProductCodeVisible { get; set; }
 
         [Display("Font Size", Order: 10, Group: "Dialog Window Properties", Collapsed: true,
@@ -66,7 +70,8 @@ namespace TapExtensions.Steps.Dialog
         public BarcodeDialog()
         {
             // Default values
-            Message = "Please enter the barcode label";
+            Title = "Please enter the barcode label";
+            Message = "";
             Picture = "";
             IsSerialNumberVisible = true;
             IsProductCodeVisible = true;
@@ -90,6 +95,7 @@ namespace TapExtensions.Steps.Dialog
                 // Show dialog window
                 IGui gui = new BarcodeDialogGui
                 {
+                    Title = Title,
                     Message = Message,
                     Picture = Picture,
                     IsSerialNumberVisible = IsSerialNumberVisible,

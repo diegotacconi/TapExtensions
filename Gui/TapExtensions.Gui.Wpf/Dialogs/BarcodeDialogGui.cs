@@ -6,6 +6,7 @@ namespace TapExtensions.Gui.Wpf.Dialogs
 {
     public class BarcodeDialogGui : IGui
     {
+        public string Title { get; set; } = "";
         public string Message { get; set; } = "";
         public string Picture { get; set; } = "";
         public int Timeout { get; set; } = 0;
@@ -62,6 +63,7 @@ namespace TapExtensions.Gui.Wpf.Dialogs
         {
             var barcodeDialogWpf = new BarcodeDialogWpf(windowOwner)
             {
+                WindowTitle = Title,
                 WindowMessage = Message,
                 WindowPicture = Picture,
                 Timeout = Timeout,
