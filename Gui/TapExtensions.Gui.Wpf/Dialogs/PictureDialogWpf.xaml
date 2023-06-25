@@ -30,10 +30,10 @@
             </Grid.RowDefinitions>
 
             <!-- Title Bar -->
-            <Border x:Name="TitleBar" Grid.Row="0" Height="32">
+            <Border x:Name="TitleBar" Grid.Row="0" Height="32" Background="#F0F0F0">
                 <Grid>
                     <TextBlock x:Name="TitleTextBlock" FontFamily="Segoe UI Semibold"
-                               Text="Title Message" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,2"/>
+                               Text="Title" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,2"/>
                 </Grid>
             </Border>
 
