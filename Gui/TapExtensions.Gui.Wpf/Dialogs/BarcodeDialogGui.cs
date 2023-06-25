@@ -2,7 +2,7 @@
 using System.Windows;
 using TapExtensions.Interfaces.Gui;
 
-namespace TapExtensions.Gui.Wpf.DialogsWithBorders
+namespace TapExtensions.Gui.Wpf.Dialogs
 {
     public class BarcodeDialogGui : IGui
     {

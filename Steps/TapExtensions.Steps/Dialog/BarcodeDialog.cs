@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text.RegularExpressions;
 using OpenTap;
-using TapExtensions.Gui.Wpf.DialogsWithBorders;
+using TapExtensions.Gui.Wpf.Dialogs;
 using TapExtensions.Interfaces.Gui;
 
 namespace TapExtensions.Steps.Dialog

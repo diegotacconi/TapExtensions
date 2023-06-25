@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,7 +9,7 @@ using System.Windows.Threading;
 using TapExtensions.Interfaces.Gui;
 using TapExtensions.Shared;
 
-namespace TapExtensions.Gui.Wpf.DialogsWithBorders
+namespace TapExtensions.Gui.Wpf.Dialogs
 {
     // ReSharper disable once RedundantExtendsListEntry
     internal partial class BarcodeDialogWpf : Window
