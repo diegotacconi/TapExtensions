@@ -1,6 +1,6 @@
 ﻿using System;
 using OpenTap;
-using TapExtensions.Gui.Wpf.DialogsWithBorders;
+using TapExtensions.Gui.Wpf.Dialogs;
 using TapExtensions.Interfaces.Gui;
 
 namespace TapExtensions.Steps.Dialog
@@ -10,7 +10,10 @@ namespace TapExtensions.Steps.Dialog
     {
         #region Settings
 
-        [Display("Message", Order: 1, Description: "The message shown to the user.")]
+        [Display("Title", Order: 1, Description: "The title of the dialog window.")]
+        public string Title { get; set; }
+
+        [Display("Message", Order: 2, Description: "The message shown to the user.")]
         [Layout(LayoutMode.Normal, 2, 6)]
         public string Message { get; set; }
 
@@ -19,6 +22,7 @@ namespace TapExtensions.Steps.Dialog
         public MessageDialog()
         {
             // Default values
+            Title = "Title";
             Message = "Message";
         }
 
@@ -27,7 +31,7 @@ namespace TapExtensions.Steps.Dialog
             try
             {
                 // Show dialog window
-                IGui gui = new PictureDialogGui { Message = Message };
+                IGui gui = new PictureDialogGui { Title = Title, Message = Message };
                 var result = gui.ShowDialog();
 
                 // Check response from the user
