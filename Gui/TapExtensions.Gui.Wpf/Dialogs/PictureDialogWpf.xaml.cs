@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -55,26 +56,28 @@ namespace TapExtensions.Gui.Wpf.Dialogs
             return ShowDialog();
         }
 
-        private void SetDialogWindowStyle()
-        {
-            // Change style
-            DialogWindow.Style = GetApplicationStyle<Window>();
-        }
-
         private void SetDialogWindowControls()
         {
-            // if (!string.IsNullOrWhiteSpace(WindowTitle))
-            //     DialogWindow.Title = WindowTitle;
+            // Shot title
+            if (!string.IsNullOrWhiteSpace(WindowTitle))
+            {
+                TitleTextBlock.Text = WindowTitle;
+                TitleBar.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                TitleBar.Visibility = Visibility.Collapsed;
+            }
 
             // Show message
             if (!string.IsNullOrWhiteSpace(WindowMessage))
             {
-                TextBlockMessage.Text = WindowMessage;
-                TextBlockMessage.Visibility = Visibility.Visible;
+                MessageTextBlock.Text = WindowMessage;
+                MessageTextBlock.Visibility = Visibility.Visible;
             }
             else
             {
-                TextBlockMessage.Visibility = Visibility.Collapsed;
+                MessageTextBlock.Visibility = Visibility.Collapsed;
             }
 
             // Show picture
@@ -190,6 +193,36 @@ namespace TapExtensions.Gui.Wpf.Dialogs
                 DialogResult = false;
                 CloseWindow();
             }
+        }
+
+        private void SetDialogWindowStyle()
+        {
+            // Change style
+            DialogWindow.Style = GetApplicationStyle<Window>();
+
+            try
+            {
+                // OuterBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(76, 142, 255));
+                // TitleTextBlock.Foreground = new SolidColorBrush(Color.FromRgb(76, 142, 255));
+
+                var b1 = GetApplicationResource<SolidColorBrush>("Tap.Highlight");
+                OuterBorder.BorderBrush = b1;
+                TitleTextBlock.Foreground = b1;
+
+                // TitleBar.Background = new SolidColorBrush(Color.FromRgb(40, 40, 46));
+                // TitleBar.Background = new SolidColorBrush(Color.FromRgb(220, 223, 236));
+                // var a2 = GetApplicationResource<ImageBrush>("Window.TitleBar.Static.Background");
+
+                var a1 = GetApplicationResource<LinearGradientBrush>("Tap.Header");
+                TitleBar.Background = a1;
+            }
+            catch
+            { }
+        }
+
+        private static T GetApplicationResource<T>(string resourceKey)
+        {
+            return (T)Application.Current.FindResource(resourceKey);
         }
 
         private Style GetApplicationStyle<T>()
