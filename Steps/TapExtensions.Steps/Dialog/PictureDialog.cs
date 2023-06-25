@@ -44,6 +44,9 @@ namespace TapExtensions.Steps.Dialog
             Description: "Specifies whether the dialog window can be resized.")]
         public bool IsResizable { get; set; }
 
+        [Display("Border Style", Order: 14, Group: "Dialog Window Properties", Collapsed: true)]
+        public EBorderStyle BorderStyle { get; set; }
+
         #endregion
 
         public PictureDialog()
@@ -56,6 +59,7 @@ namespace TapExtensions.Steps.Dialog
             MaxWidth = new Enabled<double> { IsEnabled = false, Value = 550 };
             MaxHeight = new Enabled<double> { IsEnabled = false, Value = 500 };
             IsResizable = true;
+            BorderStyle = EBorderStyle.None;
         }
 
         public override void Run()
@@ -75,7 +79,8 @@ namespace TapExtensions.Steps.Dialog
                     FontSize = FontSize.IsEnabled ? FontSize.Value : 0,
                     MaxWidth = MaxWidth.IsEnabled ? MaxWidth.Value : 0,
                     MaxHeight = MaxHeight.IsEnabled ? MaxHeight.Value : 0,
-                    IsResizable = IsResizable
+                    IsResizable = IsResizable,
+                    BorderStyle = BorderStyle
                 };
                 var result = gui.ShowDialog();
 

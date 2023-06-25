@@ -15,6 +15,7 @@ namespace TapExtensions.Gui.Wpf.Dialogs
         public double MaxWidth { get; set; } = 0;
         public double MaxHeight { get; set; } = 0;
         public bool IsResizable { get; set; } = false;
+        public EBorderStyle BorderStyle { get; set; } = EBorderStyle.None;
 
         private Application _wpfApp;
 
@@ -68,7 +69,8 @@ namespace TapExtensions.Gui.Wpf.Dialogs
                 WindowFontSize = FontSize,
                 WindowMaxWidth = MaxWidth,
                 WindowMaxHeight = MaxHeight,
-                IsWindowResizable = IsResizable
+                IsWindowResizable = IsResizable,
+                BorderStyle = BorderStyle
             };
             return pictureDialogWpf.ShowWindow() == true;
         }
