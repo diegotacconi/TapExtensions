@@ -265,8 +265,10 @@ namespace TapExtensions.Gui.Wpf.Dialogs
         private void StartTimer()
         {
             _startTime = DateTime.UtcNow;
-            _timer = new DispatcherTimer();
-            _timer.Interval = new TimeSpan(0, 0, 0, 0, 100); // Set interval to 100 milliseconds
+            _timer = new DispatcherTimer
+            {
+                Interval = new TimeSpan(0, 0, 0, 0, 100) // Set interval to 100 milliseconds
+            };
             _timer.Tick += OnTimedEvent;
             _timer.Start();
         }
@@ -305,7 +307,9 @@ namespace TapExtensions.Gui.Wpf.Dialogs
                 TitleBar.Background = a1;
             }
             catch
-            { }
+            {
+                // ignored
+            }
         }
 
         private static T GetApplicationResource<T>(string resourceKey)
@@ -313,14 +317,11 @@ namespace TapExtensions.Gui.Wpf.Dialogs
             return (T)Application.Current.FindResource(resourceKey);
         }
 
-        private Style GetApplicationStyle<T>()
+        private static Style GetApplicationStyle<T>()
         {
-            Style tempStyle;
-            if (Application.Current.Resources.Contains(typeof(T)))
-                tempStyle = new Style(typeof(T), (Style)Application.Current.Resources[typeof(T)]);
-            else
-                tempStyle = new Style(typeof(T));
-
+            var tempStyle = Application.Current.Resources.Contains(typeof(T))
+                ? new Style(typeof(T), (Style)Application.Current.Resources[typeof(T)])
+                : new Style(typeof(T));
             return tempStyle;
         }
 

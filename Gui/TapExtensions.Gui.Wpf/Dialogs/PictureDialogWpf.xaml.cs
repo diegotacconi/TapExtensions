@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -23,8 +22,8 @@ namespace TapExtensions.Gui.Wpf.Dialogs
         internal bool IsWindowResizable { get; set; } = false;
         internal EBorderStyle BorderStyle { get; set; } = EBorderStyle.None;
 
-        private DateTime _StartTime;
-        private DispatcherTimer _Timer;
+        private DateTime _startTime;
+        private DispatcherTimer _timer;
 
         internal PictureDialogWpf(Window windowOwner = null)
         {
@@ -193,8 +192,8 @@ namespace TapExtensions.Gui.Wpf.Dialogs
 
         private void CloseWindow()
         {
-            if (_Timer != null && _Timer.IsEnabled)
-                _Timer.Stop();
+            if (_timer != null && _timer.IsEnabled)
+                _timer.Stop();
             Close();
         }
 
@@ -234,16 +233,18 @@ namespace TapExtensions.Gui.Wpf.Dialogs
 
         private void StartTimer()
         {
-            _StartTime = DateTime.UtcNow;
-            _Timer = new DispatcherTimer();
-            _Timer.Interval = new TimeSpan(0, 0, 0, 0, 100); // Set interval to 100 milliseconds
-            _Timer.Tick += OnTimedEvent;
-            _Timer.Start();
+            _startTime = DateTime.UtcNow;
+            _timer = new DispatcherTimer
+            {
+                Interval = new TimeSpan(0, 0, 0, 0, 100) // Set interval to 100 milliseconds
+            };
+            _timer.Tick += OnTimedEvent;
+            _timer.Start();
         }
 
         private void OnTimedEvent(object sender, EventArgs e)
         {
-            var finishTime = _StartTime + TimeSpan.FromSeconds(Timeout);
+            var finishTime = _startTime + TimeSpan.FromSeconds(Timeout);
             var remainingDuration = finishTime - DateTime.UtcNow;
 
             if (remainingDuration <= TimeSpan.Zero)
@@ -275,7 +276,9 @@ namespace TapExtensions.Gui.Wpf.Dialogs
                 TitleBar.Background = a1;
             }
             catch
-            { }
+            {
+                // ignored
+            }
         }
 
         private static T GetApplicationResource<T>(string resourceKey)
@@ -283,14 +286,11 @@ namespace TapExtensions.Gui.Wpf.Dialogs
             return (T)Application.Current.FindResource(resourceKey);
         }
 
-        private Style GetApplicationStyle<T>()
+        private static Style GetApplicationStyle<T>()
         {
-            Style tempStyle;
-            if (Application.Current.Resources.Contains(typeof(T)))
-                tempStyle = new Style(typeof(T), (Style)Application.Current.Resources[typeof(T)]);
-            else
-                tempStyle = new Style(typeof(T));
-
+            var tempStyle = Application.Current.Resources.Contains(typeof(T))
+                ? new Style(typeof(T), (Style)Application.Current.Resources[typeof(T)])
+                : new Style(typeof(T));
             return tempStyle;
         }
     }

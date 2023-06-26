@@ -29,8 +29,10 @@ namespace TapExtensions.Gui.Wpf.Dialogs
                 // When called from a Console process
                 var thread = new Thread(() =>
                 {
-                    _wpfApp = new Application();
-                    _wpfApp.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+                    _wpfApp = new Application
+                    {
+                        ShutdownMode = ShutdownMode.OnExplicitShutdown
+                    };
                     _wpfApp.Run();
                 });
                 thread.SetApartmentState(ApartmentState.STA);
@@ -40,10 +42,7 @@ namespace TapExtensions.Gui.Wpf.Dialogs
                 while (_wpfApp == null)
                     Thread.Sleep(150);
 
-                _wpfApp.Dispatcher.Invoke(() =>
-                {
-                    result = CallShowWindow();
-                });
+                _wpfApp.Dispatcher.Invoke(() => { result = CallShowWindow(); });
             }
             else
             {
