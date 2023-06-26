@@ -2,13 +2,14 @@
 using System.IO;
 using System.IO.Compression;
 using OpenTap;
+using TapExtensions.Interfaces.Results;
 
 namespace TapExtensions.Results
 {
     [Display("Zip File",
         Groups: new[] { "TapExtensions", "Results" },
         Description: "Save results and logs into a zip file.")]
-    public class ZipFileResultListener : ResultListener
+    public class ZipFileResultListener : ResultListener, IFileAttachment
     {
         [Display("Report Path", Order: 1,
             Description: "Path where report files are to be generated")]
@@ -24,12 +25,24 @@ namespace TapExtensions.Results
         }
 
         private string _fullPath;
+        private string _anotherFilePath;
 
         public ZipFileResultListener()
         {
             // Default values
             Name = "Zip";
             ReportPath = @"C:\Temp\Zip";
+        }
+
+        public void AddFile(string filePath)
+        {
+            _anotherFilePath = filePath;
+            Log.Debug($"Add {_anotherFilePath}");
+        }
+
+        public void AddStream(string fileName, Stream fileStream)
+        {
+            throw new NotImplementedException();
         }
 
         public override void OnTestPlanRunCompleted(TestPlanRun planRun, Stream logStream)
@@ -64,6 +77,13 @@ namespace TapExtensions.Results
 
                     // Create screenshot file
                     // ...
+
+                    // Add _anotherFilePath
+                    if (!string.IsNullOrWhiteSpace(_anotherFilePath))
+                    {
+                        var anotherFile = new FileInfo(_anotherFilePath);
+                        zipArchive.CreateEntryFromFile(anotherFile.FullName, anotherFile.Name, CompressionLevel.Optimal);
+                    }
                 }
 
                 // Create directory if it doesn't exist
