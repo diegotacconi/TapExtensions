@@ -3,9 +3,9 @@ using System.IO;
 using OpenTap;
 using TapExtensions.Interfaces.Results;
 
-namespace TapExtensions.Steps.Publish
+namespace TapExtensions.Steps.Results
 {
-    [Display("AddFileToZip", Groups: new[] { "TapExtensions", "Steps", "Publish" })]
+    [Display("AddFileToZip", Groups: new[] { "TapExtensions", "Steps", "Results" })]
     public class AddFileToZip : TestStep
     {
         [Display("Result Listener", Order: 1,
