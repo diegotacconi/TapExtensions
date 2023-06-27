@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using OpenTap;
@@ -9,7 +10,7 @@ namespace TapExtensions.Results
     [Display("Zip File",
         Groups: new[] { "TapExtensions", "Results" },
         Description: "Save results and logs into a zip file.")]
-    public class ZipFileResultListener : ResultListener, IFileAttachment
+    public class ZipFileResultListener : ResultListener, IZipFile
     {
         [Display("Report Path", Order: 1,
             Description: "Path where report files are to be generated")]
@@ -25,7 +26,7 @@ namespace TapExtensions.Results
         }
 
         private string _fullPath;
-        private string _anotherFilePath;
+        private List<string> _filePaths = new List<string>();
 
         public ZipFileResultListener()
         {
@@ -34,10 +35,25 @@ namespace TapExtensions.Results
             ReportPath = @"C:\Temp\Zip";
         }
 
+        public override void OnTestPlanRunStart(TestPlanRun planRun)
+        {
+            // Clear list of files
+            _filePaths.Clear();
+        }
+
         public void AddFile(string filePath)
         {
-            _anotherFilePath = filePath;
-            Log.Debug($"Add {_anotherFilePath}");
+            // ToDo: check and remove duplicate files
+
+            if (!File.Exists(filePath))
+            {
+                Log.Warning($"File not found at {filePath}");
+            }
+            else
+            {
+                _filePaths.Add(filePath);
+                Log.Debug($"Add {filePath}");
+            }
         }
 
         public void AddStream(string fileName, Stream fileStream)
@@ -78,11 +94,14 @@ namespace TapExtensions.Results
                     // Create screenshot file
                     // ...
 
-                    // Add _anotherFilePath
-                    if (!string.IsNullOrWhiteSpace(_anotherFilePath))
+                    // Add other files
+                    foreach (var filePath in _filePaths)
                     {
-                        var anotherFile = new FileInfo(_anotherFilePath);
-                        zipArchive.CreateEntryFromFile(anotherFile.FullName, anotherFile.Name, CompressionLevel.Optimal);
+                        if (File.Exists(filePath))
+                        {
+                            var fileInfo = new FileInfo(filePath);
+                            zipArchive.CreateEntryFromFile(fileInfo.FullName, fileInfo.Name, CompressionLevel.Optimal);
+                        }
                     }
                 }
 
