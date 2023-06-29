@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Text;
 using OpenTap;
 using TapExtensions.Interfaces.Results;
 
@@ -26,7 +27,7 @@ namespace TapExtensions.Results
         }
 
         private string _fullPath;
-        private List<string> _filePaths = new List<string>();
+        private readonly List<string> _filePaths = new List<string>();
 
         public ZipFileResultListener()
         {
@@ -41,24 +42,34 @@ namespace TapExtensions.Results
             _filePaths.Clear();
         }
 
-        public void AddFile(string filePath)
+        public void AddExistingFile(string fileName)
         {
             // ToDo: check and remove duplicate files
 
-            if (!File.Exists(filePath))
+            if (!File.Exists(fileName))
             {
-                Log.Warning($"File not found at {filePath}");
+                Log.Warning($"File not found at {fileName}");
             }
             else
             {
-                _filePaths.Add(filePath);
-                Log.Debug($"Add {filePath}");
+                _filePaths.Add(fileName);
+                Log.Debug($"Add {fileName}");
             }
         }
 
-        public void AddStream(string fileName, Stream fileStream)
+        public void AddNewFile(string fileName, string fileContents)
+        {
+            AddNewFile(fileName, GenerateStreamFromString(fileContents));
+        }
+
+        public void AddNewFile(string fileName, Stream fileStream)
         {
             throw new NotImplementedException();
+        }
+
+        private static MemoryStream GenerateStreamFromString(string value)
+        {
+            return new MemoryStream(Encoding.UTF8.GetBytes(value ?? ""));
         }
 
         public override void OnTestPlanRunCompleted(TestPlanRun planRun, Stream logStream)
@@ -94,14 +105,27 @@ namespace TapExtensions.Results
                     // Create screenshot file
                     // ...
 
-                    // Add other files
+
+                    // Add streams from TestSteps
+                    /*
+                    const string streamFileName = @"folder\hello.txt";
+                    var streamEntry = zipArchive.CreateEntry(streamFileName, CompressionLevel.Optimal);
+                    using (var writer = new StreamWriter(streamEntry.Open()))
+                    {
+                        writer.BaseStream.Seek(0, SeekOrigin.Begin);
+                        writer.WriteLine("Information about this package.");
+                        writer.WriteLine("========================");
+                    }
+                    */
+
+                    // Add files from TestSteps
                     foreach (var filePath in _filePaths)
                     {
-                        if (File.Exists(filePath))
-                        {
-                            var fileInfo = new FileInfo(filePath);
-                            zipArchive.CreateEntryFromFile(fileInfo.FullName, fileInfo.Name, CompressionLevel.Optimal);
-                        }
+                        if (!File.Exists(filePath))
+                            continue;
+
+                        var fileInfo = new FileInfo(filePath);
+                        zipArchive.CreateEntryFromFile(fileInfo.FullName, fileInfo.Name, CompressionLevel.Optimal);
                     }
                 }
 

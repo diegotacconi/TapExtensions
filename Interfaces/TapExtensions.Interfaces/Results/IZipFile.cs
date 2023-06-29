@@ -1,11 +1,12 @@
-﻿using OpenTap;
-using System.IO;
+﻿using System.IO;
+using OpenTap;
 
 namespace TapExtensions.Interfaces.Results
 {
     public interface IZipFile : IResultListener
     {
-        void AddFile(string filePath);
-        void AddStream(string fileName, Stream fileStream);
+        void AddExistingFile(string fileName);
+        void AddNewFile(string fileName, string fileContents);
+        void AddNewFile(string fileName, Stream fileContents);
     }
 }
