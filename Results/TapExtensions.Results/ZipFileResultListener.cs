@@ -58,11 +58,18 @@ namespace TapExtensions.Results
 
         public void AddNewFile(string fileName, MemoryStream fileContents)
         {
-            // ToDo: check for same fileName in the list, and replace contents
-            // ToDo: check and remove duplicate files
-
-            _additionalFiles.Add(new AdditionalFile { Name = fileName, Contents = fileContents });
-            Log.Debug($"Add {fileName}");
+            var item = new AdditionalFile { Name = fileName, Contents = fileContents };
+            var duplicate = _additionalFiles.FindIndex(x => x.Name == fileName);
+            if (duplicate != -1)
+            {
+                _additionalFiles[duplicate] = item;
+                Log.Warning($"Replace {fileName}");
+            }
+            else
+            {
+                _additionalFiles.Add(item);
+                Log.Debug($"Add {fileName}");
+            }
         }
 
         public void AddNewFile(string fileName, string fileContents)
