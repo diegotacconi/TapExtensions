@@ -23,7 +23,6 @@ namespace TapExtensions.Results
         }
 
         private string _fullPath;
-        private readonly List<string> _filePaths = new List<string>();
         private readonly List<AdditionalFile> _additionalFiles = new List<AdditionalFile>();
 
         private class AdditionalFile
@@ -34,43 +33,41 @@ namespace TapExtensions.Results
 
         public ZipFileResultListener()
         {
-            // Default values
             Name = "Zip";
             ReportPath = @"C:\Temp\Zip";
         }
 
         public override void OnTestPlanRunStart(TestPlanRun planRun)
         {
-            _filePaths.Clear();
             _additionalFiles.Clear();
         }
 
         public void AddExistingFile(string fileName)
         {
-            // ToDo: check and remove duplicate files
-
             if (!File.Exists(fileName))
-            {
-                Log.Warning($"File not found at {fileName}");
-            }
-            else
-            {
-                _filePaths.Add(fileName);
-                Log.Debug($"Add {fileName}");
-            }
-        }
+                throw new FileNotFoundException($"File not found at {fileName}");
 
-        public void AddNewFile(string fileName, string fileContents)
-        {
-            AddNewFile(fileName, GenerateStreamFromString(fileContents));
+            var memoryStream = new MemoryStream();
+            using (var fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read))
+            {
+                fileStream.CopyTo(memoryStream);
+            }
+
+            AddNewFile(Path.GetFileName(fileName), memoryStream);
         }
 
         public void AddNewFile(string fileName, MemoryStream fileContents)
         {
             // ToDo: check for same fileName in the list, and replace contents
+            // ToDo: check and remove duplicate files
 
             _additionalFiles.Add(new AdditionalFile { Name = fileName, Contents = fileContents });
             Log.Debug($"Add {fileName}");
+        }
+
+        public void AddNewFile(string fileName, string fileContents)
+        {
+            AddNewFile(fileName, GenerateStreamFromString(fileContents));
         }
 
         private static MemoryStream GenerateStreamFromString(string value)
@@ -121,16 +118,6 @@ namespace TapExtensions.Results
                             additionalFile.Contents.CopyTo(entryContents);
                         }
                     }
-
-                    // Add files from TestSteps
-                    foreach (var filePath in _filePaths)
-                    {
-                        if (!File.Exists(filePath))
-                            continue;
-
-                        var fileInfo = new FileInfo(filePath);
-                        zipArchive.CreateEntryFromFile(fileInfo.FullName, fileInfo.Name, CompressionLevel.Optimal);
-                    }
                 }
 
                 // Create directory if it doesn't exist
@@ -144,7 +131,7 @@ namespace TapExtensions.Results
                     memoryStream.CopyTo(zipFileStream);
                 }
 
-                Log.Info("Saved results to {0}", zipFullPath);
+                Log.Info($"Saved results to {zipFullPath}");
             }
         }
     }
