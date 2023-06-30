@@ -7,6 +7,6 @@ namespace TapExtensions.Interfaces.Results
     {
         void AddExistingFile(string fileName);
         void AddNewFile(string fileName, string fileContents);
-        void AddNewFile(string fileName, Stream fileContents);
+        void AddNewFile(string fileName, MemoryStream fileContents);
     }
 }

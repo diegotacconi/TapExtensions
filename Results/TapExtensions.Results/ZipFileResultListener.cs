@@ -19,15 +19,18 @@ namespace TapExtensions.Results
         public string ReportPath
         {
             get => _fullPath;
-            set
-            {
-                if (!string.IsNullOrWhiteSpace(value))
-                    _fullPath = Path.GetFullPath(value);
-            }
+            set => _fullPath = !string.IsNullOrWhiteSpace(value) ? Path.GetFullPath(value) : "";
         }
 
         private string _fullPath;
         private readonly List<string> _filePaths = new List<string>();
+        private readonly List<AdditionalFile> _additionalFiles = new List<AdditionalFile>();
+
+        private class AdditionalFile
+        {
+            public string Name { get; set; }
+            public MemoryStream Contents { get; set; }
+        }
 
         public ZipFileResultListener()
         {
@@ -38,8 +41,8 @@ namespace TapExtensions.Results
 
         public override void OnTestPlanRunStart(TestPlanRun planRun)
         {
-            // Clear list of files
             _filePaths.Clear();
+            _additionalFiles.Clear();
         }
 
         public void AddExistingFile(string fileName)
@@ -62,9 +65,12 @@ namespace TapExtensions.Results
             AddNewFile(fileName, GenerateStreamFromString(fileContents));
         }
 
-        public void AddNewFile(string fileName, Stream fileStream)
+        public void AddNewFile(string fileName, MemoryStream fileContents)
         {
-            throw new NotImplementedException();
+            // ToDo: check for same fileName in the list, and replace contents
+
+            _additionalFiles.Add(new AdditionalFile { Name = fileName, Contents = fileContents });
+            Log.Debug($"Add {fileName}");
         }
 
         private static MemoryStream GenerateStreamFromString(string value)
@@ -105,18 +111,16 @@ namespace TapExtensions.Results
                     // Create screenshot file
                     // ...
 
-
-                    // Add streams from TestSteps
-                    /*
-                    const string streamFileName = @"folder\hello.txt";
-                    var streamEntry = zipArchive.CreateEntry(streamFileName, CompressionLevel.Optimal);
-                    using (var writer = new StreamWriter(streamEntry.Open()))
+                    // Add additional files from TestSteps
+                    foreach (var additionalFile in _additionalFiles)
                     {
-                        writer.BaseStream.Seek(0, SeekOrigin.Begin);
-                        writer.WriteLine("Information about this package.");
-                        writer.WriteLine("========================");
+                        var entry = zipArchive.CreateEntry(additionalFile.Name, CompressionLevel.Optimal);
+                        using (var entryContents = entry.Open())
+                        {
+                            additionalFile.Contents.Seek(0, SeekOrigin.Begin);
+                            additionalFile.Contents.CopyTo(entryContents);
+                        }
                     }
-                    */
 
                     // Add files from TestSteps
                     foreach (var filePath in _filePaths)
