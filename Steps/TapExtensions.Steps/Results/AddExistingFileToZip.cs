@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using OpenTap;
 using TapExtensions.Interfaces.Results;
 
@@ -30,7 +31,14 @@ namespace TapExtensions.Steps.Results
 
         public override void Run()
         {
-            ZipFileListener.AddExistingFile(FileName);
+            try
+            {
+                ZipFileListener.AddExistingFile(FileName);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+            }
         }
     }
 }
