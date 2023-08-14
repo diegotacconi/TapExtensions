@@ -44,8 +44,14 @@ namespace TapExtensions.Steps.Dialog
             Description: "Specifies whether the dialog window can be resized.")]
         public bool IsResizable { get; set; }
 
-        [Display("Border Style", Order: 14, Group: "Dialog Window Properties", Collapsed: true)]
-        public EBorderStyle BorderStyle { get; set; }
+        [Display("Border Color", Order: 14, Group: "Dialog Window Properties", Collapsed: true,
+            Description: "Color as a hexadecimal string:\r" +
+            "Green = Rgb(46, 204, 113) = #2ECC71\r" +
+            "Yellow = Rgb(241, 196, 15) = #F1C40F\r" +
+            "Orange = Rgb(230, 126, 34) = #E67E22\r" +
+            "Red = Rgb(231, 76, 60) = #E74C3C\r" +
+            "Blue = Rgb(76, 142, 255) = #4C8EFF")]
+        public Enabled<string> BorderColor { get; set; }
 
         #endregion
 
@@ -59,7 +65,7 @@ namespace TapExtensions.Steps.Dialog
             MaxWidth = new Enabled<double> { IsEnabled = false, Value = 550 };
             MaxHeight = new Enabled<double> { IsEnabled = false, Value = 500 };
             IsResizable = true;
-            BorderStyle = EBorderStyle.None;
+            BorderColor = new Enabled<string> { IsEnabled = false, Value = "#F1C40F" };
         }
 
         public override void Run()
@@ -80,7 +86,7 @@ namespace TapExtensions.Steps.Dialog
                     MaxWidth = MaxWidth.IsEnabled ? MaxWidth.Value : 0,
                     MaxHeight = MaxHeight.IsEnabled ? MaxHeight.Value : 0,
                     IsResizable = IsResizable,
-                    BorderStyle = BorderStyle
+                    BorderColor = BorderColor.IsEnabled ? BorderColor.Value : "",
                 };
                 var result = gui.ShowDialog();
 

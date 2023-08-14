@@ -25,7 +25,7 @@ namespace TapExtensions.Gui.Wpf.Dialogs
         internal double WindowMaxWidth { get; set; } = 0;
         internal double WindowMaxHeight { get; set; } = 0;
         internal bool IsWindowResizable { get; set; } = false;
-        internal EBorderStyle BorderStyle { get; set; } = EBorderStyle.None;
+        internal string BorderColor { get; set; } = "";
 
         private DateTime _startTime;
         private DispatcherTimer _timer;
@@ -65,57 +65,17 @@ namespace TapExtensions.Gui.Wpf.Dialogs
 
         private void SetDialogWindowBorders()
         {
-            switch (BorderStyle)
+            if (string.IsNullOrWhiteSpace(BorderColor))
             {
-                case EBorderStyle.None:
-                    BorderWithStripes.Margin = new Thickness(0);
-                    BorderWithStripes.BorderThickness = new Thickness(0);
-                    BorderWithStripes.Padding = new Thickness(0);
-                    break;
-
-                case EBorderStyle.Green:
-                    // Colors.DarkGreen;
-                    Stripe1.Color = Color.FromRgb(46, 204, 113);
-                    Stripe2.Color = Color.FromRgb(46, 204, 113);
-                    break;
-
-                case EBorderStyle.Yellow:
-                    Stripe1.Color = Color.FromRgb(241, 196, 15);
-                    Stripe2.Color = Color.FromRgb(241, 196, 15);
-                    break;
-
-                case EBorderStyle.Orange:
-                    Stripe1.Color = Color.FromRgb(230, 126, 34);
-                    Stripe2.Color = Color.FromRgb(230, 126, 34);
-                    break;
-
-                case EBorderStyle.Red:
-                    Stripe1.Color = Color.FromRgb(231, 76, 60);
-                    Stripe2.Color = Color.FromRgb(231, 76, 60);
-                    break;
-
-                case EBorderStyle.Blue:
-                    Stripe1.Color = Color.FromRgb(76, 142, 255);
-                    Stripe2.Color = Color.FromRgb(76, 142, 255);
-                    break;
-
-                case EBorderStyle.Black:
-                    Stripe1.Color = Colors.Black;
-                    Stripe2.Color = Colors.Black;
-                    break;
-
-                case EBorderStyle.Gray:
-                    Stripe1.Color = Colors.Gray;
-                    Stripe2.Color = Colors.Gray;
-                    break;
-
-                case EBorderStyle.White:
-                    Stripe1.Color = Colors.White;
-                    Stripe2.Color = Colors.White;
-                    break;
-                default:
-                    throw new ArgumentException(
-                        $"Case not found for {nameof(BorderStyle)}={BorderStyle}");
+                BorderWithStripes.Margin = new Thickness(0);
+                BorderWithStripes.BorderThickness = new Thickness(0);
+                BorderWithStripes.Padding = new Thickness(0);
+            }
+            else
+            {
+                var color = (Color)ColorConverter.ConvertFromString(BorderColor);
+                Stripe1.Color = color;
+                Stripe2.Color = color;
             }
         }
 
@@ -217,7 +177,16 @@ namespace TapExtensions.Gui.Wpf.Dialogs
                 DialogWindow.MaxHeight = WindowMaxHeight;
 
             // Change resize mode
-            DialogWindow.ResizeMode = IsWindowResizable ? ResizeMode.CanResize : ResizeMode.NoResize;
+            if (IsWindowResizable)
+            {
+                DialogWindow.ResizeMode = ResizeMode.CanResize;
+            }
+            else
+            {
+                DialogWindow.ResizeMode = ResizeMode.NoResize;
+                ProductCodeTextBox.Width = 150;
+                SerialNumberTextBox.Width = 150;
+            }
         }
 
         private void CloseWindow()
