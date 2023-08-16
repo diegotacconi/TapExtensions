@@ -4,13 +4,13 @@ using System.IO;
 using System.IO.Compression;
 using System.Text;
 using OpenTap;
-using TapExtensions.Interfaces.Results;
+using TapExtensions.Interfaces.ResultListener;
 
 namespace TapExtensions.Results
 {
     [Display("Zip File",
         Groups: new[] { "TapExtensions", "Results" },
-        Description: "Save results and logs into a zip file.")]
+        Description: "Save results and logs into a zip file")]
     public class ZipFileResultListener : ResultListener, IZipFile
     {
         [Display("Report Path", Order: 1,
@@ -112,10 +112,7 @@ namespace TapExtensions.Results
                     // Create html results file
                     // ...
 
-                    // Create screenshot file
-                    // ...
-
-                    // Add additional files from TestSteps
+                    // Add additional files from test steps
                     foreach (var additionalFile in _additionalFiles)
                     {
                         var entry = zipArchive.CreateEntry(additionalFile.Name, CompressionLevel.Optimal);

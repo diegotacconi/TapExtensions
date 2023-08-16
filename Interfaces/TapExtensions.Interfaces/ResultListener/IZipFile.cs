@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using OpenTap;
 
-namespace TapExtensions.Interfaces.Results
+namespace TapExtensions.Interfaces.ResultListener
 {
     public interface IZipFile : IResultListener
     {

@@ -1,15 +1,18 @@
 ﻿using System;
 using OpenTap;
-using TapExtensions.Interfaces.Results;
+using TapExtensions.Interfaces.ResultListener;
 
-namespace TapExtensions.Steps.Results
+namespace TapExtensions.Steps.ZipFileResultListener
 {
-    [Display("AddNewFileToZip", Groups: new[] { "TapExtensions", "Steps", "Results" })]
+    [Display("AddNewFileToZip",
+        Groups: new[] { "TapExtensions", "Steps", "ZipFileResultListener" },
+        Description:
+        "Example of how to add a new file to the zip file created by the 'Zip File' result listener")]
     public class AddNewFileToZip : TestStep
     {
         [Display("Result Listener", Order: 1,
             Description: "Reference to a result listener, such as 'Zip File'.")]
-        public IZipFile ZipFileListener { get; set; }
+        public IZipFile ZipFileResultListener { get; set; }
 
         [Display("File Name", Order: 2,
             Description: "Full path of the file to be added.")]
@@ -33,7 +36,7 @@ namespace TapExtensions.Steps.Results
         {
             try
             {
-                ZipFileListener.AddNewFile(FileName, FileContents);
+                ZipFileResultListener.AddNewFile(FileName, FileContents);
             }
             catch (Exception ex)
             {
