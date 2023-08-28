@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using OpenTap;
 using TapExtensions.Interfaces.ResultListener;
 
@@ -15,7 +16,7 @@ namespace TapExtensions.Steps.ZipFileResultListener
         public IZipFile ZipFileResultListener { get; set; }
 
         [Display("File Name", Order: 2,
-            Description: "Full path of the file to be added.")]
+            Description: "File name of the file to be added.")]
         public string FileName { get; set; }
 
         [Display("File Contents", Order: 3)]
@@ -30,6 +31,9 @@ namespace TapExtensions.Steps.ZipFileResultListener
                 "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. " +
                 "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris " +
                 "nisi ut aliquip ex ea commodo consequat.";
+            Rules.Add(() => !string.IsNullOrWhiteSpace(FileName), "cannot be empty", nameof(FileName));
+            Rules.Add(() => FileName.IndexOfAny(Path.GetInvalidFileNameChars()) < 0, "Not valid", nameof(FileName));
+            Rules.Add(() => !string.IsNullOrWhiteSpace(FileContents), "cannot be empty", nameof(FileContents));
         }
 
         public override void Run()

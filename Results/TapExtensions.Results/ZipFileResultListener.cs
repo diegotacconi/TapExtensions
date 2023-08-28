@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -58,6 +58,13 @@ namespace TapExtensions.Results
 
         public void AddNewFile(string fileName, MemoryStream fileContents)
         {
+            if (string.IsNullOrWhiteSpace(fileName))
+                throw new InvalidOperationException($"{nameof(fileName)} cannot be empty");
+            if (!(fileName.IndexOfAny(Path.GetInvalidFileNameChars()) < 0))
+                throw new InvalidOperationException($"{nameof(fileName)} is not a valid");
+            if (fileContents.Length == 0)
+                throw new InvalidOperationException($"{nameof(fileContents)} cannot be empty");
+
             var item = new AdditionalFile { Name = fileName, Contents = fileContents };
             var duplicate = _additionalFiles.FindIndex(x => x.Name == fileName);
             if (duplicate != -1)
@@ -74,12 +81,22 @@ namespace TapExtensions.Results
 
         public void AddNewFile(string fileName, string fileContents)
         {
+            if (string.IsNullOrWhiteSpace(fileName))
+                throw new InvalidOperationException($"{nameof(fileName)} cannot be empty");
+            if (!(fileName.IndexOfAny(Path.GetInvalidFileNameChars()) < 0))
+                throw new InvalidOperationException($"{nameof(fileName)} is not a valid");
+            if (string.IsNullOrWhiteSpace(fileContents))
+                throw new InvalidOperationException($"{nameof(fileContents)} cannot be empty");
+
             AddNewFile(fileName, GenerateStreamFromString(fileContents));
         }
 
         private static MemoryStream GenerateStreamFromString(string value)
         {
-            return new MemoryStream(Encoding.UTF8.GetBytes(value ?? ""));
+            if (string.IsNullOrEmpty(value))
+                throw new InvalidOperationException("string cannot be empty");
+
+            return new MemoryStream(Encoding.UTF8.GetBytes(value));
         }
 
         public override void OnTestPlanRunCompleted(TestPlanRun planRun, Stream logStream)
