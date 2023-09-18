@@ -133,15 +133,14 @@ namespace TapExtensions.Instruments.BarcodeScanner
             try
             {
                 Wakeup();
-
-                // Start Scanning
+                ScanEnable();
                 StartSession();
 
                 // Attempt to read the barcode label
                 rawBarcodeLabel = Read(new byte[0], timeout);
 
-                // Stop Scanning
                 StopSession();
+                ScanDisable();
             }
             finally
             {
@@ -337,6 +336,18 @@ namespace TapExtensions.Instruments.BarcodeScanner
         {
             // Request values of certain parameters
             Query(0xC7, new[] { parameterNumber }, CmdAck);
+        }
+
+        private void ScanDisable()
+        {
+            // Prevents the operator from scanning bar codes
+            Query(0xEA, CmdAck);
+        }
+
+        private void ScanEnable()
+        {
+            // Permits bar code scanning
+            Query(0xE9, CmdAck);
         }
 
         private void StartSession()
