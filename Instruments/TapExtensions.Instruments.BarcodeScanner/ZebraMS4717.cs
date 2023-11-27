@@ -1,5 +1,5 @@
 ﻿// Information on the Zebra MS4717 barcode scanner:
-// https://www.zebra.com/ms4717
+// https://www.zebra.com/us/en/products/oem/fixed-mount/ms4700-series.html
 // https://www.zebra.com/content/dam/zebra_new_ia/en-us/manuals/oem/ms4717-ig-en.pdf
 //
 // This instrument driver implements parts of the Zebra's Simple Serial Interface (SSI),
@@ -25,7 +25,8 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
         [Display("Serial Port Name", Order: 1,
             Description: "Remember to configure the scanner as a serial port (UART) device, over USB.")]
-        [HelpLink(@"https://github.com/diegotacconi/TapExtensions/tree/main/Instruments/TapExtensions.Instruments.BarcodeScanner/ConfigDocs")]
+        [HelpLink(
+            @"https://github.com/diegotacconi/TapExtensions/tree/main/Instruments/TapExtensions.Instruments.BarcodeScanner/ConfigDocs")]
         public string SerialPortName { get; set; }
 
         public enum ELoggingLevel
@@ -141,6 +142,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
                 StopSession();
                 ScanDisable();
+                Sleep();
             }
             finally
             {
@@ -348,6 +350,12 @@ namespace TapExtensions.Instruments.BarcodeScanner
         {
             // Permits bar code scanning
             Query(0xE9, CmdAck);
+        }
+
+        private void Sleep()
+        {
+            // Requests to place the decoder into low power
+            Query(0xEB, CmdAck);
         }
 
         private void StartSession()
