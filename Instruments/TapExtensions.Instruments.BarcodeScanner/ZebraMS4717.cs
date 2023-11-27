@@ -23,10 +23,9 @@ namespace TapExtensions.Instruments.BarcodeScanner
     {
         #region Settings
 
+        // https://github.com/diegotacconi/TapExtensions/tree/main/Instruments/TapExtensions.Instruments.BarcodeScanner/ConfigDocs
         [Display("Serial Port Name", Order: 1,
             Description: "Remember to configure the scanner as a serial port (UART) device, over USB.")]
-        [HelpLink(
-            @"https://github.com/diegotacconi/TapExtensions/tree/main/Instruments/TapExtensions.Instruments.BarcodeScanner/ConfigDocs")]
         public string SerialPortName { get; set; }
 
         public enum ELoggingLevel
