@@ -10,7 +10,7 @@ namespace TapExtensions.Steps.Ssh
     {
         #region Settings
 
-        [Display("Ssh Dut", Order: 1)]
+        [Display("Dut", Order: 1)]
         public ISsh Ssh { get; set; }
 
         [Display("Command", Order: 2)]
