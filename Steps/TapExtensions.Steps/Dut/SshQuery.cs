@@ -16,7 +16,7 @@ namespace TapExtensions.Steps.Dut
         [Display("Command", Order: 2)]
         public string Command { get; set; }
 
-        [Display("ExpectedResponse", Order: 3)]
+        [Display("Expected Response", Order: 3)]
         public string ExpectedResponse { get; set; }
 
         [Display("Timeout", Order: 4)]
@@ -41,8 +41,7 @@ namespace TapExtensions.Steps.Dut
 
             try
             {
-                var timeoutMs = Timeout * 1000;
-                var response = Dut.SendSshQuery(Command, timeoutMs);
+                var response = Dut.SendSshQuery(Command, Timeout);
                 if (!response.Contains(ExpectedResponse))
                     throw new InvalidOperationException(
                         $"Cannot find '{ExpectedResponse}' in the response to the ssh command of '{Command}'");

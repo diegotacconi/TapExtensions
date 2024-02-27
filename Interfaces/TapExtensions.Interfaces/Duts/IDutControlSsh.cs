@@ -8,10 +8,6 @@ namespace TapExtensions.Interfaces.Duts
 
         void DisconnectDut();
 
-        void SendSshCommands(string[] commands, int timeoutMs);
-
-        void SendSshCommands(string[] commands, int timeoutMs, bool runAsRoot);
-
-        string SendSshQuery(string command, int timeoutMs);
+        string SendSshQuery(string command, int timeout);
     }
 }
