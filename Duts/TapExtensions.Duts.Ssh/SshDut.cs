@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text;
 using OpenTap;
 using Renci.SshNet;
@@ -32,7 +30,7 @@ namespace TapExtensions.Duts.Ssh
         [Unit("s")]
         public int KeepAliveInterval { get; set; }
 
-        [Display("Verbose Logging", Order: 6, Group: "Debug", Collapsed: true,
+        [Display("Verbose SSH Logging", Order: 6, Group: "Debug", Collapsed: true,
             Description: "Enables verbose logging of SSH communication.")]
         public bool VerboseLoggingEnabled { get; set; } = true;
 
