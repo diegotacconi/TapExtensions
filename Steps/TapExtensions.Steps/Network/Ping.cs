@@ -46,12 +46,12 @@ namespace TapExtensions.Steps.Network
             try
             {
                 var pingOk = PingHost(IpAddress, Timeout, MinSuccessfulReplies);
-                // Publish(Name, pingOk, true, true, "bool");
+                UpgradeVerdict(pingOk ? Verdict.Pass : Verdict.Fail);
             }
             catch (Exception ex)
             {
                 Log.Error(ex.Message);
-                // Publish(Name, false, true, true, "bool");
+                UpgradeVerdict(Verdict.Fail);
             }
         }
 
