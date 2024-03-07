@@ -8,9 +8,9 @@ using TapExtensions.Interfaces.Ssh;
 
 namespace TapExtensions.Duts.Ssh
 {
-    [Display("SshDut",
+    [Display("DutSshCommand",
         Groups: new[] { "TapExtensions", "Duts", "Ssh" })]
-    public class SshDut : Dut, ISsh
+    public class DutSshCommand : Dut, ISsh
     {
         #region Settings
 
@@ -38,10 +38,10 @@ namespace TapExtensions.Duts.Ssh
 
         private SshClient _sshClient;
 
-        public SshDut()
+        public DutSshCommand()
         {
             // Default values
-            Name = nameof(SshDut);
+            Name = nameof(DutSshCommand);
             Host = "localhost";
             Port = 22;
             Username = "root";
@@ -50,24 +50,29 @@ namespace TapExtensions.Duts.Ssh
 
             // Validation rules
             Rules.Add(() => KeepAliveInterval >= 0,
-                "Time interval must be greater than or equal to zero", nameof(KeepAliveInterval));
+                "Must be greater than or equal to zero", nameof(KeepAliveInterval));
+        }
+
+        public override void Open()
+        {
+            base.Open();
+            IsConnected = false;
         }
 
         public override void Close()
         {
             Disconnect();
             base.Close();
+            IsConnected = false;
         }
 
         public void Connect()
         {
             if (_sshClient == null)
-            {
                 _sshClient = new SshClient(Host, Port, Username, Password)
                 {
                     KeepAliveInterval = TimeSpan.FromSeconds(KeepAliveInterval)
                 };
-            }
 
             if (!_sshClient.IsConnected)
             {
@@ -107,6 +112,7 @@ namespace TapExtensions.Duts.Ssh
             // https://stackoverflow.com/questions/47386713/execute-long-time-command-in-ssh-net-and-display-the-results-continuously-in-tex
 
             var cmd = _sshClient.CreateCommand(command);
+            cmd.CommandTimeout = TimeSpan.FromSeconds(timeout);
 
             Log.Debug($"SSH >> {cmd.CommandText}");
             var async = cmd.BeginExecute(ar => timer.Stop());
@@ -118,6 +124,7 @@ namespace TapExtensions.Duts.Ssh
             // var lineBuffer = new StringBuilder();
             using (var reader = new StreamReader(cmd.OutputStream, Encoding.UTF8, true, 1024, true))
             {
+                reader.BaseStream.ReadTimeout = timeout * 1000;
                 while (!async.IsCompleted || !reader.EndOfStream)
                 {
                     var line = reader.ReadLine();

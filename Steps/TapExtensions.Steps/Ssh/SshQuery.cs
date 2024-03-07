@@ -10,11 +10,9 @@ namespace TapExtensions.Steps.Ssh
     {
         #region Settings
 
-        [Display("Dut", Order: 1)]
-        public ISsh Ssh { get; set; }
+        [Display("Dut", Order: 1)] public ISsh Dut { get; set; }
 
-        [Display("Command", Order: 2)]
-        public string Command { get; set; }
+        [Display("Command", Order: 2)] public string Command { get; set; }
 
         [Display("Expected Response", Order: 3)]
         public string ExpectedResponse { get; set; }
@@ -31,26 +29,27 @@ namespace TapExtensions.Steps.Ssh
             Command = "pwd";
             ExpectedResponse = "/";
             Timeout = 5;
+
+            // Validation rules
+            Rules.Add(() => Timeout >= 0,
+                "Must be greater than or equal to zero", nameof(Timeout));
         }
 
         public override void Run()
         {
             try
             {
-                Ssh.Connect();
-
-                var response = Ssh.Query(Command, Timeout);
+                var response = Dut.Query(Command, Timeout);
                 if (!response.Contains(ExpectedResponse))
                     throw new InvalidOperationException(
                         $"Cannot find '{ExpectedResponse}' in the response to the ssh command of '{Command}'");
 
-                Ssh.Disconnect();
-                // Publish(Name, true, true, true, "bool");
+                UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)
             {
                 Log.Error(ex.Message);
-                // Publish(Name, false, true, true, "bool");
+                UpgradeVerdict(Verdict.Fail);
             }
         }
     }

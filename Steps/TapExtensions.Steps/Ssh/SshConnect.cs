@@ -1,20 +1,15 @@
 ﻿using System;
 using OpenTap;
-using TapExtensions.Interfaces.Duts;
+using TapExtensions.Interfaces.Ssh;
 
-namespace TapExtensions.Steps.Dut
+namespace TapExtensions.Steps.Ssh
 {
     [Display("SshConnect",
         Groups: new[] { "TapExtensions", "Steps", "Dut" })]
     [AllowAnyChild]
     public class SshConnect : TestStep
     {
-        #region Settings
-
-        [Display("Dut", Order: 1)]
-        public IDutControlSsh Dut { get; set; }
-
-        #endregion
+        [Display("Dut", Order: 1)] public ISsh Dut { get; set; }
 
         public override void Run()
         {
@@ -26,19 +21,21 @@ namespace TapExtensions.Steps.Dut
 
             try
             {
-                Dut.ConnectDut();
+                Dut.Connect();
 
-                if (Dut.IsConnected)
-                    Log.Debug($"'{Dut.Name}' connected");
-                else
+                if (!Dut.IsConnected)
                     throw new InvalidOperationException(
-                        $"Could not connect to '{Dut.Name}'");
+                        $"Cannot connect to '{Dut.Name}'");
+
+                UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)
             {
                 Log.Error(ex.Message);
-                // Dut.DisconnectDut();
+                UpgradeVerdict(Verdict.Fail);
             }
+
+            // RunChildSteps();
         }
     }
 }
