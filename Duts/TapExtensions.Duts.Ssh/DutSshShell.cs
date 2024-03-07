@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -196,6 +197,16 @@ namespace TapExtensions.Duts.Ssh
                     "Error occurred in executing ssh command");
 
             return response.ToString();
+        }
+
+        public void UploadFiles(List<(string localFilePath, string remoteFilePath)> files)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DownloadFiles(List<(string remoteFilePath, string localFilePath)> files)
+        {
+            throw new NotImplementedException();
         }
     }
 }

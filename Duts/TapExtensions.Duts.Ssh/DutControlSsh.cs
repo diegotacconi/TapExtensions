@@ -350,5 +350,15 @@ namespace TapExtensions.Duts.Ssh
             response = readBuffer.ToString().Trim();
             return success;
         }
+
+        public void UploadFiles(List<(string localFilePath, string remoteFilePath)> files)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DownloadFiles(List<(string remoteFilePath, string localFilePath)> files)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
