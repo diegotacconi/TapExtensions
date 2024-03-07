@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TestPlan type="OpenTap.TestPlan" Locked="false">
   <Steps>
-    <TestStep type="TapExtensions.Steps.DcPwr.DcPowerOn" Version="1.0.0-beta.11+0a52f9d0" Id="f49f6413-200c-4fcd-98af-1402294a1a78">
+    <TestStep type="TapExtensions.Steps.DcPwr.DcPowerOn" Version="1.0.0" Id="f49f6413-200c-4fcd-98af-1402294a1a78">
       <DcPwr type="TapExtensions.Instruments.DcPwr.KeysightE3632A" Source="OpenTap.InstrumentSettings">KeysightE3632A</DcPwr>
       <Voltage>5.3</Voltage>
       <Current>2</Current>
@@ -17,8 +17,8 @@
       <BreakConditions>Inherit</BreakConditions>
       <OpenTap.Description />
     </TestStep>
-    <TestStep type="TapExtensions.Steps.Uart.UartExpect" Version="1.0.0-beta.11+0a52f9d0" Id="66d5f543-d892-4e18-9769-9387df09a0c8">
-      <Uart type="TapExtensions.Duts.Uart.UartDut" Source="OpenTap.DutSettings">Uart</Uart>
+    <TestStep type="TapExtensions.Steps.Uart.UartExpect" Version="1.0.0" Id="66d5f543-d892-4e18-9769-9387df09a0c8">
+      <Uart type="TapExtensions.Duts.Uart.DutUart" Source="OpenTap.DutSettings">Uart</Uart>
       <ExpectedResponse>login:</ExpectedResponse>
       <Timeout>60</Timeout>
       <Enabled>true</Enabled>
@@ -27,7 +27,7 @@
       <BreakConditions>Inherit</BreakConditions>
       <OpenTap.Description />
     </TestStep>
-    <TestStep type="TapExtensions.Steps.Network.Ping" Version="1.0.0-beta.11+0a52f9d0" Id="7ab8c006-dee6-40b7-8a85-3c7ac4f0f702">
+    <TestStep type="TapExtensions.Steps.Network.Ping" Version="1.0.0" Id="7ab8c006-dee6-40b7-8a85-3c7ac4f0f702">
       <IpAddress>192.168.101.1</IpAddress>
       <MinSuccessfulReplies>4</MinSuccessfulReplies>
       <Timeout>60</Timeout>
@@ -37,8 +37,16 @@
       <BreakConditions>Inherit</BreakConditions>
       <OpenTap.Description />
     </TestStep>
-    <TestStep type="TapExtensions.Steps.Ssh.SshQuery" Version="1.0.0-beta.11+0a52f9d0" Id="205cc203-d8d2-49c2-9aa0-b76469243963">
-      <Ssh type="TapExtensions.Duts.Ssh.SshDut" Source="OpenTap.DutSettings">Ssh</Ssh>
+    <TestStep type="TapExtensions.Steps.Ssh.SshConnect" Version="1.0.0" Id="3d92934a-0c15-40a6-9e4d-7dabd7e99f1c">
+      <Dut type="TapExtensions.Duts.Ssh.DutSshCommand" Source="OpenTap.DutSettings">SshCommand</Dut>
+      <Enabled>true</Enabled>
+      <Name>SshConnect</Name>
+      <ChildTestSteps />
+      <BreakConditions>Inherit</BreakConditions>
+      <OpenTap.Description />
+    </TestStep>
+    <TestStep type="TapExtensions.Steps.Ssh.SshQuery" Version="1.0.0" Id="205cc203-d8d2-49c2-9aa0-b76469243963">
+      <Dut type="TapExtensions.Duts.Ssh.DutSshCommand" Source="OpenTap.DutSettings">SshCommand</Dut>
       <Command>pwd</Command>
       <ExpectedResponse>/</ExpectedResponse>
       <Timeout>5</Timeout>
@@ -48,8 +56,8 @@
       <BreakConditions>Inherit</BreakConditions>
       <OpenTap.Description />
     </TestStep>
-    <TestStep type="TapExtensions.Steps.Ssh.SshQuery" Version="1.0.0-beta.11+0a52f9d0" Id="1fccda19-8dbd-4e9f-97d0-5e612ebc30a1">
-      <Ssh type="TapExtensions.Duts.Ssh.SshDut" Source="OpenTap.DutSettings">Ssh</Ssh>
+    <TestStep type="TapExtensions.Steps.Ssh.SshQuery" Version="1.0.0" Id="1fccda19-8dbd-4e9f-97d0-5e612ebc30a1">
+      <Dut type="TapExtensions.Duts.Ssh.DutSshCommand" Source="OpenTap.DutSettings">SshCommand</Dut>
       <Command>cat /etc/issue</Command>
       <ExpectedResponse>Linux</ExpectedResponse>
       <Timeout>5</Timeout>
@@ -59,7 +67,7 @@
       <BreakConditions>Inherit</BreakConditions>
       <OpenTap.Description />
     </TestStep>
-    <TestStep type="TapExtensions.Steps.DcPwr.DcPowerOff" Version="1.0.0-beta.11+0a52f9d0" Id="28e1be6d-8adc-46a0-bfd4-066776c5f59d">
+    <TestStep type="TapExtensions.Steps.DcPwr.DcPowerOff" Version="1.0.0" Id="28e1be6d-8adc-46a0-bfd4-066776c5f59d">
       <DcPwr type="TapExtensions.Instruments.DcPwr.KeysightE3632A" Source="OpenTap.InstrumentSettings">KeysightE3632A</DcPwr>
       <Enabled>true</Enabled>
       <Name>DcPowerOff</Name>
@@ -68,10 +76,7 @@
       <OpenTap.Description />
     </TestStep>
   </Steps>
-  <BreakConditions>Inherit</BreakConditions>
+    <BreakConditions>Inherit</BreakConditions>
   <OpenTap.Description />
-  <Package.Dependencies>
-    <Package Name="OpenTAP" Version="^9.17.4+ea67c63a" />
-    <Package Name="TapExtensions" Version="^1.0.0-beta.11+0a52f9d0" />
-  </Package.Dependencies>
+  <Package.Dependencies />
 </TestPlan>
