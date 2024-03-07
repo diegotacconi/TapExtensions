@@ -30,7 +30,7 @@ namespace TapExtensions.Duts.Ssh
         [Unit("s")]
         public int KeepAliveInterval { get; set; }
 
-        [Display("Verbose SSH Logging", Order: 6, Group: "Debug", Collapsed: true,
+        [Display("Verbose Logging", Order: 6, Group: "Debug", Collapsed: true,
             Description: "Enables verbose logging of SSH communication.")]
         public bool VerboseLoggingEnabled { get; set; } = true;
 
@@ -100,11 +100,8 @@ namespace TapExtensions.Duts.Ssh
 
         public string Query(string command, int timeout)
         {
-            if (_sshClient == null)
-                throw new InvalidOperationException($"{nameof(_sshClient)} is null");
-
-            if (!_sshClient.IsConnected)
-                throw new InvalidOperationException($"{nameof(_sshClient)} is not connected");
+            if (_sshClient == null || !_sshClient.IsConnected)
+                throw new InvalidOperationException($"{Name} is not connected");
 
             var timer = new Stopwatch();
             timer.Start();
@@ -124,7 +121,7 @@ namespace TapExtensions.Duts.Ssh
             // var lineBuffer = new StringBuilder();
             using (var reader = new StreamReader(cmd.OutputStream, Encoding.UTF8, true, 1024, true))
             {
-                reader.BaseStream.ReadTimeout = timeout * 1000;
+                // reader.BaseStream.ReadTimeout = timeout * 1000;
                 while (!async.IsCompleted || !reader.EndOfStream)
                 {
                     var line = reader.ReadLine();

@@ -5,7 +5,7 @@ using TapExtensions.Interfaces.Ssh;
 namespace TapExtensions.Steps.Ssh
 {
     [Display("SshConnect",
-        Groups: new[] { "TapExtensions", "Steps", "Dut" })]
+        Groups: new[] { "TapExtensions", "Steps", "Ssh" })]
     [AllowAnyChild]
     public class SshConnect : TestStep
     {

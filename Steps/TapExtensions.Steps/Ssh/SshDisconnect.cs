@@ -5,7 +5,7 @@ using TapExtensions.Interfaces.Ssh;
 namespace TapExtensions.Steps.Ssh
 {
     [Display("SshDisconnect",
-        Groups: new[] { "TapExtensions", "Steps", "Dut" })]
+        Groups: new[] { "TapExtensions", "Steps", "Ssh" })]
     public class SshDisconnect : TestStep
     {
         [Display("Dut", Order: 1)] public ISsh Dut { get; set; }

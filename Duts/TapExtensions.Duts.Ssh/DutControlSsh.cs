@@ -34,7 +34,7 @@ namespace TapExtensions.Duts.Ssh
         [Unit("s")]
         public int KeepAliveInterval { get; set; }
 
-        [Display("Verbose SSH Logging", Order: 6, Group: "Debug", Collapsed: true,
+        [Display("Verbose Logging", Order: 6, Group: "Debug", Collapsed: true,
             Description: "Enables verbose logging of SSH communication.")]
         public bool VerboseLoggingEnabled { get; set; } = true;
 
@@ -208,14 +208,14 @@ namespace TapExtensions.Duts.Ssh
 
         protected void VerifySshConnection()
         {
-            if (_sshClient == null) throw new InvalidOperationException(nameof(_sshClient) + " is null!");
-            if (!_sshClient.IsConnected) throw new InvalidOperationException("Ssh client not connected!");
+            if (_sshClient == null || !_sshClient.IsConnected)
+                throw new InvalidOperationException($"{Name} (ssh client) is not connected");
         }
 
         protected void VerifyScpConnection()
         {
-            if (_scpClient == null) throw new InvalidOperationException(nameof(_scpClient) + " is null!");
-            if (!_scpClient.IsConnected) throw new InvalidOperationException("Scp client not connected!");
+            if (_scpClient == null || !_scpClient.IsConnected)
+                throw new InvalidOperationException($"{Name} (scp client) is not connected");
         }
 
         public virtual string Query(string command, int timeout)
