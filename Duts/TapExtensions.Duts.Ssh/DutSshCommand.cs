@@ -104,8 +104,8 @@ namespace TapExtensions.Duts.Ssh
             if (_sshClient == null || !_sshClient.IsConnected)
                 throw new InvalidOperationException($"{Name} is not connected");
 
-            var timer = new Stopwatch();
-            timer.Start();
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
 
             // https://stackoverflow.com/questions/47386713/execute-long-time-command-in-ssh-net-and-display-the-results-continuously-in-tex
 
@@ -113,7 +113,7 @@ namespace TapExtensions.Duts.Ssh
             cmd.CommandTimeout = TimeSpan.FromSeconds(timeout);
 
             Log.Debug($"SSH >> {cmd.CommandText}");
-            var async = cmd.BeginExecute(ar => timer.Stop());
+            var async = cmd.BeginExecute(ar => stopwatch.Stop());
 
             // var stdoutStreamReader = new StreamReader(cmd.OutputStream);
             // var stderrStreamReader = new StreamReader(cmd.ExtendedOutputStream);
@@ -122,13 +122,17 @@ namespace TapExtensions.Duts.Ssh
             // var lineBuffer = new StringBuilder();
             using (var reader = new StreamReader(cmd.OutputStream, Encoding.UTF8, true, 1024, true))
             {
-                // reader.BaseStream.ReadTimeout = timeout * 1000;
                 while (!async.IsCompleted || !reader.EndOfStream)
                 {
-                    var line = reader.ReadLine();
-                    if (line != null)
+                    if (timeout > 0 && stopwatch.Elapsed > TimeSpan.FromSeconds(timeout))
+                        throw new InvalidOperationException(
+                            "Timeout occurred while waiting for ssh response to end");
+
+                    // var line = reader.ReadLine();
+                    var line = reader.ReadToEnd();
+                    if (!string.IsNullOrEmpty(line))
                     {
-                        readBuffer.Append(line + "\n");
+                        readBuffer.Append(line);
 
                         // ToDo: call LogLineByLine()
 
@@ -147,49 +151,6 @@ namespace TapExtensions.Duts.Ssh
 
             return readBuffer.ToString();
         }
-
-        /*
-        public List<string> QueryToList(string command, int timeout)
-        {
-            var lines = new List<string>();
-
-            if (_sshClient == null)
-                throw new InvalidOperationException($"{nameof(_sshClient)} is null");
-
-            if (!_sshClient.IsConnected)
-                throw new InvalidOperationException($"{nameof(_sshClient)} is not connected");
-
-            var cmd = _sshClient.CreateCommand(command);
-            Log.Debug($"SSH >> {cmd.CommandText}");
-            var async = cmd.BeginExecute();
-
-            using (var reader = new StreamReader(cmd.OutputStream, Encoding.UTF8, true, 1024, true))
-            {
-                while (!async.IsCompleted || !reader.EndOfStream)
-                {
-                    var line = reader.ReadLine();
-                    if (!string.IsNullOrEmpty(line))
-                    {
-                        lines.Add(line);
-                        Log.Debug($"SSH << {line}");
-                        // LogBytes(Encoding.UTF8.GetBytes(line));
-                    }
-                }
-            }
-
-            cmd.EndExecute(async);
-
-            if (cmd.ExitStatus != 0)
-                throw new InvalidOperationException(cmd.Error);
-
-            // Check if the list of response lines from the ssh command is empty
-            var isEmpty = !lines.Any();
-            if (isEmpty)
-                lines = new List<string> {string.Empty};
-
-            return lines;
-        }
-        */
 
         /*
         private void LogBytes(byte[] bytes)
