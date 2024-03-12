@@ -153,27 +153,31 @@ namespace TapExtensions.Duts.Ssh
         }
 
         /*
-        private void LogBytes(byte[] bytes)
+        private void SendToLog(string lineBuffer)
         {
-            if (VerboseLoggingEnabled)
+            if (string.IsNullOrWhiteSpace(lineBuffer))
+                return;
+
+            var lines = lineBuffer.Split(new[] { "\r\n", "\n\r", "\r", "\n" },
+                StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var line in lines)
             {
-                var sb1 = new StringBuilder();
-                var sb2 = new StringBuilder();
-                foreach (var c in bytes)
-                {
-                    sb1.Append(c.ToString("X2") + " ");
+                if (string.IsNullOrWhiteSpace(line))
+                    continue; // Go to the next line
 
-                    var j = c;
-                    if (j >= 0x20 && j <= 0x7E)
-                        sb2.Append((char) j);
-                    else
-                        sb2.Append('.');
+                // Remove ANSI escape codes from log message
+                var lineWithoutAnsiEscapeCodes =
+                    Regex.Replace(line, @"\x1B\[[^@-~]*[@-~]", "", RegexOptions.Compiled);
 
-                    sb2.Append("  ");
-                }
+                var msg = $"SSH << {lineWithoutAnsiEscapeCodes}";
 
-                Log.Debug($"Debug - Hex:   {sb1}");
-                Log.Debug($"Debug - Ascii: {sb2}");
+                // Truncate log message to a maximum sting length
+                const int maxLength = 500;
+                if (msg.Length > maxLength)
+                    msg = msg.Substring(0, maxLength) + "***";
+
+                Log.Debug(msg);
             }
         }
         */
