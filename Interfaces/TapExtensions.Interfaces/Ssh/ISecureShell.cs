@@ -2,7 +2,7 @@
 
 namespace TapExtensions.Interfaces.Ssh
 {
-    public interface ISsh : IDut
+    public interface ISecureShell : IDut
     {
         void Connect();
 

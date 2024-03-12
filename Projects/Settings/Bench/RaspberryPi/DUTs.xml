@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <DutSettings type="OpenTap.DutSettings">
-  <DutUart type="TapExtensions.Duts.Uart.DutUart" Source="">
+  <UartDut type="TapExtensions.Duts.Uart.UartDut" Source="">
     <PortName>COM5</PortName>
     <BaudRate>115200</BaudRate>
     <Parity>None</Parity>
@@ -11,8 +11,8 @@
     <ID />
     <Comment />
     <Name>Uart</Name>
-  </DutUart>
-  <DutSshCommand type="TapExtensions.Duts.Ssh.DutSshCommand" Source="">
+  </UartDut>
+  <SshCommandDut type="TapExtensions.Duts.Ssh.SshCommandDut" Source="">
     <Host>192.168.101.1</Host>
     <Port>22</Port>
     <Username>pi</Username>
@@ -22,8 +22,8 @@
     <ID />
     <Comment />
     <Name>SshCommand</Name>
-  </DutSshCommand>
-  <DutSshShell type="TapExtensions.Duts.Ssh.DutSshShell" Source="">
+  </SshCommandDut>
+  <SshShellDut type="TapExtensions.Duts.Ssh.SshShellDut" Source="">
     <Host>192.168.101.1</Host>
     <Port>22</Port>
     <Username>pi</Username>
@@ -33,7 +33,7 @@
     <ID />
     <Comment />
     <Name>SshShell</Name>
-  </DutSshShell>
+  </SshShellDut>
   <DutControlSsh type="TapExtensions.Duts.Ssh.DutControlSsh" Source="">
     <Host>192.168.101.1</Host>
     <Port>22</Port>

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -9,9 +8,9 @@ using TapExtensions.Interfaces.Ssh;
 
 namespace TapExtensions.Duts.Ssh
 {
-    [Display("DutSshCommand",
+    [Display("SshCommandDut",
         Groups: new[] { "TapExtensions", "Duts", "Ssh" })]
-    public class DutSshCommand : Dut, ISsh
+    public class SshCommandDut : Dut, ISecureShell
     {
         #region Settings
 
@@ -39,10 +38,10 @@ namespace TapExtensions.Duts.Ssh
 
         private SshClient _sshClient;
 
-        public DutSshCommand()
+        public SshCommandDut()
         {
             // Default values
-            Name = nameof(DutSshCommand);
+            Name = nameof(SshCommandDut);
             Host = "localhost";
             Port = 22;
             Username = "root";

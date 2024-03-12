@@ -8,9 +8,9 @@ using TapExtensions.Interfaces.Uart;
 
 namespace TapExtensions.Duts.Uart
 {
-    [Display("DutUart",
+    [Display("UartDut",
         Groups: new[] { "TapExtensions", "Duts", "Uart" })]
-    public class DutUart : Dut, IUart
+    public class UartDut : Dut, IUart
     {
         #region Settings
 
@@ -49,10 +49,10 @@ namespace TapExtensions.Duts.Uart
         private readonly ManualResetEvent _waitForEvent = new ManualResetEvent(false);
         private string _response;
 
-        public DutUart()
+        public UartDut()
         {
             // Default values
-            Name = nameof(DutUart);
+            Name = nameof(UartDut);
             PortName = "COM13";
             BaudRate = 115200;
             Parity = Parity.None;

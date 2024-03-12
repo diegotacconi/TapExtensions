@@ -8,7 +8,7 @@ namespace TapExtensions.Steps.Ssh
         Groups: new[] { "TapExtensions", "Steps", "Ssh" })]
     public class SshDisconnect : TestStep
     {
-        [Display("Dut", Order: 1)] public ISsh Dut { get; set; }
+        [Display("Dut", Order: 1)] public ISecureShell Dut { get; set; }
 
         public override void Run()
         {

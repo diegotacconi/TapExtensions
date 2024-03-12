@@ -14,7 +14,7 @@ namespace TapExtensions.Duts.Ssh
 {
     [Display("DutControlSsh",
         Groups: new[] { "TapExtensions", "Duts", "Ssh" })]
-    public class DutControlSsh : Dut, ISsh
+    public class DutControlSsh : Dut, ISecureShell
     {
         #region Settings
 

@@ -8,9 +8,9 @@ using TapExtensions.Interfaces.Ssh;
 
 namespace TapExtensions.Duts.Ssh
 {
-    [Display("DutSshShell",
+    [Display("SshShellDut",
         Groups: new[] { "TapExtensions", "Duts", "Ssh" })]
-    public class DutSshShell : Dut, ISsh
+    public class SshShellDut : Dut, ISecureShell
     {
         #region Settings
 
@@ -39,10 +39,10 @@ namespace TapExtensions.Duts.Ssh
         private SshClient _sshClient;
         private readonly object _sshLock = new object();
 
-        public DutSshShell()
+        public SshShellDut()
         {
             // Default values
-            Name = nameof(DutSshShell);
+            Name = nameof(SshShellDut);
             Host = "localhost";
             Port = 22;
             Username = "root";

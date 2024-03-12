@@ -9,7 +9,7 @@ namespace TapExtensions.Steps.Ssh
     [AllowAnyChild]
     public class SshConnect : TestStep
     {
-        [Display("Dut", Order: 1)] public ISsh Dut { get; set; }
+        [Display("Dut", Order: 1)] public ISecureShell Dut { get; set; }
 
         public override void Run()
         {
