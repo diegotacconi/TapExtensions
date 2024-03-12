@@ -10,17 +10,15 @@ namespace TapExtensions.Steps.Uart
     {
         #region Settings
 
-        [Display("Uart Dut", Order: 1)]
-        public IUart Uart { get; set; }
+        [Display("Uart Dut", Order: 1)] public IUart Dut { get; set; }
 
-        [Display("Command", Order: 2)]
-        public string Command { get; set; }
+        [Display("Command", Order: 2)] public string Command { get; set; }
 
         [Display("Expected Response", Order: 3)]
         public string ExpectedResponse { get; set; }
 
-        [Display("Expected Prompt", Order: 4)]
-        public string ExpectedPrompt { get; set; }
+        [Display("Expected EndOfMessage", Order: 4, Description: "Usually a shell prompt")]
+        public string ExpectedEndOfMessage { get; set; }
 
         [Display("Timeout", Order: 5)]
         [Unit("s")]
@@ -33,7 +31,7 @@ namespace TapExtensions.Steps.Uart
             // Default values
             Command = "pwd";
             ExpectedResponse = "/home/user";
-            ExpectedPrompt = "user@hostname#";
+            ExpectedEndOfMessage = "user@hostname#";
             Timeout = 5;
 
             // Validation rules
@@ -45,13 +43,18 @@ namespace TapExtensions.Steps.Uart
         {
             try
             {
-                var response = Uart.Query(Command, ExpectedPrompt, Timeout);
-                // Publish(Name, response.Contains(ExpectedResponse), true, true, "bool");
+                var response = Dut.Query(Command, ExpectedEndOfMessage, Timeout);
+
+                if (!response.Contains(ExpectedResponse))
+                    throw new InvalidOperationException(
+                        $"Cannot find '{ExpectedResponse}' in the response to the ssh command of '{Command}'");
+
+                UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)
             {
                 Log.Error(ex.Message);
-                // Publish(Name, false, true, true, "bool");
+                UpgradeVerdict(Verdict.Fail);
             }
         }
     }
