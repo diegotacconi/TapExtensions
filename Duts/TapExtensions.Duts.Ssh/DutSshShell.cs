@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -100,12 +99,11 @@ namespace TapExtensions.Duts.Ssh
             IsConnected = false;
         }
 
-        public string Query(string command, int timeout)
+        public bool Query(string command, int timeout, out string response)
         {
             if (_sshClient == null || !_sshClient.IsConnected)
                 throw new InvalidOperationException($"{Name} is not connected");
 
-            string response;
             lock (_sshLock)
             {
                 using (var shell = _sshClient.CreateShellStream("SshShell", 0, 0, 0, 0, 1024))
@@ -123,7 +121,8 @@ namespace TapExtensions.Duts.Ssh
                 }
             }
 
-            return response;
+            // ToDo: need to check if ExitStatus is zero
+            return true;
         }
 
         private void WriteStream(string command, Stream shell, Stopwatch stopwatch, int timeout)
@@ -197,16 +196,6 @@ namespace TapExtensions.Duts.Ssh
                     "Error occurred in executing ssh command");
 
             return response.ToString();
-        }
-
-        public void UploadFiles(List<(string localFilePath, string remoteFilePath)> files)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void DownloadFiles(List<(string remoteFilePath, string localFilePath)> files)
-        {
-            throw new NotImplementedException();
         }
     }
 }

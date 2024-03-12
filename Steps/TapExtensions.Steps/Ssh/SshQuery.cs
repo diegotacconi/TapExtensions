@@ -39,7 +39,10 @@ namespace TapExtensions.Steps.Ssh
         {
             try
             {
-                var response = Dut.Query(Command, Timeout);
+                if (!Dut.Query(Command, Timeout, out var response))
+                    throw new InvalidOperationException(
+                        "Exit status of ssh command was not 0");
+
                 if (!response.Contains(ExpectedResponse))
                     throw new InvalidOperationException(
                         $"Cannot find '{ExpectedResponse}' in the response to the ssh command of '{Command}'");

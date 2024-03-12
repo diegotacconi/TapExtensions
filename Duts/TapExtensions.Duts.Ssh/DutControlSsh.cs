@@ -218,22 +218,21 @@ namespace TapExtensions.Duts.Ssh
                 throw new InvalidOperationException($"{Name} (scp client) is not connected");
         }
 
-        public virtual string Query(string command, int timeout)
+        public virtual bool Query(string command, int timeout, out string response)
+
         {
             VerifySshConnection();
-            string response;
 
+            bool success;
             lock (SshLock)
             {
                 using (var shell = _sshClient.CreateShellStream("sshCommand", 800, 24, 8000, 600, 1024))
                 {
-                    if (!SendCommand(shell, command, timeout, out response))
-                        throw new InvalidOperationException(
-                            $"Error occurred in executing command: {command}");
+                    success = SendCommand(shell, command, timeout, out response);
                 }
             }
 
-            return response;
+            return success;
         }
 
         private bool SendCommand(ShellStream stream, string command, int timeout, out string response)
@@ -349,16 +348,6 @@ namespace TapExtensions.Duts.Ssh
             stopwatch.Stop();
             response = readBuffer.ToString().Trim();
             return success;
-        }
-
-        public void UploadFiles(List<(string localFilePath, string remoteFilePath)> files)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void DownloadFiles(List<(string remoteFilePath, string localFilePath)> files)
-        {
-            throw new NotImplementedException();
         }
     }
 }

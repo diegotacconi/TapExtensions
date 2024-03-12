@@ -99,7 +99,7 @@ namespace TapExtensions.Duts.Ssh
             IsConnected = false;
         }
 
-        public string Query(string command, int timeout)
+        public bool Query(string command, int timeout, out string response)
         {
             if (_sshClient == null || !_sshClient.IsConnected)
                 throw new InvalidOperationException($"{Name} is not connected");
@@ -146,10 +146,11 @@ namespace TapExtensions.Duts.Ssh
 
             cmd.EndExecute(async);
 
-            if (cmd.ExitStatus != 0)
-                throw new InvalidOperationException(cmd.Error);
+            // if (cmd.ExitStatus != 0)
+            //     throw new InvalidOperationException(cmd.Error);
 
-            return readBuffer.ToString();
+            response = readBuffer.ToString();
+            return cmd.ExitStatus == 0;
         }
 
         /*
@@ -181,15 +182,5 @@ namespace TapExtensions.Duts.Ssh
             }
         }
         */
-
-        public void UploadFiles(List<(string localFilePath, string remoteFilePath)> files)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void DownloadFiles(List<(string remoteFilePath, string localFilePath)> files)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
