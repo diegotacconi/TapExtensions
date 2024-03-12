@@ -59,9 +59,6 @@ namespace TapExtensions.Steps.Ssh
         {
             try
             {
-                // if (!Dut.IsConnected)
-                //     Ssh.Connect();
-
                 foreach (var q in Queries)
                 {
                     var response = Dut.Query(q.Command, q.Timeout);

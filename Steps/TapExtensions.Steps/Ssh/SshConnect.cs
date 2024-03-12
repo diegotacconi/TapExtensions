@@ -16,6 +16,7 @@ namespace TapExtensions.Steps.Ssh
             if (Dut.IsConnected)
             {
                 Log.Debug($"'{Dut.Name}' already connected");
+                UpgradeVerdict(Verdict.Pass);
                 return;
             }
 
@@ -26,16 +27,14 @@ namespace TapExtensions.Steps.Ssh
                 if (!Dut.IsConnected)
                     throw new InvalidOperationException(
                         $"Cannot connect to '{Dut.Name}'");
-
-                UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)
             {
                 Log.Error(ex.Message);
-                UpgradeVerdict(Verdict.Fail);
+                // Dut.Disconnect();
             }
 
-            // RunChildSteps();
+            UpgradeVerdict(Dut.IsConnected ? Verdict.Pass : Verdict.Fail);
         }
     }
 }
