@@ -97,13 +97,22 @@ namespace TapExtensions.Steps.DcPwr
                 var measuredVoltage = DcPwr.MeasureVoltage();
                 var measuredCurrent = DcPwr.MeasureCurrent();
 
-                // Publish(Name + ".Voltage", measuredVoltage, VoltageLimitLow, VoltageLimitHigh, "V");
-                // Publish(Name + ".Current", measuredCurrent, CurrentLimitLow, CurrentLimitHigh, "A");
+                if (measuredVoltage < VoltageLimitLow || measuredVoltage > VoltageLimitHigh)
+                    throw new InvalidOperationException(
+                        $"The measured voltage of {Math.Round(measuredVoltage, 3)} is not " +
+                        $"within the expected limits of {VoltageLimitLow} to {VoltageLimitHigh}");
+
+                if (measuredCurrent < CurrentLimitLow || measuredCurrent > CurrentLimitHigh)
+                    throw new InvalidOperationException(
+                        $"The measured voltage of {Math.Round(measuredCurrent, 3)} is not " +
+                        $"within the expected limits of {CurrentLimitLow} to {CurrentLimitHigh}");
+
+                UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)
             {
                 Log.Error(ex.Message);
-                // Publish(Name, false, true, true, "bool");
+                UpgradeVerdict(Verdict.Fail);
             }
         }
     }

@@ -22,12 +22,12 @@ namespace TapExtensions.Steps.DcPwr
 
                 DcPwr.SetOutputState(EState.Off);
 
-                // Publish(Name, true, true, true, "bool");
+                UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)
             {
                 Log.Error(ex.Message);
-                // Publish(Name, false, true, true, "bool");
+                UpgradeVerdict(Verdict.Fail);
             }
         }
     }
