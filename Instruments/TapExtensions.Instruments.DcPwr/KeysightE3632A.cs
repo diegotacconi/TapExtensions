@@ -16,6 +16,11 @@ namespace TapExtensions.Instruments.DcPwr
         [Display("Voltage Range", Group: "Open Parameters", Order: 5)]
         public EVoltageRange VoltageRangeChoice { get; set; }
 
+        [Display("Clear Protections", Group: "Open Parameters", Order: 6,
+            Description: "Enables and clears the over-current protection (OCP) and \n" +
+                         "the over-voltage protection (OVP), when opening the driver")]
+        public bool ClearProtectionsOnOpen { get; set; } = true;
+
         public KeysightE3632A()
         {
             // Default values
@@ -29,6 +34,8 @@ namespace TapExtensions.Instruments.DcPwr
             Open("E3632A", Name);
             SetVoltageRange(VoltageRangeChoice.ToString());
             GetMaxMinValues();
+            if (ClearProtectionsOnOpen)
+                SetAndClearProtections();
         }
     }
 }
