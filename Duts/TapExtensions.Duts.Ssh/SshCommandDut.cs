@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
 using System.Text;
 using OpenTap;
 using Renci.SshNet;
@@ -14,11 +15,11 @@ namespace TapExtensions.Duts.Ssh
     {
         #region Settings
 
-        [Display("Host", Order: 1, Group: "SSH Settings", Description: "Host name (or IP address)")]
-        public string Host { get; set; }
+        [Display("IP Address", Order: 1, Group: "SSH Settings")]
+        public string IpAddress { get; set; }
 
         [Display("Port", Order: 2, Group: "SSH Settings", Description: "TCP port number (default value is 22)")]
-        public int Port { get; set; }
+        public int TcpPort { get; set; }
 
         [Display("Username", Order: 3, Group: "SSH Settings")]
         public string Username { get; set; }
@@ -42,13 +43,15 @@ namespace TapExtensions.Duts.Ssh
         {
             // Default values
             Name = nameof(SshCommandDut);
-            Host = "localhost";
-            Port = 22;
+            IpAddress = "127.0.0.1";
+            TcpPort = 22;
             Username = "root";
             Password = "";
             KeepAliveInterval = 30;
 
             // Validation rules
+            Rules.Add(() => IPAddress.TryParse(IpAddress, out _),
+                "Not a valid IPv4 Address", nameof(IpAddress));
             Rules.Add(() => KeepAliveInterval >= 0,
                 "Must be greater than or equal to zero", nameof(KeepAliveInterval));
         }
@@ -69,7 +72,7 @@ namespace TapExtensions.Duts.Ssh
         public void Connect()
         {
             if (_sshClient == null)
-                _sshClient = new SshClient(Host, Port, Username, Password)
+                _sshClient = new SshClient(IpAddress, TcpPort, Username, Password)
                 {
                     KeepAliveInterval = TimeSpan.FromSeconds(KeepAliveInterval)
                 };
@@ -77,7 +80,7 @@ namespace TapExtensions.Duts.Ssh
             if (!_sshClient.IsConnected)
             {
                 if (VerboseLoggingEnabled)
-                    Log.Debug($"Connecting to {Host} on port {Port}");
+                    Log.Debug($"Connecting to {IpAddress} on port {TcpPort}");
 
                 _sshClient.Connect();
                 IsConnected = true;
@@ -90,7 +93,7 @@ namespace TapExtensions.Duts.Ssh
                 return;
 
             if (VerboseLoggingEnabled)
-                Log.Debug($"Disconnecting from {Host}");
+                Log.Debug($"Disconnecting from {IpAddress}");
 
             _sshClient.Disconnect();
             _sshClient.Dispose();

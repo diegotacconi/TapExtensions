@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -18,11 +19,11 @@ namespace TapExtensions.Duts.Ssh
     {
         #region Settings
 
-        [Display("Host", Order: 1, Group: "SSH Settings", Description: "Host name (or IP address)")]
-        public string Host { get; set; }
+        [Display("IP Address", Order: 1, Group: "SSH Settings")]
+        public string IpAddress { get; set; }
 
         [Display("Port", Order: 2, Group: "SSH Settings", Description: "TCP port number (default value is 22)")]
-        public int Port { get; set; }
+        public int TcpPort { get; set; }
 
         [Display("Username", Order: 3, Group: "SSH Settings")]
         public string Username { get; set; }
@@ -50,13 +51,15 @@ namespace TapExtensions.Duts.Ssh
         {
             // Default values
             Name = nameof(DutControlSsh);
-            Host = "localhost";
-            Port = 22;
+            IpAddress = "127.0.0.1";
+            TcpPort = 22;
             Username = "root";
             Password = "";
             KeepAliveInterval = 30;
 
             // Validation rules
+            Rules.Add(() => IPAddress.TryParse(IpAddress, out _),
+                "Not a valid IPv4 Address", nameof(IpAddress));
             Rules.Add(() => KeepAliveInterval >= 0,
                 "Must be greater than or equal to zero", nameof(KeepAliveInterval));
 
@@ -93,7 +96,7 @@ namespace TapExtensions.Duts.Ssh
                 new PasswordAuthenticationMethod(Username, Password)
             };
 
-            var passwordConnectionInfo = new ConnectionInfo(Host, Username, authenticationMethods.ToArray());
+            var passwordConnectionInfo = new ConnectionInfo(IpAddress, Username, authenticationMethods.ToArray());
             return passwordConnectionInfo;
         }
 
@@ -118,7 +121,7 @@ namespace TapExtensions.Duts.Ssh
                 try
                 {
                     if (VerboseLoggingEnabled)
-                        Log.Debug($"Connecting SSH to {Host} on port {Port}");
+                        Log.Debug($"Connecting SSH to {IpAddress} on port {TcpPort}");
 
                     _sshClient.Connect();
                 }
@@ -156,7 +159,7 @@ namespace TapExtensions.Duts.Ssh
                 try
                 {
                     if (VerboseLoggingEnabled)
-                        Log.Debug($"Connecting SCP to {Host} on port {Port}");
+                        Log.Debug($"Connecting SCP to {IpAddress} on port {TcpPort}");
 
                     _scpClient.Connect();
                 }
@@ -186,7 +189,7 @@ namespace TapExtensions.Duts.Ssh
                 return;
 
             if (VerboseLoggingEnabled)
-                Log.Debug($"Disconnecting SSH from {Host}");
+                Log.Debug($"Disconnecting SSH from {IpAddress}");
 
             _sshClient.Disconnect();
             _sshClient.Dispose();
@@ -199,7 +202,7 @@ namespace TapExtensions.Duts.Ssh
                 return;
 
             if (VerboseLoggingEnabled)
-                Log.Debug($"Disconnecting SCP from {Host}");
+                Log.Debug($"Disconnecting SCP from {IpAddress}");
 
             _scpClient.Disconnect();
             _scpClient.Dispose();
