@@ -1,4 +1,5 @@
-﻿using OpenTap;
+﻿using System.Collections.Generic;
+using OpenTap;
 
 namespace TapExtensions.Interfaces.Ssh
 {
@@ -6,16 +7,14 @@ namespace TapExtensions.Interfaces.Ssh
     {
         string IpAddress { get; }
 
-        int TcpPort { get; }
-
-        string Username { get; }
-
-        string Password { get; }
-
         void Connect();
 
         void Disconnect();
 
-        bool Query(string command, int timeout, out string response);
+        void UploadFiles(List<(string localFileName, string remoteFileName)> files);
+
+        void DownloadFiles(List<(string remoteFileName, string localFileName)> files);
+
+        bool SendSshQuery(string command, int timeout, out string response);
     }
 }

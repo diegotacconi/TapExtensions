@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
@@ -101,7 +102,17 @@ namespace TapExtensions.Duts.Ssh
             IsConnected = false;
         }
 
-        public bool Query(string command, int timeout, out string response)
+        public void UploadFiles(List<(string localFileName, string remoteFileName)> files)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DownloadFiles(List<(string remoteFileName, string localFileName)> files)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool SendSshQuery(string command, int timeout, out string response)
         {
             if (_sshClient == null || !_sshClient.IsConnected)
                 throw new InvalidOperationException($"{Name} is not connected");

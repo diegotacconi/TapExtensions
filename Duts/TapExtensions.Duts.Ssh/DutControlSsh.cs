@@ -183,6 +183,16 @@ namespace TapExtensions.Duts.Ssh
             IsConnected = false;
         }
 
+        public void UploadFiles(List<(string localFileName, string remoteFileName)> files)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DownloadFiles(List<(string remoteFileName, string localFileName)> files)
+        {
+            throw new NotImplementedException();
+        }
+
         protected void DisconnectSsh()
         {
             if (_sshClient == null)
@@ -221,7 +231,7 @@ namespace TapExtensions.Duts.Ssh
                 throw new InvalidOperationException($"{Name} (scp client) is not connected");
         }
 
-        public virtual bool Query(string command, int timeout, out string response)
+        public virtual bool SendSshQuery(string command, int timeout, out string response)
 
         {
             VerifySshConnection();

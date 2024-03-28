@@ -39,7 +39,7 @@ namespace TapExtensions.Steps.Ssh
         {
             try
             {
-                if (!Dut.Query(Command, Timeout, out var response))
+                if (!Dut.SendSshQuery(Command, Timeout, out var response))
                     throw new InvalidOperationException(
                         "Exit status of ssh command was not 0");
 
