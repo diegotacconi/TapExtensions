@@ -183,12 +183,12 @@ namespace TapExtensions.Duts.Ssh
             IsConnected = false;
         }
 
-        public void UploadFiles(List<(string localFileName, string remoteFileName)> files)
+        public void UploadFiles(List<(string localFilename, string remoteFilename)> files)
         {
             throw new NotImplementedException();
         }
 
-        public void DownloadFiles(List<(string remoteFileName, string localFileName)> files)
+        public void DownloadFiles(List<(string remoteFilename, string localFilename)> files)
         {
             throw new NotImplementedException();
         }

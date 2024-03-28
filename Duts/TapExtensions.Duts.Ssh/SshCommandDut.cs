@@ -39,6 +39,7 @@ namespace TapExtensions.Duts.Ssh
         #endregion
 
         private SshClient _sshClient;
+        private ScpClient _scpClient;
 
         public SshCommandDut()
         {
@@ -102,12 +103,69 @@ namespace TapExtensions.Duts.Ssh
             IsConnected = false;
         }
 
-        public void UploadFiles(List<(string localFileName, string remoteFileName)> files)
+        private void ScpConnect()
         {
-            throw new NotImplementedException();
+            if (_scpClient == null)
+            {
+                _scpClient = new ScpClient(IpAddress, TcpPort, Username, Password)
+                {
+                    KeepAliveInterval = TimeSpan.FromSeconds(KeepAliveInterval)
+                };
+            }
+
+            if (!_scpClient.IsConnected)
+            {
+                if (VerboseLoggingEnabled)
+                    Log.Debug($"SCP: Connecting to {IpAddress} on port {TcpPort}");
+
+                _scpClient.Connect();
+            }
         }
 
-        public void DownloadFiles(List<(string remoteFileName, string localFileName)> files)
+        private void ScpDisconnect()
+        {
+            if (_scpClient == null)
+                return;
+
+            if (VerboseLoggingEnabled)
+                Log.Debug($"SCP: Disconnecting from {IpAddress}");
+
+            _scpClient.Disconnect();
+            _scpClient.Dispose();
+            _scpClient = null;
+        }
+
+        public void UploadFiles(List<(string localFilename, string remoteFilename)> files)
+        {
+            // Connect
+            ScpConnect();
+
+            // Transfer files
+            foreach (var (localFileName, remoteFileName) in files)
+            {
+                if (string.IsNullOrWhiteSpace(localFileName))
+                    throw new InvalidOperationException(
+                        "Local filename cannot be empty");
+
+                if (string.IsNullOrWhiteSpace(remoteFileName))
+                    throw new InvalidOperationException(
+                        "Remote filename cannot be empty");
+
+                if (!File.Exists(localFileName))
+                    throw new FileNotFoundException($"The file {localFileName} could not be found");
+
+                Log.Debug($"SCP: Transferring file from {localFileName} to {remoteFileName}");
+                using (var fileStream = File.OpenRead(localFileName))
+                {
+                    _scpClient.Upload(fileStream, remoteFileName);
+                }
+            }
+
+            // Disconnect
+            ScpDisconnect();
+        }
+
+        public void DownloadFiles(List<(string remoteFilename, string localFilename)> files)
         {
             throw new NotImplementedException();
         }
