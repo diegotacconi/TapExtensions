@@ -6,9 +6,9 @@ using TapExtensions.Interfaces.Ssh;
 
 namespace TapExtensions.Steps.Ssh
 {
-    [Display("SshUploadFile",
+    [Display("UploadFile",
         Groups: new[] { "TapExtensions", "Steps", "Ssh" })]
-    public class SshUploadFile : TestStep
+    public class UploadFile : TestStep
     {
         #region Settings
 
@@ -31,7 +31,7 @@ namespace TapExtensions.Steps.Ssh
 
         #endregion
 
-        public SshUploadFile()
+        public UploadFile()
         {
             // Default values
             LocalFile = @"C:\Windows\Web\Screen\img100.jpg";

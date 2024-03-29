@@ -6,9 +6,9 @@ using TapExtensions.Interfaces.Ssh;
 
 namespace TapExtensions.Steps.Ssh
 {
-    [Display("SshDownloadFile",
+    [Display("DownloadFile",
         Groups: new[] { "TapExtensions", "Steps", "Ssh" })]
-    public class SshDownloadFile : TestStep
+    public class DownloadFile : TestStep
     {
         #region Settings
 
@@ -24,7 +24,7 @@ namespace TapExtensions.Steps.Ssh
 
         #endregion
 
-        public SshDownloadFile()
+        public DownloadFile()
         {
             // Default values
             RemoteFile = "/tmp/img100.jpg";

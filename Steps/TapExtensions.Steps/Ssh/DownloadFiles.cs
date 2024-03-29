@@ -6,9 +6,9 @@ using TapExtensions.Interfaces.Ssh;
 
 namespace TapExtensions.Steps.Ssh
 {
-    [Display("SshUploadFiles",
+    [Display("DownloadFiles",
         Groups: new[] { "TapExtensions", "Steps", "Ssh" })]
-    public class SshUploadFiles : TestStep
+    public class DownloadFiles : TestStep
     {
         #region Settings
 
@@ -16,32 +16,25 @@ namespace TapExtensions.Steps.Ssh
 
         public class FilePair : ValidatingObject
         {
-            [Display("Local File (Source)", Order: 1,
-                Description: "Full path of the local file location")]
-            [FilePath]
-            public string LocalFile
-            {
-                get => _localFile;
-                set => _localFile = !string.IsNullOrWhiteSpace(value) ? Path.GetFullPath(value) : "";
-            }
-
-            private string _localFile;
-
-            [Display("Remote File (Destination)", Order: 2,
-                Description: "Full path to the remote file location")]
+            [Display("Remote File (Source)", Order: 1,
+                Description: "Full path of the remote file location")]
             public string RemoteFile { get; set; }
+
+            [Display("Local File (Destination)", Order: 2,
+                Description: "Full path to the local file location")]
+            public string LocalFile { get; set; }
 
             public FilePair()
             {
                 // Validation rules
-                Rules.Add(() => !string.IsNullOrWhiteSpace(LocalFile),
-                    "Cannot be empty", nameof(LocalFile));
                 Rules.Add(() => !string.IsNullOrWhiteSpace(RemoteFile),
                     "Cannot be empty", nameof(RemoteFile));
-                Rules.Add(() => LocalFile?.IndexOfAny(Path.GetInvalidPathChars()) < 0,
-                    "Not valid", nameof(LocalFile));
+                Rules.Add(() => !string.IsNullOrWhiteSpace(LocalFile),
+                    "Cannot be empty", nameof(LocalFile));
                 Rules.Add(() => RemoteFile?.IndexOfAny(Path.GetInvalidPathChars()) < 0,
                     "Not valid", nameof(RemoteFile));
+                Rules.Add(() => LocalFile?.IndexOfAny(Path.GetInvalidPathChars()) < 0,
+                    "Not valid", nameof(LocalFile));
             }
         }
 
@@ -49,13 +42,13 @@ namespace TapExtensions.Steps.Ssh
 
         #endregion
 
-        public SshUploadFiles()
+        public DownloadFiles()
         {
             // Default values
             Files = new List<FilePair>
             {
-                new FilePair { LocalFile = @"C:\Windows\Web\Screen\img102.jpg", RemoteFile = "/tmp/img102.jpg" },
-                new FilePair { LocalFile = @"C:\Windows\Web\Screen\img103.png", RemoteFile = "/tmp/img103.png" }
+                new FilePair { RemoteFile = "/tmp/img102.jpg", LocalFile = @"C:\Temp\img102.jpg" },
+                new FilePair { RemoteFile = "/tmp/img103.png", LocalFile = @"C:\Temp\img103.png" }
             };
         }
 
@@ -65,9 +58,9 @@ namespace TapExtensions.Steps.Ssh
             {
                 var files = new List<(string, string)>();
                 foreach (var x in Files)
-                    files.Add((x.LocalFile, x.RemoteFile));
+                    files.Add((x.RemoteFile, x.LocalFile));
 
-                Dut.UploadFiles(files);
+                Dut.DownloadFiles(files);
                 UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)
