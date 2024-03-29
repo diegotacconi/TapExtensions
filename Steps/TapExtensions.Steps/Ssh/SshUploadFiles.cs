@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using OpenTap;
 using TapExtensions.Interfaces.Ssh;
 
@@ -15,53 +14,48 @@ namespace TapExtensions.Steps.Ssh
 
         [Display("Dut", Order: 1)] public ISecureShell Dut { get; set; }
 
-        public class LocalAndRemoteFilePair : ValidatingObject
+        public class FilePair : ValidatingObject
         {
-            [Display("Local Filename (Source)", Order: 1,
+            [Display("Local File (Source)", Order: 1,
                 Description: "Full path of the local file location")]
             [FilePath]
-            public string LocalFilename
+            public string LocalFile
             {
-                get => _localFilename;
-                set => _localFilename = !string.IsNullOrWhiteSpace(value) ? Path.GetFullPath(value) : "";
+                get => _localFile;
+                set => _localFile = !string.IsNullOrWhiteSpace(value) ? Path.GetFullPath(value) : "";
             }
 
-            private string _localFilename;
+            private string _localFile;
 
-            [Display("Remote Filename (Destination)", Order: 2,
+            [Display("Remote File (Destination)", Order: 2,
                 Description: "Full path to the remote file location")]
-            public string RemoteFilename { get; set; }
+            public string RemoteFile { get; set; }
 
-            public LocalAndRemoteFilePair()
+            public FilePair()
             {
                 // Validation rules
-                Rules.Add(() => !string.IsNullOrWhiteSpace(LocalFilename),
-                    "Filename cannot be empty", nameof(LocalFilename));
-                Rules.Add(() => !string.IsNullOrWhiteSpace(RemoteFilename),
-                    "Filename cannot be empty", nameof(RemoteFilename));
-                Rules.Add(() => LocalFilename?.IndexOfAny(Path.GetInvalidPathChars()) < 0,
-                    "Not valid", nameof(LocalFilename));
-                Rules.Add(() => RemoteFilename?.IndexOfAny(Path.GetInvalidPathChars()) < 0,
-                    "Not valid", nameof(RemoteFilename));
-                Rules.Add(() => File.Exists(LocalFilename),
-                    "File not found", nameof(LocalFilename));
+                Rules.Add(() => !string.IsNullOrWhiteSpace(LocalFile),
+                    "Cannot be empty", nameof(LocalFile));
+                Rules.Add(() => !string.IsNullOrWhiteSpace(RemoteFile),
+                    "Cannot be empty", nameof(RemoteFile));
+                Rules.Add(() => LocalFile?.IndexOfAny(Path.GetInvalidPathChars()) < 0,
+                    "Not valid", nameof(LocalFile));
+                Rules.Add(() => RemoteFile?.IndexOfAny(Path.GetInvalidPathChars()) < 0,
+                    "Not valid", nameof(RemoteFile));
             }
         }
 
-        [Display("Files", Order: 5)] public List<LocalAndRemoteFilePair> Files { get; set; }
+        [Display("Files", Order: 5)] public List<FilePair> Files { get; set; }
 
         #endregion
 
         public SshUploadFiles()
         {
             // Default values
-            Files = new List<LocalAndRemoteFilePair>
+            Files = new List<FilePair>
             {
-                new LocalAndRemoteFilePair
-                {
-                    LocalFilename = @"C:\Windows\Web\Screen\img100.jpg",
-                    RemoteFilename = "/tmp/img100.jpg"
-                }
+                new FilePair { LocalFile = @"C:\Windows\Web\Screen\img102.jpg", RemoteFile = "/tmp/img102.jpg" },
+                new FilePair { LocalFile = @"C:\Windows\Web\Screen\img103.png", RemoteFile = "/tmp/img103.png" }
             };
         }
 
@@ -69,7 +63,10 @@ namespace TapExtensions.Steps.Ssh
         {
             try
             {
-                var files = Files.Select(file => (file.LocalFilename, file.RemoteFilename)).ToList();
+                var files = new List<(string, string)>();
+                foreach (var x in Files)
+                    files.Add((x.LocalFile, x.RemoteFile));
+
                 Dut.UploadFiles(files);
                 UpgradeVerdict(Verdict.Pass);
             }
