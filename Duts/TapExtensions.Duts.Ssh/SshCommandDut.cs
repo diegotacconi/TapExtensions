@@ -141,24 +141,21 @@ namespace TapExtensions.Duts.Ssh
             ScpConnect();
 
             // Transfer files
-            foreach (var (localFileName, remoteFileName) in files)
+            foreach (var (localFilename, remoteFilename) in files)
             {
-                if (string.IsNullOrWhiteSpace(localFileName))
-                    throw new InvalidOperationException(
-                        "Local filename cannot be empty");
+                if (string.IsNullOrWhiteSpace(localFilename))
+                    throw new InvalidOperationException("Local filename cannot be empty");
+                if (string.IsNullOrWhiteSpace(remoteFilename))
+                    throw new InvalidOperationException("Remote filename cannot be empty");
+                if (!(localFilename.IndexOfAny(Path.GetInvalidPathChars()) < 0))
+                    throw new InvalidOperationException("Local filename is not a valid");
+                if (!(remoteFilename.IndexOfAny(Path.GetInvalidPathChars()) < 0))
+                    throw new InvalidOperationException("Remote filename is not a valid");
+                if (!File.Exists(localFilename))
+                    throw new FileNotFoundException($"The file {localFilename} could not be found");
 
-                if (string.IsNullOrWhiteSpace(remoteFileName))
-                    throw new InvalidOperationException(
-                        "Remote filename cannot be empty");
-
-                if (!File.Exists(localFileName))
-                    throw new FileNotFoundException($"The file {localFileName} could not be found");
-
-                Log.Debug($"SCP: Transferring file from {localFileName} to {remoteFileName}");
-                using (var fileStream = File.OpenRead(localFileName))
-                {
-                    _scpClient.Upload(fileStream, remoteFileName);
-                }
+                Log.Debug($"SCP: Transferring file from {localFilename} to {remoteFilename}");
+                _scpClient.Upload(new FileInfo(localFilename), remoteFilename);
             }
 
             // Disconnect
@@ -167,7 +164,27 @@ namespace TapExtensions.Duts.Ssh
 
         public void DownloadFiles(List<(string remoteFilename, string localFilename)> files)
         {
-            throw new NotImplementedException();
+            // Connect
+            ScpConnect();
+
+            // Transfer files
+            foreach (var (remoteFilename, localFilename) in files)
+            {
+                if (string.IsNullOrWhiteSpace(localFilename))
+                    throw new InvalidOperationException("Local filename cannot be empty");
+                if (string.IsNullOrWhiteSpace(remoteFilename))
+                    throw new InvalidOperationException("Remote filename cannot be empty");
+                if (!(localFilename.IndexOfAny(Path.GetInvalidPathChars()) < 0))
+                    throw new InvalidOperationException("Local filename is not a valid");
+                if (!(remoteFilename.IndexOfAny(Path.GetInvalidPathChars()) < 0))
+                    throw new InvalidOperationException("Remote filename is not a valid");
+
+                Log.Debug($"SCP: Transferring file from {remoteFilename} to {localFilename}");
+                _scpClient.Download(remoteFilename, new FileInfo(localFilename));
+            }
+
+            // Disconnect
+            ScpDisconnect();
         }
 
         public bool SendSshQuery(string command, int timeout, out string response)

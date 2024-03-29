@@ -17,7 +17,8 @@ namespace TapExtensions.Steps.Ssh
 
         public class LocalAndRemoteFilePair : ValidatingObject
         {
-            [Display("Local Filename", Order: 1, Description: "Full path to the local file location")]
+            [Display("Local Filename (Source)", Order: 1,
+                Description: "Full path of the local file location")]
             [FilePath]
             public string LocalFilename
             {
@@ -27,7 +28,8 @@ namespace TapExtensions.Steps.Ssh
 
             private string _localFilename;
 
-            [Display("Remote Filename", Order: 2, Description: "Full path to the remote file location")]
+            [Display("Remote Filename (Destination)", Order: 2,
+                Description: "Full path to the remote file location")]
             public string RemoteFilename { get; set; }
 
             public LocalAndRemoteFilePair()
@@ -37,6 +39,10 @@ namespace TapExtensions.Steps.Ssh
                     "Filename cannot be empty", nameof(LocalFilename));
                 Rules.Add(() => !string.IsNullOrWhiteSpace(RemoteFilename),
                     "Filename cannot be empty", nameof(RemoteFilename));
+                Rules.Add(() => LocalFilename?.IndexOfAny(Path.GetInvalidPathChars()) < 0,
+                    "Not valid", nameof(LocalFilename));
+                Rules.Add(() => RemoteFilename?.IndexOfAny(Path.GetInvalidPathChars()) < 0,
+                    "Not valid", nameof(RemoteFilename));
                 Rules.Add(() => File.Exists(LocalFilename),
                     "File not found", nameof(LocalFilename));
             }
@@ -53,8 +59,8 @@ namespace TapExtensions.Steps.Ssh
             {
                 new LocalAndRemoteFilePair
                 {
-                    LocalFilename = @"C:\Windows\Web\Screen\img103.png",
-                    RemoteFilename = "/tmp/img103.png"
+                    LocalFilename = @"C:\Windows\Web\Screen\img100.jpg",
+                    RemoteFilename = "/tmp/img100.jpg"
                 }
             };
         }
