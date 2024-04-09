@@ -11,9 +11,9 @@ namespace TapExtensions.Interfaces.Ssh
 
         void Disconnect();
 
-        void UploadFiles(List<(string localFilename, string remoteFilename)> files);
+        void UploadFiles(List<(string localFile, string remoteFile)> files);
 
-        void DownloadFiles(List<(string remoteFilename, string localFilename)> files);
+        void DownloadFiles(List<(string remoteFile, string localFile)> files);
 
         bool SendSshQuery(string command, int timeout, out string response);
     }

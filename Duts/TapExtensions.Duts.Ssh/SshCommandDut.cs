@@ -106,12 +106,10 @@ namespace TapExtensions.Duts.Ssh
         private void ScpConnect()
         {
             if (_scpClient == null)
-            {
                 _scpClient = new ScpClient(IpAddress, TcpPort, Username, Password)
                 {
                     KeepAliveInterval = TimeSpan.FromSeconds(KeepAliveInterval)
                 };
-            }
 
             if (!_scpClient.IsConnected)
             {
@@ -135,52 +133,52 @@ namespace TapExtensions.Duts.Ssh
             _scpClient = null;
         }
 
-        public void UploadFiles(List<(string localFilename, string remoteFilename)> files)
+        public void UploadFiles(List<(string localFile, string remoteFile)> files)
         {
             // Connect
             ScpConnect();
 
             // Transfer files
-            foreach (var (localFilename, remoteFilename) in files)
+            foreach (var (localFile, remoteFile) in files)
             {
-                if (string.IsNullOrWhiteSpace(localFilename))
+                if (string.IsNullOrWhiteSpace(localFile))
                     throw new InvalidOperationException("Local filename cannot be empty");
-                if (string.IsNullOrWhiteSpace(remoteFilename))
+                if (string.IsNullOrWhiteSpace(remoteFile))
                     throw new InvalidOperationException("Remote filename cannot be empty");
-                if (!(localFilename.IndexOfAny(Path.GetInvalidPathChars()) < 0))
+                if (!(localFile.IndexOfAny(Path.GetInvalidPathChars()) < 0))
                     throw new InvalidOperationException("Local filename is not a valid");
-                if (!(remoteFilename.IndexOfAny(Path.GetInvalidPathChars()) < 0))
+                if (!(remoteFile.IndexOfAny(Path.GetInvalidPathChars()) < 0))
                     throw new InvalidOperationException("Remote filename is not a valid");
-                if (!File.Exists(localFilename))
-                    throw new FileNotFoundException($"The file {localFilename} could not be found");
+                if (!File.Exists(localFile))
+                    throw new FileNotFoundException($"The file {localFile} could not be found");
 
-                Log.Debug($"SCP: Transferring file from {localFilename} to {remoteFilename}");
-                _scpClient.Upload(new FileInfo(localFilename), remoteFilename);
+                Log.Debug($"SCP: Transferring file from {localFile} to {remoteFile}");
+                _scpClient.Upload(new FileInfo(localFile), remoteFile);
             }
 
             // Disconnect
             ScpDisconnect();
         }
 
-        public void DownloadFiles(List<(string remoteFilename, string localFilename)> files)
+        public void DownloadFiles(List<(string remoteFile, string localFile)> files)
         {
             // Connect
             ScpConnect();
 
             // Transfer files
-            foreach (var (remoteFilename, localFilename) in files)
+            foreach (var (remoteFile, localFile) in files)
             {
-                if (string.IsNullOrWhiteSpace(localFilename))
+                if (string.IsNullOrWhiteSpace(localFile))
                     throw new InvalidOperationException("Local filename cannot be empty");
-                if (string.IsNullOrWhiteSpace(remoteFilename))
+                if (string.IsNullOrWhiteSpace(remoteFile))
                     throw new InvalidOperationException("Remote filename cannot be empty");
-                if (!(localFilename.IndexOfAny(Path.GetInvalidPathChars()) < 0))
+                if (!(localFile.IndexOfAny(Path.GetInvalidPathChars()) < 0))
                     throw new InvalidOperationException("Local filename is not a valid");
-                if (!(remoteFilename.IndexOfAny(Path.GetInvalidPathChars()) < 0))
+                if (!(remoteFile.IndexOfAny(Path.GetInvalidPathChars()) < 0))
                     throw new InvalidOperationException("Remote filename is not a valid");
 
-                Log.Debug($"SCP: Transferring file from {remoteFilename} to {localFilename}");
-                _scpClient.Download(remoteFilename, new FileInfo(localFilename));
+                Log.Debug($"SCP: Transferring file from {remoteFile} to {localFile}");
+                _scpClient.Download(remoteFile, new FileInfo(localFile));
             }
 
             // Disconnect
