@@ -135,6 +135,9 @@ namespace TapExtensions.Duts.Ssh
 
         public void UploadFiles(List<(string localFile, string remoteFile)> files)
         {
+            if (files.Count == 0)
+                throw new ArgumentException(@"List of files cannot be empty", nameof(files));
+
             // Connect
             ScpConnect();
 
@@ -145,10 +148,6 @@ namespace TapExtensions.Duts.Ssh
                     throw new InvalidOperationException("Local filename cannot be empty");
                 if (string.IsNullOrWhiteSpace(remoteFile))
                     throw new InvalidOperationException("Remote filename cannot be empty");
-                if (!(localFile.IndexOfAny(Path.GetInvalidPathChars()) < 0))
-                    throw new InvalidOperationException("Local filename is not a valid");
-                if (!(remoteFile.IndexOfAny(Path.GetInvalidPathChars()) < 0))
-                    throw new InvalidOperationException("Remote filename is not a valid");
                 if (!File.Exists(localFile))
                     throw new FileNotFoundException($"The file {localFile} could not be found");
 
@@ -162,6 +161,9 @@ namespace TapExtensions.Duts.Ssh
 
         public void DownloadFiles(List<(string remoteFile, string localFile)> files)
         {
+            if (files.Count == 0)
+                throw new ArgumentException(@"List of files cannot be empty", nameof(files));
+
             // Connect
             ScpConnect();
 
@@ -172,10 +174,6 @@ namespace TapExtensions.Duts.Ssh
                     throw new InvalidOperationException("Local filename cannot be empty");
                 if (string.IsNullOrWhiteSpace(remoteFile))
                     throw new InvalidOperationException("Remote filename cannot be empty");
-                if (!(localFile.IndexOfAny(Path.GetInvalidPathChars()) < 0))
-                    throw new InvalidOperationException("Local filename is not a valid");
-                if (!(remoteFile.IndexOfAny(Path.GetInvalidPathChars()) < 0))
-                    throw new InvalidOperationException("Remote filename is not a valid");
 
                 Log.Debug($"SCP: Transferring file from {remoteFile} to {localFile}");
                 _scpClient.Download(remoteFile, new FileInfo(localFile));
