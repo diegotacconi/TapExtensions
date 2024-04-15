@@ -152,26 +152,30 @@ namespace TapExtensions.Duts.Uart
                     var currentLine = _logBuffer.ToString();
                     _logBuffer.Clear();
 
-                    if (VerboseLoggingEnabled)
+                    if (!VerboseLoggingEnabled)
+                        continue; // Go to the next foreach character
+
+                    // Split into lines
+                    var lines = currentLine.Split(new[] { "\r\n", "\n\r", "\r", "\n" },
+                        StringSplitOptions.RemoveEmptyEntries);
+
+                    foreach (var line in lines)
                     {
-                        var lines = currentLine.Split(new[] { "\r\n", "\n\r", "\r", "\n" },
-                            StringSplitOptions.RemoveEmptyEntries);
+                        if (string.IsNullOrWhiteSpace(line))
+                            continue; // Go to the next foreach line
 
-                        foreach (var line in lines)
-                        {
-                            // Remove ANSI escape codes from log message
-                            var lineWithoutAnsiEscapeCodes =
-                                Regex.Replace(line, @"\x1B\[[^@-~]*[@-~]", "", RegexOptions.Compiled);
+                        // Remove ANSI escape codes from log message
+                        var lineWithoutAnsiEscapeCodes =
+                            Regex.Replace(line, @"\x1B\[[^@-~]*[@-~]", "", RegexOptions.Compiled);
 
-                            var msg = $"{_sp.PortName} << {lineWithoutAnsiEscapeCodes}";
+                        var msg = $"{_sp.PortName} << {lineWithoutAnsiEscapeCodes}";
 
-                            // Truncate log message to a maximum sting length
-                            const int maxLength = 500;
-                            if (msg.Length > maxLength)
-                                msg = msg.Substring(0, maxLength) + "***";
+                        // Truncate log message to a maximum sting length
+                        const int maxLength = 500;
+                        if (msg.Length > maxLength)
+                            msg = msg.Substring(0, maxLength) + "***";
 
-                            Log.Debug(msg);
-                        }
+                        Log.Debug(msg);
                     }
                 }
             }
