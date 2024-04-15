@@ -152,7 +152,9 @@ namespace TapExtensions.Duts.Ssh
                 if (!File.Exists(localFile))
                     throw new FileNotFoundException($"The file {localFile} could not be found");
 
-                Log.Debug($"SCP: Transferring file from {localFile} to {remoteFile}");
+                if (VerboseLoggingEnabled)
+                    Log.Debug($"SCP: Transferring file from {localFile} to {remoteFile}");
+
                 _scpClient.Upload(new FileInfo(localFile), remoteFile);
             }
 
@@ -176,7 +178,9 @@ namespace TapExtensions.Duts.Ssh
                 if (string.IsNullOrWhiteSpace(remoteFile))
                     throw new InvalidOperationException("Remote filename cannot be empty");
 
-                Log.Debug($"SCP: Transferring file from {remoteFile} to {localFile}");
+                if (VerboseLoggingEnabled)
+                    Log.Debug($"SCP: Transferring file from {remoteFile} to {localFile}");
+
                 _scpClient.Download(remoteFile, new FileInfo(localFile));
             }
 
@@ -195,7 +199,9 @@ namespace TapExtensions.Duts.Ssh
             var cmd = _sshClient.CreateCommand(command);
             cmd.CommandTimeout = TimeSpan.FromSeconds(timeout);
 
-            Log.Debug($"SSH >> {cmd.CommandText}");
+            if (VerboseLoggingEnabled)
+                Log.Debug($"SSH >> {cmd.CommandText}");
+
             var async = cmd.BeginExecute(ar => stopwatch.Stop());
 
             // var stderrStreamReader = new StreamReader(cmd.ExtendedOutputStream);
@@ -210,32 +216,39 @@ namespace TapExtensions.Duts.Ssh
                             "Timeout occurred while waiting for ssh response to end");
 
                     var readPart = reader.ReadToEnd();
-                    if (!string.IsNullOrEmpty(readPart))
+
+                    if (string.IsNullOrEmpty(readPart))
                     {
-                        readBuffer.Append(readPart);
+                        TapThread.Sleep(1);
+                        continue; // Go to the next while iteration
+                    }
 
-                        // Split into lines
-                        var lines = readPart.Split(new[] { "\r\n", "\n\r", "\r", "\n" },
-                            StringSplitOptions.RemoveEmptyEntries);
+                    readBuffer.Append(readPart);
 
-                        foreach (var line in lines)
-                        {
-                            if (string.IsNullOrWhiteSpace(line))
-                                continue; // Go to the next line
+                    if (!VerboseLoggingEnabled)
+                        continue; // Go to the next while iteration
 
-                            // Remove ANSI escape codes from log message
-                            var lineWithoutAnsiEscapeCodes =
-                                Regex.Replace(line, @"\x1B\[[^@-~]*[@-~]", "", RegexOptions.Compiled);
+                    // Split into lines
+                    var lines = readPart.Split(new[] { "\r\n", "\n\r", "\r", "\n" },
+                        StringSplitOptions.RemoveEmptyEntries);
 
-                            var msg = $"SSH << {lineWithoutAnsiEscapeCodes}";
+                    foreach (var line in lines)
+                    {
+                        if (string.IsNullOrWhiteSpace(line))
+                            continue; // Go to the next foreach line
 
-                            // Truncate long message to a maximum sting length
-                            const int maxLength = 500;
-                            if (msg.Length > maxLength)
-                                msg = msg.Substring(0, maxLength) + "***";
+                        // Remove ANSI escape codes from log message
+                        var lineWithoutAnsiEscapeCodes =
+                            Regex.Replace(line, @"\x1B\[[^@-~]*[@-~]", "", RegexOptions.Compiled);
 
-                            Log.Debug(msg);
-                        }
+                        var msg = $"SSH << {lineWithoutAnsiEscapeCodes}";
+
+                        // Truncate long message to a maximum sting length
+                        const int maxLength = 500;
+                        if (msg.Length > maxLength)
+                            msg = msg.Substring(0, maxLength) + "***";
+
+                        Log.Debug(msg);
                     }
                 }
             }
