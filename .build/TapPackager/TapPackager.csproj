@@ -29,7 +29,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Duts\TapExtensions.Duts.DutHandle\TapExtensions.Duts.DutHandle.csproj" />
     <ProjectReference Include="..\..\Duts\TapExtensions.Duts.Ssh\TapExtensions.Duts.Ssh.csproj" />
     <ProjectReference Include="..\..\Duts\TapExtensions.Duts.Uart\TapExtensions.Duts.Uart.csproj" />
     <ProjectReference Include="..\..\Gui\TapExtensions.Gui.Wpf\TapExtensions.Gui.Wpf.csproj" />
