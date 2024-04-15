@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using OpenTap;
 using Renci.SshNet;
 using TapExtensions.Interfaces.Ssh;
@@ -191,19 +192,15 @@ namespace TapExtensions.Duts.Ssh
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            // https://stackoverflow.com/questions/47386713/execute-long-time-command-in-ssh-net-and-display-the-results-continuously-in-tex
-
             var cmd = _sshClient.CreateCommand(command);
             cmd.CommandTimeout = TimeSpan.FromSeconds(timeout);
 
             Log.Debug($"SSH >> {cmd.CommandText}");
             var async = cmd.BeginExecute(ar => stopwatch.Stop());
 
-            // var stdoutStreamReader = new StreamReader(cmd.OutputStream);
             // var stderrStreamReader = new StreamReader(cmd.ExtendedOutputStream);
 
             var readBuffer = new StringBuilder();
-            // var lineBuffer = new StringBuilder();
             using (var reader = new StreamReader(cmd.OutputStream, Encoding.UTF8, true, 1024, true))
             {
                 while (!async.IsCompleted || !reader.EndOfStream)
@@ -212,20 +209,35 @@ namespace TapExtensions.Duts.Ssh
                         throw new InvalidOperationException(
                             "Timeout occurred while waiting for ssh response to end");
 
-                    // var line = reader.ReadLine();
-                    var line = reader.ReadToEnd();
-                    if (!string.IsNullOrEmpty(line))
+                    var readPart = reader.ReadToEnd();
+                    if (!string.IsNullOrEmpty(readPart))
                     {
-                        readBuffer.Append(line);
+                        readBuffer.Append(readPart);
 
-                        // ToDo: call LogLineByLine()
+                        // Split into lines
+                        var lines = readPart.Split(new[] { "\r\n", "\n\r", "\r", "\n" },
+                            StringSplitOptions.RemoveEmptyEntries);
 
-                        if (!string.IsNullOrWhiteSpace(line))
-                            Log.Debug($"SSH << {line}");
+                        foreach (var line in lines)
+                        {
+                            if (string.IsNullOrWhiteSpace(line))
+                                continue; // Go to the next line
+
+                            // Remove ANSI escape codes from log message
+                            var lineWithoutAnsiEscapeCodes =
+                                Regex.Replace(line, @"\x1B\[[^@-~]*[@-~]", "", RegexOptions.Compiled);
+
+                            var msg = $"SSH << {lineWithoutAnsiEscapeCodes}";
+
+                            // Truncate long message to a maximum sting length
+                            const int maxLength = 500;
+                            if (msg.Length > maxLength)
+                                msg = msg.Substring(0, maxLength) + "***";
+
+                            Log.Debug(msg);
+                        }
                     }
                 }
-
-                // LogBytes(Encoding.UTF8.GetBytes(readBuffer.ToString()));
             }
 
             cmd.EndExecute(async);
@@ -236,35 +248,5 @@ namespace TapExtensions.Duts.Ssh
             response = readBuffer.ToString();
             return cmd.ExitStatus == 0;
         }
-
-        /*
-        private void SendToLog(string lineBuffer)
-        {
-            if (string.IsNullOrWhiteSpace(lineBuffer))
-                return;
-
-            var lines = lineBuffer.Split(new[] { "\r\n", "\n\r", "\r", "\n" },
-                StringSplitOptions.RemoveEmptyEntries);
-
-            foreach (var line in lines)
-            {
-                if (string.IsNullOrWhiteSpace(line))
-                    continue; // Go to the next line
-
-                // Remove ANSI escape codes from log message
-                var lineWithoutAnsiEscapeCodes =
-                    Regex.Replace(line, @"\x1B\[[^@-~]*[@-~]", "", RegexOptions.Compiled);
-
-                var msg = $"SSH << {lineWithoutAnsiEscapeCodes}";
-
-                // Truncate log message to a maximum sting length
-                const int maxLength = 500;
-                if (msg.Length > maxLength)
-                    msg = msg.Substring(0, maxLength) + "***";
-
-                Log.Debug(msg);
-            }
-        }
-        */
     }
 }
