@@ -228,28 +228,8 @@ namespace TapExtensions.Duts.Ssh
                     if (!VerboseLoggingEnabled)
                         continue; // Go to the next while iteration
 
-                    // Split into lines
-                    var lines = readPart.Split(new[] { "\r\n", "\n\r", "\r", "\n" },
-                        StringSplitOptions.RemoveEmptyEntries);
-
-                    foreach (var line in lines)
-                    {
-                        if (string.IsNullOrWhiteSpace(line))
-                            continue; // Go to the next foreach line
-
-                        // Remove ANSI escape codes from log message
-                        var lineWithoutAnsiEscapeCodes =
-                            Regex.Replace(line, @"\x1B\[[^@-~]*[@-~]", "", RegexOptions.Compiled);
-
-                        var msg = $"SSH << {lineWithoutAnsiEscapeCodes}";
-
-                        // Truncate long message to a maximum sting length
-                        const int maxLength = 500;
-                        if (msg.Length > maxLength)
-                            msg = msg.Substring(0, maxLength) + "***";
-
-                        Log.Debug(msg);
-                    }
+                    foreach (var msg in GetLogMessages(readPart))
+                        Log.Debug($"SSH << {msg}");
                 }
             }
 
@@ -260,6 +240,33 @@ namespace TapExtensions.Duts.Ssh
 
             response = readBuffer.ToString();
             return cmd.ExitStatus == 0;
+        }
+
+        private static List<string> GetLogMessages(string paragraph)
+        {
+            var messages = new List<string>();
+
+            // Split into lines
+            var lines = paragraph.Split(new[] { "\r\n", "\n\r", "\r", "\n" },
+                StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var line in lines)
+            {
+                if (string.IsNullOrWhiteSpace(line))
+                    continue; // Go to the next foreach line
+
+                // Remove ANSI escape codes from log message
+                var msg = Regex.Replace(line, @"\x1B\[[^@-~]*[@-~]", "", RegexOptions.Compiled);
+
+                // Truncate long message to a maximum sting length
+                const int maxLength = 500;
+                if (msg.Length > maxLength)
+                    msg = msg.Substring(0, maxLength) + "***";
+
+                messages.Add(msg);
+            }
+
+            return messages;
         }
     }
 }
