@@ -171,7 +171,7 @@ namespace TapExtensions.Duts.Ssh
                 string line;
                 if ((line = reader.ReadLine()) == null)
                 {
-                    TapThread.Sleep(10);
+                    TapThread.Sleep(1);
                     continue;
                 }
 
