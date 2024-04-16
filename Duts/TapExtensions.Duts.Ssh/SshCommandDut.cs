@@ -76,9 +76,7 @@ namespace TapExtensions.Duts.Ssh
         {
             if (_sshClient == null)
                 _sshClient = new SshClient(IpAddress, TcpPort, Username, Password)
-                {
-                    KeepAliveInterval = TimeSpan.FromSeconds(KeepAliveInterval)
-                };
+                    { KeepAliveInterval = TimeSpan.FromSeconds(KeepAliveInterval) };
 
             if (!_sshClient.IsConnected)
             {
@@ -108,9 +106,7 @@ namespace TapExtensions.Duts.Ssh
         {
             if (_scpClient == null)
                 _scpClient = new ScpClient(IpAddress, TcpPort, Username, Password)
-                {
-                    KeepAliveInterval = TimeSpan.FromSeconds(KeepAliveInterval)
-                };
+                    { KeepAliveInterval = TimeSpan.FromSeconds(KeepAliveInterval) };
 
             if (!_scpClient.IsConnected)
             {
@@ -137,7 +133,7 @@ namespace TapExtensions.Duts.Ssh
         public void UploadFiles(List<(string localFile, string remoteFile)> files)
         {
             if (files.Count == 0)
-                throw new ArgumentException(@"List of files cannot be empty", nameof(files));
+                throw new ArgumentException("List of files cannot be empty", nameof(files));
 
             // Connect
             ScpConnect();
@@ -165,7 +161,7 @@ namespace TapExtensions.Duts.Ssh
         public void DownloadFiles(List<(string remoteFile, string localFile)> files)
         {
             if (files.Count == 0)
-                throw new ArgumentException(@"List of files cannot be empty", nameof(files));
+                throw new ArgumentException("List of files cannot be empty", nameof(files));
 
             // Connect
             ScpConnect();
@@ -203,8 +199,6 @@ namespace TapExtensions.Duts.Ssh
                 Log.Debug($"SSH >> {cmd.CommandText}");
 
             var async = cmd.BeginExecute(ar => stopwatch.Stop());
-
-            // var stderrStreamReader = new StreamReader(cmd.ExtendedOutputStream);
 
             var readBuffer = new StringBuilder();
             using (var reader = new StreamReader(cmd.OutputStream, Encoding.UTF8, true, 1024, true))
