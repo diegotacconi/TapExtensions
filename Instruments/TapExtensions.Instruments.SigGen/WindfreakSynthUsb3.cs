@@ -5,7 +5,10 @@ using TapExtensions.Interfaces.SigGen;
 
 namespace TapExtensions.Instruments.SigGen
 {
-    public class SynthUsb2 : Instrument, ISigGen
+    [Display("Windfreak SynthUSB3",
+        Groups: new[] { "TapExtensions", "Instruments", "SigGen" },
+        Description: "Windfreak SynthUSB3 RF Signal Generator, from 12MHz to 6.4GHz")]
+    public class WindfreakSynthUsb3 : Instrument, ISigGen
     {
         public double GetFrequency()
         {
