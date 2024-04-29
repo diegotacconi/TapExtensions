@@ -37,6 +37,7 @@
     <ProjectReference Include="..\..\Interfaces\TapExtensions.Interfaces\TapExtensions.Interfaces.csproj" />
     <ProjectReference Include="..\..\Results\TapExtensions.Results\TapExtensions.Results.csproj" />
     <ProjectReference Include="..\..\Shared\TapExtensions.Shared\TapExtensions.Shared.csproj" />
+    <ProjectReference Include="..\..\Shared\TapExtensions.Shared.Win32\TapExtensions.Shared.Win32.csproj" />
     <ProjectReference Include="..\..\Steps\TapExtensions.Steps\TapExtensions.Steps.csproj" />
   </ItemGroup>
 
