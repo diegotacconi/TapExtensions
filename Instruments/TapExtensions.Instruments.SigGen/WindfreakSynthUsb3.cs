@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Security;
 using System.Xml.Serialization;
 using OpenTap;
 using TapExtensions.Interfaces.Common;
@@ -32,7 +33,15 @@ namespace TapExtensions.Instruments.SigGen
         [Browsable(true)]
         public void ShowAvailableUsbDevicesButton()
         {
-            ShowAvailableUsbDevices();
+            var devices = UsbDevices.GetAllSerialDevices();
+
+            var msg = "";
+            foreach (var device in devices)
+                msg += $"'{device.ComPort}', '{device.InstancePath}', '{device.Description}'\n";
+
+            // ToDo: Show as a table on the Dialog Window
+
+            UserInput.Request(new DialogWindow(msg), true);
         }
 
         [EnabledIf(nameof(AutoDetection), true, HideIfDisabled = true)]
@@ -40,10 +49,19 @@ namespace TapExtensions.Instruments.SigGen
         [Browsable(true)]
         public void SearchNowButton()
         {
-            SearchNow();
+            var msg = "Searching for USB Instance Path(s) of " +
+                      $"'{string.Join("', '", SearchForUsbInstancePaths)}'\n";
+
+            var found = UsbDevices.FindInstancePath(SearchForUsbInstancePaths);
+
+            msg += $"Found serial port at '{found.ComPort}' " +
+                   $"with USB Instance Path of '{found.InstancePath}' " +
+                   $"and Description of '{found.Description}'";
+
+            UserInput.Request(new DialogWindow(msg), true);
         }
 
-        public enum ELoggingLevel : int
+        public enum ELoggingLevel
         {
             None = 0,
             Normal = 1,
@@ -89,7 +107,6 @@ namespace TapExtensions.Instruments.SigGen
 
         private void SearchNow()
         {
-
             if (LoggingLevel >= ELoggingLevel.Verbose)
                 Log.Debug("Searching for USB Instance Path(s) of " +
                           $"'{string.Join("', '", SearchForUsbInstancePaths)}'");
@@ -101,7 +118,6 @@ namespace TapExtensions.Instruments.SigGen
                           $"with USB Instance Path of '{found.InstancePath}' " +
                           $"and Description of '{found.Description}'");
 
-            SerialPortName = found.ComPort;
             SerialPortName = found.ComPort;
         }
 
@@ -134,5 +150,27 @@ namespace TapExtensions.Instruments.SigGen
         {
             Log.Warning("SetRfOutputState() Not Implemented");
         }
+    }
+
+    [Display("Auto-Detection Dialog")]
+    internal class DialogWindow
+    {
+        public DialogWindow(string message)
+        {
+            Message = message;
+        }
+
+        [Browsable(true)]
+        [Layout(LayoutMode.FullRow, 2)]
+        public string Message { get; }
+
+        [Layout(LayoutMode.FloatBottom | LayoutMode.FullRow)]
+        [Submit]
+        public EDialogButton Response { get; set; } = EDialogButton.Ok;
+    }
+
+    public enum EDialogButton
+    {
+        Ok
     }
 }

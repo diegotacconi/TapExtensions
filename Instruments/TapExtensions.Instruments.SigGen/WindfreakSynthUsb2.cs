@@ -17,7 +17,7 @@ namespace TapExtensions.Instruments.SigGen
         [Display("Serial Port Name", Order: 1)]
         public string SerialPortName { get; set; }
 
-        public enum ELoggingLevel : int
+        public enum ELoggingLevel
         {
             None = 0,
             Normal = 1,
