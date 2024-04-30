@@ -30,12 +30,12 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
         public enum ELoggingLevel
         {
-            Verbose,
+            None,
             Normal,
-            None
+            Verbose
         }
 
-        [Display("Logging Level", Order: 2,
+        [Display("Logging Level", Order: 20, Group: "Debug", Collapsed: true,
             Description: "Level of verbose logging for serial port (UART) communication.")]
         public ELoggingLevel LoggingLevel { get; set; }
 

@@ -17,14 +17,14 @@ namespace TapExtensions.Instruments.SigGen
         [Display("Serial Port Name", Order: 1)]
         public string SerialPortName { get; set; }
 
-        public enum ELoggingLevel
+        public enum ELoggingLevel : int
         {
-            Verbose,
-            Normal,
-            None
+            None = 0,
+            Normal = 1,
+            Verbose = 2
         }
 
-        [Display("Logging Level", Order: 2,
+        [Display("Logging Level", Order: 20, Group: "Debug", Collapsed: true,
             Description: "Level of verbose logging for serial port (UART) communication.")]
         public ELoggingLevel LoggingLevel { get; set; }
 
@@ -49,7 +49,7 @@ namespace TapExtensions.Instruments.SigGen
             base.Open();
             OpenSerialPort();
 
-            if (LoggingLevel == ELoggingLevel.Verbose || LoggingLevel == ELoggingLevel.Normal)
+            if (LoggingLevel >= ELoggingLevel.Normal)
             {
                 // +) Model Type
                 Log.Debug("Model Type: " + WriteRead("+").Trim('\n'));
@@ -141,7 +141,7 @@ namespace TapExtensions.Instruments.SigGen
             {
                 if (_sp.IsOpen)
                 {
-                    if (LoggingLevel == ELoggingLevel.Verbose || LoggingLevel == ELoggingLevel.Normal)
+                    if (LoggingLevel >= ELoggingLevel.Normal)
                         Log.Debug($"Closing serial port ({_sp.PortName})");
 
                     // Close serial port
@@ -220,7 +220,7 @@ namespace TapExtensions.Instruments.SigGen
                     _frequencyMhz = frequencyMhz;
                 }
 
-                if (LoggingLevel == ELoggingLevel.Verbose || LoggingLevel == ELoggingLevel.Normal)
+                if (LoggingLevel >= ELoggingLevel.Normal)
                     Log.Debug($"Set frequency to {_frequencyMhz} MHz");
             }
         }
@@ -265,7 +265,7 @@ namespace TapExtensions.Instruments.SigGen
                         throw new InvalidOperationException("Unable to set the SG output state to Off (phase locked)");
                 }
 
-                if (LoggingLevel == ELoggingLevel.Verbose || LoggingLevel == ELoggingLevel.Normal)
+                if (LoggingLevel >= ELoggingLevel.Normal)
                     Log.Debug($"Set RF output state to {state}");
             }
         }
@@ -286,7 +286,7 @@ namespace TapExtensions.Instruments.SigGen
                 TapThread.Sleep(intervalMs);
             } while (!response.Contains("\n") && loopCount < maxCount);
 
-            if (LoggingLevel == ELoggingLevel.Verbose)
+            if (LoggingLevel >= ELoggingLevel.Verbose)
                 Log.Debug("{0} << {1}", _sp.PortName, response.Trim('\n'));
 
             return response;
@@ -294,7 +294,7 @@ namespace TapExtensions.Instruments.SigGen
 
         private void Write(string command)
         {
-            if (LoggingLevel == ELoggingLevel.Verbose)
+            if (LoggingLevel >= ELoggingLevel.Verbose)
                 Log.Debug("{0} >> {1}", _sp.PortName, command);
 
             _sp.DiscardInBuffer();
