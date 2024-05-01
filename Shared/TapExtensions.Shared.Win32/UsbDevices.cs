@@ -7,7 +7,7 @@ namespace TapExtensions.Shared.Win32
 {
     public static class UsbDevices
     {
-        private static readonly object obj = new object();
+        private static readonly object Obj = new object();
 
         public class UsbSerialDevice
         {
@@ -20,7 +20,7 @@ namespace TapExtensions.Shared.Win32
         {
             var messages = new List<string>();
 
-            lock (obj)
+            lock (Obj)
             {
                 using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_SerialPort"))
                 {
@@ -72,7 +72,7 @@ namespace TapExtensions.Shared.Win32
         {
             var devices = new List<UsbSerialDevice>();
 
-            lock (obj)
+            lock (Obj)
             {
                 using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_SerialPort"))
                 {
