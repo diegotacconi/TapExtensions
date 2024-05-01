@@ -7,6 +7,8 @@ namespace TapExtensions.Shared.Win32
 {
     public static class UsbDevices
     {
+        private static readonly object obj = new object();
+
         public class UsbSerialDevice
         {
             public string ComPort { get; set; }
@@ -17,45 +19,49 @@ namespace TapExtensions.Shared.Win32
         public static List<string> ListAllComPorts()
         {
             var messages = new List<string>();
-            using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_SerialPort"))
+
+            lock (obj)
             {
-                var mObjects = searcher.Get().Cast<ManagementBaseObject>().ToList();
-                foreach (var mObject in mObjects)
+                using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_SerialPort"))
                 {
-                    // https://learn.microsoft.com/en-us/windows/win32/cimwin32prov/win32-pnpentity?redirectedfrom=MSDN
-                    var items = new List<string>
+                    var mObjects = searcher.Get().Cast<ManagementBaseObject>().ToList();
+                    foreach (var mObject in mObjects)
                     {
-                        "Availability",
-                        "Caption",
-                        // "ClassGuid",
-                        // "CompatibleID[]",
-                        // "ConfigManagerErrorCode",
-                        // "ConfigManagerUserConfig",
-                        "CreationClassName",
-                        "Description",
-                        "DeviceID",
-                        // "ErrorCleared",
-                        // "ErrorDescription",
-                        // "HardwareID[]",
-                        // "InstallDate",
-                        // "LastErrorCode",
-                        // "Manufacturer",
-                        "Name",
-                        "PNPDeviceID",
-                        // "PowerManagementCapabilities[]",
-                        "PowerManagementSupported",
-                        // "Present",
-                        // "Service",
-                        "Status",
-                        "StatusInfo"
-                        // "SystemCreationClassName",
-                        // "SystemName",
-                    };
+                        // https://learn.microsoft.com/en-us/windows/win32/cimwin32prov/win32-pnpentity?redirectedfrom=MSDN
+                        var items = new List<string>
+                        {
+                            "Availability",
+                            "Caption",
+                            // "ClassGuid",
+                            // "CompatibleID[]",
+                            // "ConfigManagerErrorCode",
+                            // "ConfigManagerUserConfig",
+                            "CreationClassName",
+                            "Description",
+                            "DeviceID",
+                            // "ErrorCleared",
+                            // "ErrorDescription",
+                            // "HardwareID[]",
+                            // "InstallDate",
+                            // "LastErrorCode",
+                            // "Manufacturer",
+                            "Name",
+                            "PNPDeviceID",
+                            // "PowerManagementCapabilities[]",
+                            "PowerManagementSupported",
+                            // "Present",
+                            // "Service",
+                            "Status",
+                            "StatusInfo"
+                            // "SystemCreationClassName",
+                            // "SystemName",
+                        };
 
-                    foreach (var item in items)
-                        messages.Add($"{item,-24} = {mObject[item]}");
+                        foreach (var item in items)
+                            messages.Add($"{item,-24} = {mObject[item]}");
 
-                    messages.Add("---");
+                        messages.Add("---");
+                    }
                 }
             }
 
@@ -65,16 +71,20 @@ namespace TapExtensions.Shared.Win32
         public static List<UsbSerialDevice> GetAllSerialDevices()
         {
             var devices = new List<UsbSerialDevice>();
-            using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_SerialPort"))
+
+            lock (obj)
             {
-                var mObjects = searcher.Get().Cast<ManagementBaseObject>().ToList();
-                foreach (var mObject in mObjects)
-                    devices.Add(new UsbSerialDevice
-                    {
-                        ComPort = mObject["DeviceID"].ToString(),
-                        InstancePath = mObject["PNPDeviceID"].ToString(),
-                        Description = mObject["Description"].ToString()
-                    });
+                using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_SerialPort"))
+                {
+                    var mObjects = searcher.Get().Cast<ManagementBaseObject>().ToList();
+                    foreach (var mObject in mObjects)
+                        devices.Add(new UsbSerialDevice
+                        {
+                            ComPort = mObject["DeviceID"].ToString(),
+                            InstancePath = mObject["PNPDeviceID"].ToString(),
+                            Description = mObject["Description"].ToString()
+                        });
+                }
             }
 
             return devices;

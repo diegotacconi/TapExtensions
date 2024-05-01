@@ -20,7 +20,7 @@ namespace TapExtensions.Instruments.SigGen
         public string SerialPortName { get; set; }
 
         [Display("Use AutoDetection", Order: 2, Group: "Serial Port AutoDetection", Collapsed: true)]
-        public bool UseAutoDetection { get; set; } = false;
+        public bool UseAutoDetection { get; set; } = true;
 
         [EnabledIf(nameof(UseAutoDetection))]
         [Display("USB Device Address", Order: 3, Group: "Serial Port AutoDetection", Collapsed: true,
@@ -76,7 +76,7 @@ namespace TapExtensions.Instruments.SigGen
         public UsbSerialDevice1()
         {
             // Default values
-            Name = "SynthUsb3";
+            Name = nameof(UsbSerialDevice1);
             SerialPortName = "COM6";
 
             UsbDeviceAddresses = new List<string>
