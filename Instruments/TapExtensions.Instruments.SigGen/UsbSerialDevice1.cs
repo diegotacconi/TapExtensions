@@ -85,7 +85,7 @@ namespace TapExtensions.Instruments.SigGen
                 @"USB\VID_16D0&PID_0557"
             };
 
-            LoggingLevel = ELoggingLevel.Verbose;
+            LoggingLevel = ELoggingLevel.Normal;
         }
 
         public override void Open()
@@ -111,7 +111,7 @@ namespace TapExtensions.Instruments.SigGen
             var found = UsbDevices.FindInstancePath(UsbDeviceAddresses);
 
             if (LoggingLevel >= ELoggingLevel.Normal)
-                Log.Debug($"Found serial port at '{found.ComPort}' " +
+                Log.Debug($"Found serial port '{found.ComPort}' " +
                           $"with USB Instance Path of '{found.InstancePath}' " +
                           $"and Description of '{found.Description}'");
 

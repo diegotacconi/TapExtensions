@@ -55,7 +55,7 @@ namespace TapExtensions.Instruments.SigGen
 
             var found = UsbDevices.FindInstancePath(UsbDeviceAddresses);
 
-            Log.Debug($"Found serial port at '{found.ComPort}' " +
+            Log.Debug($"Found serial port '{found.ComPort}' " +
                       $"with USB Instance Path of '{found.InstancePath}' " +
                       $"and Description of '{found.Description}'");
 
@@ -81,9 +81,7 @@ namespace TapExtensions.Instruments.SigGen
             // Close serial port if already opened
             CloseSerialPort();
 
-            Log.Debug($"Opening serial port ({_sp.PortName}) with BaudRate={_sp.BaudRate}, " +
-                      $"Parity={_sp.Parity}, DataBits={_sp.DataBits}, StopBits={_sp.StopBits}, " +
-                      $"Handshake={_sp.Handshake}");
+            Log.Debug($"Opening serial port ({_sp.PortName})");
 
             // Open serial port
             _sp.Open();
