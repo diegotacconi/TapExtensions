@@ -13,7 +13,7 @@ namespace TapExtensions.Instruments.SigGen
         #region Settings
 
         [EnabledIf(nameof(UseAutoDetection), false)]
-        [Display("Serial Port Name", Order: 1, Description: "Example: 'COM1'")]
+        [Display("Serial Port Name", Order: 1, Description: "Example: 'COM3'")]
         public string SerialPortName { get; set; }
 
         [Display("Use AutoDetection", Order: 2, Group: "Serial Port AutoDetection", Collapsed: true)]
