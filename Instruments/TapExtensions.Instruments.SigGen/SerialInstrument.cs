@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO.Ports;
 using OpenTap;
 using TapExtensions.Shared.Win32;
+// using System.ComponentModel;
 
 namespace TapExtensions.Instruments.SigGen
 {
@@ -23,9 +24,60 @@ namespace TapExtensions.Instruments.SigGen
                          @"Example: 'USB\VID_1234&PID_5678\SERIALNUMBER'")]
         public List<string> UsbDeviceAddresses { get; set; }
 
+        /*
+        [Browsable(true)]
+        [Display("Show available USB Devices", Order: 5, Group: "Serial Port AutoDetection", Collapsed: true)]
+        [EnabledIf(nameof(UseAutoDetection))]
+        public void ShowAvailableUsbDevicesButton()
+        {
+            var devices = UsbDevices.GetAllSerialDevices();
+
+            var msg = "";
+            foreach (var device in devices)
+                msg += $"'{device.ComPort}', '{device.InstancePath}', '{device.Description}'\n";
+
+            UserInput.Request(new DialogWindow(msg), true);
+        }
+
+        [Browsable(true)]
+        [Display("Try AutoDetection", Order: 6, Group: "Serial Port AutoDetection", Collapsed: true,
+            Description: "Click this button to try to find a \nUSB device that matches the search criteria")]
+        [EnabledIf(nameof(UseAutoDetection))]
+        public void TryAutoDetectionButton()
+        {
+            var found = UsbDevices.FindInstancePath(UsbDeviceAddresses);
+
+            var msg = $"Found serial port at '{found.ComPort}' " +
+                      $"with USB Instance Path of '{found.InstancePath}' " +
+                      $"and Description of '{found.Description}'";
+
+            UserInput.Request(new DialogWindow(msg), true);
+        }
+        */
+
+        public enum ELoggingLevel
+        {
+            None = 0,
+            Normal = 1,
+            Verbose = 2
+        }
+
+        [Display("Logging Level", Order: 20, Group: "Debug", Collapsed: true,
+            Description: "Level of verbose logging for serial port (UART) communication.")]
+        public ELoggingLevel LoggingLevel { get; set; } = ELoggingLevel.Normal;
+
         #endregion
 
         private SerialPort _sp;
+
+        /*
+        private void ShowAvailableUsbDevices()
+        {
+            var devices = UsbDevices.GetAllSerialDevices();
+            foreach (var device in devices)
+                Log.Debug($"'{device.ComPort}', '{device.InstancePath}', '{device.Description}'");
+        }
+        */
 
         public override void Open()
         {
@@ -40,14 +92,16 @@ namespace TapExtensions.Instruments.SigGen
                 throw new InvalidOperationException(
                     "List of USB Device Address cannot be empty");
 
-            Log.Debug("Searching for USB Instance Path(s) of " +
-                      $"'{string.Join("', '", UsbDeviceAddresses)}'");
+            if (LoggingLevel >= ELoggingLevel.Normal)
+                Log.Debug("Searching for USB Instance Path(s) of " +
+                          $"'{string.Join("', '", UsbDeviceAddresses)}'");
 
             var found = UsbDevices.FindInstancePath(UsbDeviceAddresses);
 
-            Log.Debug($"Found serial port '{found.ComPort}' " +
-                      $"with USB Instance Path of '{found.InstancePath}' " +
-                      $"and Description of '{found.Description}'");
+            if (LoggingLevel >= ELoggingLevel.Normal)
+                Log.Debug($"Found serial port '{found.ComPort}' " +
+                          $"with USB Instance Path of '{found.InstancePath}' " +
+                          $"and Description of '{found.Description}'");
 
             return found.ComPort;
         }
@@ -75,7 +129,8 @@ namespace TapExtensions.Instruments.SigGen
             // Close serial port if already opened
             CloseSerialPort();
 
-            Log.Debug($"Opening serial port ({_sp.PortName})");
+            if (LoggingLevel >= ELoggingLevel.Normal)
+                Log.Debug($"Opening serial port ({_sp.PortName})");
 
             // Open serial port
             _sp.Open();
@@ -95,7 +150,8 @@ namespace TapExtensions.Instruments.SigGen
             {
                 if (_sp.IsOpen)
                 {
-                    Log.Debug($"Closing serial port ({_sp.PortName})");
+                    if (LoggingLevel >= ELoggingLevel.Normal)
+                        Log.Debug($"Closing serial port ({_sp.PortName})");
 
                     // Close serial port
                     _sp.DiscardInBuffer();
@@ -110,4 +166,28 @@ namespace TapExtensions.Instruments.SigGen
             }
         }
     }
+
+    /*
+    [Display("Auto-Detection Dialog")]
+    internal class DialogWindow
+    {
+        public DialogWindow(string message)
+        {
+            Message = message;
+        }
+
+        [Browsable(true)]
+        [Layout(LayoutMode.FullRow, 2)]
+        public string Message { get; }
+
+        [Layout(LayoutMode.FloatBottom | LayoutMode.FullRow)]
+        [Submit]
+        public EDialogButton Response { get; set; } = EDialogButton.Ok;
+    }
+
+    internal enum EDialogButton
+    {
+        Ok
+    }
+    */
 }
