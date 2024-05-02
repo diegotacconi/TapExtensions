@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO.Ports;
 using OpenTap;
 using TapExtensions.Shared.Win32;
+
 // using System.ComponentModel;
 
 namespace TapExtensions.Instruments.SigGen
@@ -92,7 +93,7 @@ namespace TapExtensions.Instruments.SigGen
                 throw new InvalidOperationException(
                     "List of USB Device Address cannot be empty");
 
-            if (LoggingLevel >= ELoggingLevel.Normal)
+            if (LoggingLevel >= ELoggingLevel.Verbose)
                 Log.Debug("Searching for USB Instance Path(s) of " +
                           $"'{string.Join("', '", UsbDeviceAddresses)}'");
 
@@ -164,6 +165,38 @@ namespace TapExtensions.Instruments.SigGen
             {
                 Log.Warning(ex.Message);
             }
+        }
+
+        public virtual string SerialQuery(string command)
+        {
+            SerialCommand(command);
+
+            var response = string.Empty;
+            const int timeoutMs = 3000;
+            const int intervalMs = 10;
+            const int maxCount = timeoutMs / intervalMs;
+            var loopCount = 0;
+            do
+            {
+                loopCount++;
+                response += _sp.ReadExisting();
+                TapThread.Sleep(intervalMs);
+            } while (!response.Contains("\n") && loopCount < maxCount);
+
+            if (LoggingLevel >= ELoggingLevel.Verbose)
+                Log.Debug("{0} << {1}", _sp.PortName, response.Trim('\n'));
+
+            return response;
+        }
+
+        public virtual void SerialCommand(string command)
+        {
+            if (LoggingLevel >= ELoggingLevel.Verbose)
+                Log.Debug("{0} >> {1}", _sp.PortName, command);
+
+            _sp.DiscardInBuffer();
+            _sp.DiscardOutBuffer();
+            _sp.WriteLine(command);
         }
     }
 
