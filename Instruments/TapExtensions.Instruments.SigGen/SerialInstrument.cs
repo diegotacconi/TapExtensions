@@ -2,54 +2,44 @@
 using System.Collections.Generic;
 using System.IO.Ports;
 using OpenTap;
-using TapExtensions.Interfaces.Common;
-using TapExtensions.Interfaces.SigGen;
 using TapExtensions.Shared.Win32;
 
 namespace TapExtensions.Instruments.SigGen
 {
-    [Display("UsbSerialDevice4",
-        Groups: new[] { "TapExtensions", "Instruments", "SigGen" })]
-    public class UsbSerialDevice4 : Instrument, ISigGen
+    public abstract class SerialInstrument : Instrument
     {
         #region Settings
 
         [EnabledIf(nameof(UseAutoDetection), false)]
-        [Display("Serial Port Name", Order: 1)]
+        [Display("Serial Port Name", Order: 1, Description: "Example: 'COM1'")]
         public string SerialPortName { get; set; }
 
         [Display("Use AutoDetection", Order: 2, Group: "Serial Port AutoDetection", Collapsed: true)]
-        public bool UseAutoDetection { get; set; } = true;
+        public bool UseAutoDetection { get; set; } = false;
 
         [EnabledIf(nameof(UseAutoDetection))]
         [Display("USB Device Address", Order: 3, Group: "Serial Port AutoDetection", Collapsed: true,
-            Description: "List of USB device addresses to search for a match")]
+            Description: "List of USB device addresses to search for a match.\n" +
+                         @"Example: 'USB\VID_1234&PID_5678\SERIALNUMBER'")]
         public List<string> UsbDeviceAddresses { get; set; }
 
         #endregion
 
         private SerialPort _sp;
 
-        public UsbSerialDevice4()
-        {
-            // Default values
-            Name = nameof(UsbSerialDevice4);
-            SerialPortName = "COM3";
-            UsbDeviceAddresses = new List<string>
-            {
-                @"USB\VID_05E0&PID_1701\USB_CDC_SYMBOL_SCANNER"
-            };
-        }
-
         public override void Open()
         {
             base.Open();
-            var portName = UseAutoDetection ? SearchForUsbDevice() : SerialPortName;
+            var portName = UseAutoDetection ? FindSerialPort() : SerialPortName;
             OpenSerialPort(portName);
         }
 
-        private string SearchForUsbDevice()
+        private string FindSerialPort()
         {
+            if (UsbDeviceAddresses.Count == 0)
+                throw new InvalidOperationException(
+                    "List of USB Device Address cannot be empty");
+
             Log.Debug("Searching for USB Instance Path(s) of " +
                       $"'{string.Join("', '", UsbDeviceAddresses)}'");
 
@@ -64,6 +54,10 @@ namespace TapExtensions.Instruments.SigGen
 
         private void OpenSerialPort(string portName)
         {
+            if (string.IsNullOrWhiteSpace(portName))
+                throw new InvalidOperationException(
+                    "Serial Port Name cannot be empty");
+
             _sp = new SerialPort
             {
                 PortName = portName,
@@ -114,36 +108,6 @@ namespace TapExtensions.Instruments.SigGen
             {
                 Log.Warning(ex.Message);
             }
-        }
-
-        public double GetFrequency()
-        {
-            throw new NotImplementedException();
-        }
-
-        public double GetOutputLevel()
-        {
-            throw new NotImplementedException();
-        }
-
-        public EState GetRfOutputState()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetFrequency(double frequencyMhz)
-        {
-            Log.Warning("SetFrequency() Not Implemented");
-        }
-
-        public void SetOutputLevel(double outputLevelDbm)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetRfOutputState(EState state)
-        {
-            Log.Warning("SetRfOutputState() Not Implemented");
         }
     }
 }

@@ -9,9 +9,9 @@ using TapExtensions.Shared.Win32;
 
 namespace TapExtensions.Instruments.SigGen
 {
-    [Display("UsbSerialDevice1",
+    [Display("UsbSerialDev1",
         Groups: new[] { "TapExtensions", "Instruments", "SigGen" })]
-    public class UsbSerialDevice1 : Instrument, ISigGen
+    public class UsbSerialDev1 : Instrument, ISigGen
     {
         #region Settings
 
@@ -73,10 +73,10 @@ namespace TapExtensions.Instruments.SigGen
 
         private SerialPort _sp;
 
-        public UsbSerialDevice1()
+        public UsbSerialDev1()
         {
             // Default values
-            Name = nameof(UsbSerialDevice1);
+            Name = nameof(UsbSerialDev1);
             SerialPortName = "COM6";
 
             UsbDeviceAddresses = new List<string>

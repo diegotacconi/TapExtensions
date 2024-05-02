@@ -16,58 +16,6 @@ namespace TapExtensions.Shared.Win32
             public string Description { get; set; }
         }
 
-        public static List<string> ListAllComPorts()
-        {
-            var messages = new List<string>();
-
-            lock (Obj)
-            {
-                using (var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_SerialPort"))
-                {
-                    var mObjects = searcher.Get().Cast<ManagementBaseObject>().ToList();
-                    foreach (var mObject in mObjects)
-                    {
-                        // https://learn.microsoft.com/en-us/windows/win32/cimwin32prov/win32-pnpentity?redirectedfrom=MSDN
-                        var items = new List<string>
-                        {
-                            "Availability",
-                            "Caption",
-                            // "ClassGuid",
-                            // "CompatibleID[]",
-                            // "ConfigManagerErrorCode",
-                            // "ConfigManagerUserConfig",
-                            "CreationClassName",
-                            "Description",
-                            "DeviceID",
-                            // "ErrorCleared",
-                            // "ErrorDescription",
-                            // "HardwareID[]",
-                            // "InstallDate",
-                            // "LastErrorCode",
-                            // "Manufacturer",
-                            "Name",
-                            "PNPDeviceID",
-                            // "PowerManagementCapabilities[]",
-                            "PowerManagementSupported",
-                            // "Present",
-                            // "Service",
-                            "Status",
-                            "StatusInfo"
-                            // "SystemCreationClassName",
-                            // "SystemName",
-                        };
-
-                        foreach (var item in items)
-                            messages.Add($"{item,-24} = {mObject[item]}");
-
-                        messages.Add("---");
-                    }
-                }
-            }
-
-            return messages;
-        }
-
         public static List<UsbSerialDevice> GetAllSerialDevices()
         {
             var devices = new List<UsbSerialDevice>();
@@ -92,6 +40,9 @@ namespace TapExtensions.Shared.Win32
 
         public static UsbSerialDevice FindInstancePath(List<string> searchItems)
         {
+            if (searchItems.Count == 0)
+                throw new InvalidOperationException("List of items cannot be empty");
+
             var found = new List<UsbSerialDevice>();
             var devices = GetAllSerialDevices();
 
@@ -101,8 +52,9 @@ namespace TapExtensions.Shared.Win32
                         found.Add(device);
 
             if (found.Count == 0)
-                throw new Exception("Cannot find a serial port with " +
-                                    $"USB Instance Path(s) of '{string.Join("', '", searchItems)}'");
+                throw new InvalidOperationException(
+                    "Cannot find a serial port with USB Instance Path(s) of " +
+                    $"'{string.Join("', '", searchItems)}'");
 
             return found.First();
         }
