@@ -10,6 +10,7 @@ using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using OpenTap;
+using TapExtensions.Shared.Win32;
 
 namespace TapExtensions.Instruments.BarcodeScanner
 {
@@ -21,15 +22,24 @@ namespace TapExtensions.Instruments.BarcodeScanner
         #region Settings
 
         // https://github.com/diegotacconi/TapExtensions/tree/main/Instruments/TapExtensions.Instruments.BarcodeScanner/ConfigDocs
+        [EnabledIf(nameof(UseAutoDetection), false)]
         [Display("Serial Port Name", Order: 1,
             Description: "Remember to configure the scanner as a serial port (UART) device, over USB.")]
         public string SerialPortName { get; set; }
 
+        [Display("Use AutoDetection", Order: 2, Group: "Serial Port AutoDetection", Collapsed: true)]
+        public bool UseAutoDetection { get; set; }
+
+        [EnabledIf(nameof(UseAutoDetection))]
+        [Display("USB Device Address", Order: 3, Group: "Serial Port AutoDetection", Collapsed: true,
+            Description: "List of USB device addresses to search for a match.")]
+        public List<string> UsbDeviceAddresses { get; set; }
+
         public enum ELoggingLevel
         {
-            None,
-            Normal,
-            Verbose
+            None = 0,
+            Normal = 1,
+            Verbose = 2
         }
 
         [Display("Logging Level", Order: 20, Group: "Debug", Collapsed: true,
@@ -38,6 +48,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
         #endregion
 
+        private string _portName;
         private SerialPort _sp;
 
         public RakindaLV3000U()
@@ -45,12 +56,16 @@ namespace TapExtensions.Instruments.BarcodeScanner
             // Default values
             Name = nameof(RakindaLV3000U);
             SerialPortName = "COM6";
+            UseAutoDetection = true;
+            UsbDeviceAddresses = new List<string> { @"USB\VID_1EAB&PID_1D06" };
             LoggingLevel = ELoggingLevel.Normal;
         }
 
         public override void Open()
         {
             base.Open();
+
+            _portName = UseAutoDetection ? FindSerialPort() : SerialPortName;
 
             // Check if barcode scanner is available
             OpenSerialPort();
@@ -88,13 +103,35 @@ namespace TapExtensions.Instruments.BarcodeScanner
             WriteRead(cmdBytes, expectedSuccessfulReply, timeout);
         }
 
+        private string FindSerialPort()
+        {
+            if (UsbDeviceAddresses.Count == 0)
+                throw new InvalidOperationException(
+                    "List of USB Device Address cannot be empty");
+
+            if (LoggingLevel >= ELoggingLevel.Verbose)
+                Log.Debug("Searching for USB Instance Path(s) of " +
+                          $"'{string.Join("', '", UsbDeviceAddresses)}'");
+
+            var found = UsbDevices.FindInstancePath(UsbDeviceAddresses);
+
+            if (LoggingLevel >= ELoggingLevel.Normal)
+                Log.Debug($"Found serial port '{found.ComPort}' " +
+                          $"with USB Instance Path of '{found.InstancePath}' " +
+                          $"and Description of '{found.Description}'");
+
+            return found.ComPort;
+        }
+
         private void OpenSerialPort()
         {
-            // Example: USB\VID_1EAB&PID_1D06
+            if (string.IsNullOrWhiteSpace(_portName))
+                throw new InvalidOperationException(
+                    "Serial Port Name cannot be empty");
 
             _sp = new SerialPort
             {
-                PortName = SerialPortName,
+                PortName = _portName,
                 BaudRate = 9600,
                 Parity = Parity.None,
                 DataBits = 8,
@@ -107,7 +144,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
             // Close serial port if already opened
             CloseSerialPort();
 
-            if (LoggingLevel == ELoggingLevel.Verbose || LoggingLevel == ELoggingLevel.Normal)
+            if (LoggingLevel >= ELoggingLevel.Normal)
                 Log.Debug($"Opening serial port ({_sp.PortName})");
 
             // Open serial port
@@ -128,7 +165,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
             {
                 if (_sp.IsOpen)
                 {
-                    if (LoggingLevel == ELoggingLevel.Verbose || LoggingLevel == ELoggingLevel.Normal)
+                    if (LoggingLevel >= ELoggingLevel.Normal)
                         Log.Debug($"Closing serial port ({_sp.PortName})");
 
                     // Close serial port

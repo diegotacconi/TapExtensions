@@ -25,9 +25,9 @@ namespace TapExtensions.Instruments.BarcodeScanner
         #region Settings
 
         // https://github.com/diegotacconi/TapExtensions/tree/main/Instruments/TapExtensions.Instruments.BarcodeScanner/ConfigDocs
+        [EnabledIf(nameof(UseAutoDetection), false)]
         [Display("Serial Port Name", Order: 1,
-            Description: "Remember to configure the scanner as a serial port (UART) device, over USB.\n" +
-                         "Example: 'COM3'")]
+            Description: "Remember to configure the scanner as a serial port (UART) device, over USB.")]
         public string SerialPortName { get; set; }
 
         [Display("Use AutoDetection", Order: 2, Group: "Serial Port AutoDetection", Collapsed: true)]
@@ -35,8 +35,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
         [EnabledIf(nameof(UseAutoDetection))]
         [Display("USB Device Address", Order: 3, Group: "Serial Port AutoDetection", Collapsed: true,
-            Description: "List of USB device addresses to search for a match.\n" +
-                         @"Example: 'USB\VID_1234&PID_5678\SERIALNUMBER'")]
+            Description: "List of USB device addresses to search for a match.")]
         public List<string> UsbDeviceAddresses { get; set; }
 
         public enum ELoggingLevel
@@ -173,13 +172,17 @@ namespace TapExtensions.Instruments.BarcodeScanner
                 Wakeup();
                 ScanEnable();
                 StartSession();
-
-                // Attempt to read the barcode label
-                rawBarcodeLabel = Read(new byte[0], timeout);
-
-                StopSession();
-                ScanDisable();
-                Sleep();
+                try
+                {
+                    // Attempt to read the barcode label
+                    rawBarcodeLabel = Read(new byte[0], timeout);
+                }
+                finally
+                {
+                    StopSession();
+                    ScanDisable();
+                    Sleep();
+                }
             }
             finally
             {

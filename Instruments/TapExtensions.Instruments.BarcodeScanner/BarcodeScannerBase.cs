@@ -8,7 +8,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
     {
         #region Settings
 
-        [Display("Retry", Order: 10,
+        [Display("Retry", Order: 30,
             Description: "Maximum number of iteration attempts to retry scanning the barcode label.")]
         public Enabled<int> MaxIterationCount { get; set; }
 
