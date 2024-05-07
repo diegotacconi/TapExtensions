@@ -5,14 +5,14 @@ using System.Management;
 
 namespace TapExtensions.Shared.Win32
 {
-    public static class UsbDevices
+    public static class UsbSerialDevices
     {
         private static readonly object Obj = new object();
 
         public class UsbSerialDevice
         {
             public string ComPort { get; set; }
-            public string InstancePath { get; set; }
+            public string UsbAddress { get; set; }
             public string Description { get; set; }
         }
 
@@ -29,7 +29,7 @@ namespace TapExtensions.Shared.Win32
                         devices.Add(new UsbSerialDevice
                         {
                             ComPort = mObject["DeviceID"].ToString(),
-                            InstancePath = mObject["PNPDeviceID"].ToString(),
+                            UsbAddress = mObject["PNPDeviceID"].ToString(),
                             Description = mObject["Description"].ToString()
                         });
                 }
@@ -38,25 +38,48 @@ namespace TapExtensions.Shared.Win32
             return devices;
         }
 
-        public static UsbSerialDevice FindInstancePath(List<string> searchItems)
+        public static UsbSerialDevice FindUsbAddress(List<string> searchItems)
         {
             if (searchItems.Count == 0)
                 throw new InvalidOperationException("List of items cannot be empty");
 
-            var found = new List<UsbSerialDevice>();
+            var finds = new List<UsbSerialDevice>();
             var devices = GetAllSerialDevices();
 
             foreach (var searchItem in searchItems)
-                foreach (var device in devices)
-                    if (device.InstancePath.Contains(searchItem, StringComparison.OrdinalIgnoreCase))
-                        found.Add(device);
+            {
+                var find = FindUsbAddress(devices, searchItem);
+                if (find != null)
+                {
+                    finds.Add(find);
+                    break;
+                }
+            }
 
-            if (found.Count == 0)
+            if (finds.Count == 0)
                 throw new InvalidOperationException(
-                    "Cannot find a serial port with USB Instance Path(s) of " +
+                    "Cannot find a serial port with USB Address(es) of " +
                     $"'{string.Join("', '", searchItems)}'");
 
-            return found.First();
+            return finds.First();
+        }
+
+        private static UsbSerialDevice FindUsbAddress(List<UsbSerialDevice> devices, string searchItem)
+        {
+            var found = new List<UsbSerialDevice>();
+
+            foreach (var device in devices)
+                if (device.UsbAddress.Contains(searchItem, StringComparison.OrdinalIgnoreCase))
+                    found.Add(device);
+
+            if (found.Count > 1)
+                throw new InvalidOperationException(
+                    "Found multiple devices of " +
+                    $"'{string.Join("', '", found.Select(x => x.UsbAddress))}'; " +
+                    $"when searching for the USB Address of '{searchItem}'. " +
+                    "Please enter a search pattern that will return a single serial port device");
+
+            return found.Any() ? found.First() : null;
         }
     }
 

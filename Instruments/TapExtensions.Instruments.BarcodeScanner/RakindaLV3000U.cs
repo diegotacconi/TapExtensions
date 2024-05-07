@@ -110,14 +110,14 @@ namespace TapExtensions.Instruments.BarcodeScanner
                     "List of USB Device Address cannot be empty");
 
             if (LoggingLevel >= ELoggingLevel.Verbose)
-                Log.Debug("Searching for USB Instance Path(s) of " +
+                Log.Debug("Searching for USB Address(es) of " +
                           $"'{string.Join("', '", UsbDeviceAddresses)}'");
 
-            var found = UsbDevices.FindInstancePath(UsbDeviceAddresses);
+            var found = UsbSerialDevices.FindUsbAddress(UsbDeviceAddresses);
 
             if (LoggingLevel >= ELoggingLevel.Normal)
                 Log.Debug($"Found serial port '{found.ComPort}' " +
-                          $"with USB Instance Path of '{found.InstancePath}' " +
+                          $"with USB Address of '{found.UsbAddress}' " +
                           $"and Description of '{found.Description}'");
 
             return found.ComPort;

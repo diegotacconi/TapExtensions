@@ -31,11 +31,11 @@ namespace TapExtensions.Instruments.SigGen
         [EnabledIf(nameof(UseAutoDetection))]
         public void ShowAvailableUsbDevicesButton()
         {
-            var devices = UsbDevices.GetAllSerialDevices();
+            var devices = UsbSerialDevices.GetAllSerialDevices();
 
             var msg = "";
             foreach (var device in devices)
-                msg += $"'{device.ComPort}', '{device.InstancePath}', '{device.Description}'\n";
+                msg += $"'{device.ComPort}', '{device.UsbAddress}', '{device.Description}'\n";
 
             UserInput.Request(new DialogWindow(msg), true);
         }
@@ -46,10 +46,10 @@ namespace TapExtensions.Instruments.SigGen
         [EnabledIf(nameof(UseAutoDetection))]
         public void TryAutoDetectionButton()
         {
-            var found = UsbDevices.FindInstancePath(UsbDeviceAddresses);
+            var found = UsbSerialDevices.FindUsbAddress(UsbDeviceAddresses);
 
             var msg = $"Found serial port at '{found.ComPort}' " +
-                      $"with USB Instance Path of '{found.InstancePath}' " +
+                      $"with USB Address of '{found.UsbAddress}' " +
                       $"and Description of '{found.Description}'";
 
             UserInput.Request(new DialogWindow(msg), true);
@@ -74,9 +74,9 @@ namespace TapExtensions.Instruments.SigGen
         /*
         private void ShowAvailableUsbDevices()
         {
-            var devices = UsbDevices.GetAllSerialDevices();
+            var devices = UsbSerialDevices.GetAllSerialDevices();
             foreach (var device in devices)
-                Log.Debug($"'{device.ComPort}', '{device.InstancePath}', '{device.Description}'");
+                Log.Debug($"'{device.ComPort}', '{device.UsbAddress}', '{device.Description}'");
         }
         */
 
@@ -94,14 +94,14 @@ namespace TapExtensions.Instruments.SigGen
                     "List of USB Device Address cannot be empty");
 
             if (LoggingLevel >= ELoggingLevel.Verbose)
-                Log.Debug("Searching for USB Instance Path(s) of " +
+                Log.Debug("Searching for USB Address(es) of " +
                           $"'{string.Join("', '", UsbDeviceAddresses)}'");
 
-            var found = UsbDevices.FindInstancePath(UsbDeviceAddresses);
+            var found = UsbSerialDevices.FindUsbAddress(UsbDeviceAddresses);
 
             if (LoggingLevel >= ELoggingLevel.Normal)
                 Log.Debug($"Found serial port '{found.ComPort}' " +
-                          $"with USB Instance Path of '{found.InstancePath}' " +
+                          $"with USB Address of '{found.UsbAddress}' " +
                           $"and Description of '{found.Description}'");
 
             return found.ComPort;

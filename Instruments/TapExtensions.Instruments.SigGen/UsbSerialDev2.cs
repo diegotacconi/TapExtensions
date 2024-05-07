@@ -18,6 +18,14 @@ namespace TapExtensions.Instruments.SigGen
             UsbDeviceAddresses = new List<string>
             {
                 @"USB\VID_10C4&PID_EA70&MI_00\A&6C616C5&0&0000"
+
+                /*
+                  USB\VID_10C4&PID_EA70&MI_00\A&6C616C5&0&0000
+                  USB\VID_10C4&PID_EA70&MI_01\A&6C616C5&0&0001
+
+                  USB\VID_10C4&PID_EA70&MI_00\6&1DB4B887&0&0000
+                  USB\VID_10C4&PID_EA70&MI_01\6&1DB4B887&0&0001
+                 */
             };
         }
 
