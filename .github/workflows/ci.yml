@@ -13,7 +13,7 @@ jobs:
 
       # Checkout our repository, so the job can access it
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
@@ -24,7 +24,7 @@ jobs:
         msbuild-architecture: x64
 
     - name: Setup NuGet
-      uses: nuget/setup-nuget@v1
+      uses: nuget/setup-nuget@v2
 
     - name: Restore NuGet Packages
       run: nuget restore TapExtensions.sln
@@ -39,12 +39,12 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
     - name: Setup DotNet
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
 
     - name: Install Dependencies
       run: dotnet restore
