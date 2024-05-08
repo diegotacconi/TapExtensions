@@ -3,7 +3,7 @@ name: CI
 on: [push]
 
 jobs:
-  build:
+  Build-Win:
   
     # For a list of available runner types, refer to
     # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
@@ -11,9 +11,6 @@ jobs:
     strategy:
       matrix:
         Architecture: [x64]
-
-    env:
-      Solution_Name: TapExtensions.sln
 
     steps:
     
@@ -35,3 +32,28 @@ jobs:
 
     - name: Build the Solution
       run: msbuild TapExtensions.sln /property:Configuration=Release
+
+
+  Build-Linux:
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Setup DotNet
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '6.0.x'
+
+    - name: Display DotNet version
+      run: dotnet --version
+
+    - name: Install dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet publish -c Release TapExtensions.sln
