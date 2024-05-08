@@ -4,16 +4,13 @@ on: [push]
 
 jobs:
   Build-Win:
-  
+
     # For a list of available runner types, refer to
     # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
     runs-on: windows-2022
-    strategy:
-      matrix:
-        Architecture: [x64]
 
     steps:
-    
+
       # Checkout our repository, so the job can access it
     - name: Checkout
       uses: actions/checkout@v3
@@ -22,11 +19,13 @@ jobs:
 
       # Add MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
     - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1.0.2
+      uses: microsoft/setup-msbuild@v2
+      with:
+        msbuild-architecture: x64
 
     - name: Setup NuGet
       uses: nuget/setup-nuget@v1
-     
+
     - name: Restore NuGet Packages
       run: nuget restore TapExtensions.sln
 
@@ -56,4 +55,4 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      run: dotnet publish -c Release TapExtensions.sln
+      run: dotnet publish -c Debug TapExtensions.sln
