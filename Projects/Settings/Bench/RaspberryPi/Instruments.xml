@@ -2,6 +2,7 @@
 <InstrumentSettings type="OpenTap.InstrumentSettings">
   <KeysightE3632A type="TapExtensions.Instruments.DcPwr.KeysightE3632A" Source="">
     <VoltageRangeChoice>P15V</VoltageRangeChoice>
+    <ClearProtectionsOnOpen>true</ClearProtectionsOnOpen>
     <VisaAddress>GPIB0::9::INSTR</VisaAddress>
     <IoTimeout>2000</IoTimeout>
     <FinegrainedLock>false</FinegrainedLock>

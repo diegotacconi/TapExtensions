@@ -2,7 +2,7 @@
 <TestPlan type="OpenTap.TestPlan" Locked="false">
   <Steps>
     <TestStep type="OpenTap.Plugins.BasicSteps.SequenceStep" Version="9.16.4+654f0b6b" Id="03e2215a-6581-4865-9daa-c55e52a63e09">
-      <Enabled>true</Enabled>
+      <Enabled>false</Enabled>
       <Name>Uart</Name>
       <ChildTestSteps>
         <TestStep type="TapExtensions.Steps.Uart.UartQuery" Version="1.0.0" Id="7e339a49-9bfe-4842-a6b4-64f217e4980e">
@@ -154,14 +154,14 @@
       <IpAddress>192.168.101.1</IpAddress>
       <MinSuccessfulReplies>4</MinSuccessfulReplies>
       <Timeout>60</Timeout>
-      <Enabled>false</Enabled>
+      <Enabled>true</Enabled>
       <Name>Ping</Name>
       <ChildTestSteps />
       <BreakConditions>Inherit</BreakConditions>
       <OpenTap.Description />
     </TestStep>
     <TestStep type="OpenTap.Plugins.BasicSteps.SequenceStep" Version="9.16.4+654f0b6b" Id="e26c84b0-d400-49ac-a2c3-818a761a192d">
-      <Enabled>false</Enabled>
+      <Enabled>true</Enabled>
       <Name>SshCommand</Name>
       <ChildTestSteps>
         <TestStep type="TapExtensions.Steps.Ssh.SshConnect" Version="1.0.0" Id="92080331-c475-4e08-b7b3-728057417863">
@@ -253,7 +253,7 @@
       <BreakConditions>Inherit</BreakConditions>
     </TestStep>
     <TestStep type="OpenTap.Plugins.BasicSteps.SequenceStep" Version="9.16.4+654f0b6b" Id="de9b87a6-68dc-4e2e-9a95-aaa6abc5f936">
-      <Enabled>false</Enabled>
+      <Enabled>true</Enabled>
       <Name>SshShell</Name>
       <ChildTestSteps>
         <TestStep type="TapExtensions.Steps.Ssh.SshConnect" Version="1.0.0" Id="6e9820aa-c9f6-4080-b61f-3f022345ced3">
@@ -335,130 +335,8 @@
           <Command>passwd</Command>
           <ExpectedResponse></ExpectedResponse>
           <Timeout>10</Timeout>
-          <Enabled>true</Enabled>
-          <Name>SshShellQuery7</Name>
-          <ChildTestSteps />
-          <BreakConditions>Inherit</BreakConditions>
-          <OpenTap.Description />
-        </TestStep>
-        <TestStep type="TapExtensions.Steps.Ssh.SshQueries" Version="1.0.0" Id="5b74961d-0a2a-45c1-b83e-28b5696dd651">
-          <Dut type="TapExtensions.Duts.Ssh.SshShellDut" Source="OpenTap.DutSettings">SshShell</Dut>
-          <Queries>
-            <Query>
-              <Command>pwd</Command>
-              <ExpectedResponse>/</ExpectedResponse>
-              <Timeout>5</Timeout>
-            </Query>
-            <Query>
-              <Command>ls</Command>
-              <ExpectedResponse></ExpectedResponse>
-              <Timeout>5</Timeout>
-            </Query>
-            <Query>
-              <Command>my_var=Hello_World</Command>
-              <ExpectedResponse></ExpectedResponse>
-              <Timeout>5</Timeout>
-            </Query>
-            <Query>
-              <Command>echo $my_var</Command>
-              <ExpectedResponse>Hello_World</ExpectedResponse>
-              <Timeout>5</Timeout>
-            </Query>
-          </Queries>
           <Enabled>false</Enabled>
-          <Name>SshShellQueries</Name>
-          <ChildTestSteps />
-          <BreakConditions>Inherit</BreakConditions>
-          <OpenTap.Description />
-        </TestStep>
-      </ChildTestSteps>
-      <BreakConditions>Inherit</BreakConditions>
-    </TestStep>
-    <TestStep type="OpenTap.Plugins.BasicSteps.SequenceStep" Version="9.16.4+654f0b6b" Id="117dc502-a3cd-4f33-8421-4cd8ac4544bc">
-      <Enabled>false</Enabled>
-      <Name>DutControlSsh</Name>
-      <ChildTestSteps>
-        <TestStep type="TapExtensions.Steps.Ssh.SshConnect" Version="1.0.0" Id="8681ba1d-8cdf-4cd6-a41e-9ef5cf11466c">
-          <Dut type="TapExtensions.Duts.Ssh.DutControlSsh" Source="OpenTap.DutSettings">DutControlSsh</Dut>
-          <Enabled>true</Enabled>
-          <Name>DutControlSshConnect</Name>
-          <ChildTestSteps />
-          <BreakConditions>Inherit</BreakConditions>
-          <OpenTap.Description />
-        </TestStep>
-        <TestStep type="TapExtensions.Steps.Ssh.SshQuery" Version="1.0.0" Id="c116a512-b119-413c-bec5-4b95d88b70d3">
-          <Dut type="TapExtensions.Duts.Ssh.DutControlSsh" Source="OpenTap.DutSettings">DutControlSsh</Dut>
-          <Command>cat /etc/issue</Command>
-          <ExpectedResponse>Linux</ExpectedResponse>
-          <Timeout>5</Timeout>
-          <Enabled>true</Enabled>
-          <Name>DutControlSshQuery1</Name>
-          <ChildTestSteps />
-          <BreakConditions>Inherit</BreakConditions>
-          <OpenTap.Description />
-        </TestStep>
-        <TestStep type="TapExtensions.Steps.Ssh.SshQuery" Version="1.0.0" Id="d0ed8bfd-19ac-4e3b-b5d1-903603263098">
-          <Dut type="TapExtensions.Duts.Ssh.DutControlSsh" Source="OpenTap.DutSettings">DutControlSsh</Dut>
-          <Command>pwd</Command>
-          <ExpectedResponse>/home/pi</ExpectedResponse>
-          <Timeout>5</Timeout>
-          <Enabled>true</Enabled>
-          <Name>DutControlSshQuery2</Name>
-          <ChildTestSteps />
-          <BreakConditions>Inherit</BreakConditions>
-          <OpenTap.Description />
-        </TestStep>
-        <TestStep type="TapExtensions.Steps.Ssh.SshQuery" Version="1.0.0" Id="e40a0766-f9dc-4317-b145-a1029089420f">
-          <Dut type="TapExtensions.Duts.Ssh.DutControlSsh" Source="OpenTap.DutSettings">DutControlSsh</Dut>
-          <Command>echo -e "First line\nSecond line\nThird line\nFourth line\nFirth line\n"</Command>
-          <ExpectedResponse>Fourth line</ExpectedResponse>
-          <Timeout>5</Timeout>
-          <Enabled>true</Enabled>
-          <Name>DutControlSshQuery3</Name>
-          <ChildTestSteps />
-          <BreakConditions>Inherit</BreakConditions>
-          <OpenTap.Description />
-        </TestStep>
-        <TestStep type="TapExtensions.Steps.Ssh.SshQuery" Version="1.0.0" Id="1b882c8a-e28b-475e-808b-a7db2ef374ff">
-          <Dut type="TapExtensions.Duts.Ssh.DutControlSsh" Source="OpenTap.DutSettings">DutControlSsh</Dut>
-          <Command>ls -al</Command>
-          <ExpectedResponse></ExpectedResponse>
-          <Timeout>5</Timeout>
-          <Enabled>true</Enabled>
-          <Name>DutControlSshQuery4</Name>
-          <ChildTestSteps />
-          <BreakConditions>Inherit</BreakConditions>
-          <OpenTap.Description />
-        </TestStep>
-        <TestStep type="TapExtensions.Steps.Ssh.SshQuery" Version="1.0.0" Id="d1c2980f-af89-42d5-9326-cf265a0dd77a">
-          <Dut type="TapExtensions.Duts.Ssh.DutControlSsh" Source="OpenTap.DutSettings">DutControlSsh</Dut>
-          <Command>for i in {1..20}; do sleep 1; echo "-$i-"; done</Command>
-          <ExpectedResponse>-20-</ExpectedResponse>
-          <Timeout>25</Timeout>
-          <Enabled>true</Enabled>
-          <Name>DutControlSshQuery5</Name>
-          <ChildTestSteps />
-          <BreakConditions>Inherit</BreakConditions>
-          <OpenTap.Description />
-        </TestStep>
-        <TestStep type="TapExtensions.Steps.Ssh.SshQuery" Version="1.0.0" Id="ed84bbf4-5cc1-441c-b9fc-7b5f2f671be5">
-          <Dut type="TapExtensions.Duts.Ssh.DutControlSsh" Source="OpenTap.DutSettings">DutControlSsh</Dut>
-          <Command>for i in {1..20}; do sleep 1; echo "-$i-"; done</Command>
-          <ExpectedResponse>-20-</ExpectedResponse>
-          <Timeout>5</Timeout>
-          <Enabled>true</Enabled>
-          <Name>DutControlSshQuery6</Name>
-          <ChildTestSteps />
-          <BreakConditions>Inherit</BreakConditions>
-          <OpenTap.Description />
-        </TestStep>
-        <TestStep type="TapExtensions.Steps.Ssh.SshQuery" Version="1.0.0" Id="63292447-182d-4522-b0ff-5a7c83a74e5a">
-          <Dut type="TapExtensions.Duts.Ssh.DutControlSsh" Source="OpenTap.DutSettings">DutControlSsh</Dut>
-          <Command>passwd</Command>
-          <ExpectedResponse></ExpectedResponse>
-          <Timeout>10</Timeout>
-          <Enabled>true</Enabled>
-          <Name>DutControlSshQuery7</Name>
+          <Name>SshShellQuery7</Name>
           <ChildTestSteps />
           <BreakConditions>Inherit</BreakConditions>
           <OpenTap.Description />
@@ -467,7 +345,6 @@
       <BreakConditions>Inherit</BreakConditions>
     </TestStep>
   </Steps>
-  <OscarTestplanVersion></OscarTestplanVersion>
   <BreakConditions>Inherit</BreakConditions>
   <OpenTap.Description />
   <Package.Dependencies />

@@ -11,7 +11,7 @@
       <VoltageLimitHigh>5.4</VoltageLimitHigh>
       <CurrentLimitLow>-0.01</CurrentLimitLow>
       <CurrentLimitHigh>2</CurrentLimitHigh>
-      <Enabled>true</Enabled>
+      <Enabled>false</Enabled>
       <Name>DcPowerOn</Name>
       <ChildTestSteps />
       <BreakConditions>Inherit</BreakConditions>
@@ -21,7 +21,7 @@
       <Uart type="TapExtensions.Duts.Uart.UartDut" Source="OpenTap.DutSettings">Uart</Uart>
       <ExpectedResponse>login:</ExpectedResponse>
       <Timeout>60</Timeout>
-      <Enabled>true</Enabled>
+      <Enabled>false</Enabled>
       <Name>WaitForUartResponse</Name>
       <ChildTestSteps />
       <BreakConditions>Inherit</BreakConditions>
@@ -69,14 +69,14 @@
     </TestStep>
     <TestStep type="TapExtensions.Steps.DcPwr.DcPowerOff" Version="1.0.0" Id="28e1be6d-8adc-46a0-bfd4-066776c5f59d">
       <DcPwr type="TapExtensions.Instruments.DcPwr.KeysightE3632A" Source="OpenTap.InstrumentSettings">KeysightE3632A</DcPwr>
-      <Enabled>true</Enabled>
+      <Enabled>false</Enabled>
       <Name>DcPowerOff</Name>
       <ChildTestSteps />
       <BreakConditions>Inherit</BreakConditions>
       <OpenTap.Description />
     </TestStep>
   </Steps>
-    <BreakConditions>Inherit</BreakConditions>
+  <BreakConditions>Inherit</BreakConditions>
   <OpenTap.Description />
   <Package.Dependencies />
 </TestPlan>
