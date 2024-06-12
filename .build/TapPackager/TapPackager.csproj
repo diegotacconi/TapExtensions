@@ -34,6 +34,7 @@
     <ProjectReference Include="..\..\Gui\TapExtensions.Gui.Wpf\TapExtensions.Gui.Wpf.csproj" />
     <ProjectReference Include="..\..\Instruments\TapExtensions.Instruments.BarcodeScanner\TapExtensions.Instruments.BarcodeScanner.csproj" />
     <ProjectReference Include="..\..\Instruments\TapExtensions.Instruments.DcPwr\TapExtensions.Instruments.DcPwr.csproj" />
+    <ProjectReference Include="..\..\Instruments\TapExtensions.Instruments.RasPi\TapExtensions.Instruments.RasPi.csproj" />
     <ProjectReference Include="..\..\Instruments\TapExtensions.Instruments.SigGen\TapExtensions.Instruments.SigGen.csproj" />
     <ProjectReference Include="..\..\Interfaces\TapExtensions.Interfaces\TapExtensions.Interfaces.csproj" />
     <ProjectReference Include="..\..\Results\TapExtensions.Results\TapExtensions.Results.csproj" />
