@@ -12,8 +12,19 @@ namespace TapExtensions.Instruments.SigGen
         Description: "Windfreak SynthUSB2 RF Signal Generator, 34MHz to 4.4GHz")]
     public class WindfreakSynthUsb2 : SerialInstrument, ISigGen
     {
+        // Frequency range
         private const double MinFreqMhz = 35;
         private const double MaxFreqMhz = 4400;
+
+        // Amplitude range
+        private const double DefaultAmplitude = 1.5; // Default amplitude when power is set to 'a3'.
+        private const double StepAmplitude = 3; // Attenuation step between power levels of 'a3', 'a2', 'a1', and 'a0'.
+        private const double MaxAmplitude = DefaultAmplitude + 0.5 * StepAmplitude;
+        private const double HighAmplitude = DefaultAmplitude - 0.5 * StepAmplitude;
+        private const double MidAmplitude = DefaultAmplitude - 1.5 * StepAmplitude;
+        private const double LowAmplitude = DefaultAmplitude - 2.5 * StepAmplitude;
+        private const double MinAmplitude = DefaultAmplitude - 3.5 * StepAmplitude;
+
         private readonly object _internalInstLock = new object();
         private double _frequencyMhz;
         private bool _isOpen;
@@ -99,7 +110,7 @@ namespace TapExtensions.Instruments.SigGen
 
         public double GetOutputLevel()
         {
-            throw new NotSupportedException();
+            throw new NotImplementedException();
         }
 
         public EState GetRfOutputState()
@@ -109,7 +120,7 @@ namespace TapExtensions.Instruments.SigGen
 
         public void SetFrequency(double frequencyMhz)
         {
-            // Check if frequency is is out-of-range
+            // Check if frequency is out-of-range
             if (frequencyMhz < MinFreqMhz)
                 throw new ArgumentOutOfRangeException(nameof(frequencyMhz),
                     $@"Cannot set frequency below {MinFreqMhz} MHz");
@@ -151,7 +162,34 @@ namespace TapExtensions.Instruments.SigGen
 
         public void SetOutputLevel(double outputLevelDbm)
         {
-            throw new NotSupportedException();
+            // Check if amplitude is out-of-range
+            if (outputLevelDbm > MaxAmplitude)
+                throw new ArgumentOutOfRangeException(nameof(outputLevelDbm),
+                    $@"Cannot set amplitude above {MaxAmplitude} dBm");
+            if (outputLevelDbm < MinAmplitude)
+                throw new ArgumentOutOfRangeException(nameof(outputLevelDbm),
+                    $@"Cannot set amplitude below {MinAmplitude} dBm");
+
+            var a = 0;
+            switch (outputLevelDbm)
+            {
+                case double x when x >= HighAmplitude:
+                    a = 3;
+                    break;
+                case double x when x < HighAmplitude && x >= MidAmplitude:
+                    a = 2;
+                    break;
+                case double x when x < MidAmplitude && x >= LowAmplitude:
+                    a = 1;
+                    break;
+                case double x when x < LowAmplitude:
+                    a = 0;
+                    break;
+            }
+
+            SerialCommand($"a{a:D1}");
+            if (!SerialQuery("a?").Contains($"{a:D1}"))
+                throw new Exception($"Unable to set the SG RF Power to 'a{a:D1}'");
         }
 
         public void SetRfOutputState(EState state)
