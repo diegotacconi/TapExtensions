@@ -10,20 +10,11 @@ namespace TapExtensions.Instruments.SigGen
     [Display("Windfreak SynthUSB2",
         Groups: new[] { "TapExtensions", "Instruments", "SigGen" },
         Description: "Windfreak SynthUSB2 RF Signal Generator, 34MHz to 4.4GHz")]
-    public class WindfreakSynthUsb2 : SerialInstrument, ISigGen
+    public class WindfreakSynthUsb2 : UsbSerialInstrument, ISigGen
     {
         // Frequency range
         private const double MinFreqMhz = 35;
         private const double MaxFreqMhz = 4400;
-
-        // Amplitude range
-        private const double DefaultAmplitude = 1.5; // Default amplitude when power is set to 'a3'.
-        private const double StepAmplitude = 3; // Attenuation step between power levels of 'a3', 'a2', 'a1', and 'a0'.
-        private const double MaxAmplitude = DefaultAmplitude + 0.5 * StepAmplitude;
-        private const double HighAmplitude = DefaultAmplitude - 0.5 * StepAmplitude;
-        private const double MidAmplitude = DefaultAmplitude - 1.5 * StepAmplitude;
-        private const double LowAmplitude = DefaultAmplitude - 2.5 * StepAmplitude;
-        private const double MinAmplitude = DefaultAmplitude - 3.5 * StepAmplitude;
 
         private readonly object _internalInstLock = new object();
         private double _frequencyMhz;
@@ -63,10 +54,8 @@ namespace TapExtensions.Instruments.SigGen
             if (!SerialQuery("h?").Contains("1"))
                 throw new InvalidOperationException("Unable to set the SG RF Power to High");
 
-            // a) set RF Power (0=minimum, 3=maximum)
-            SerialCommand("a3");
-            if (!SerialQuery("a?").Contains("3"))
-                throw new InvalidOperationException("Unable to set the SG RF Power to maximum");
+            // a) set amplitude
+            SetOutputLevel(0);
 
             // g) run sweep (on=1 / off=0)
             SerialCommand("g0");
@@ -78,7 +67,7 @@ namespace TapExtensions.Instruments.SigGen
             if (!SerialQuery("x?").Contains("1"))
                 throw new InvalidOperationException("Unable to set the SG internal reference to internal");
 
-            // f) set RF Frequency
+            // f) set frequency
             SetFrequency(1000);
 
             _isOpen = true;
@@ -94,18 +83,18 @@ namespace TapExtensions.Instruments.SigGen
 
         public double GetFrequency()
         {
-            var freqReplyMhz = _frequencyMhz;
+            double freqMhz;
 
             lock (_internalInstLock)
             {
-                var freqReply = SerialQuery("f?");
-                if (double.TryParse(freqReply, out var freqReplyKhz))
-                    freqReplyMhz = freqReplyKhz * 0.001;
-                else
-                    Log.Warning($"Unable to parse {freqReply}");
+                var response = SerialQuery("f?");
+                if (!double.TryParse(response, out var freqKhz))
+                    throw new InvalidOperationException($"Unable to parse response of '{response}'");
+
+                freqMhz = freqKhz * 0.001;
             }
 
-            return freqReplyMhz;
+            return freqMhz;
         }
 
         public double GetOutputLevel()
@@ -146,50 +135,71 @@ namespace TapExtensions.Instruments.SigGen
                 var freqReplyMhz = GetFrequency();
                 const double tolerance = 1e-6;
                 if (Math.Abs(frequencyMhz - freqReplyMhz) > tolerance)
-                {
-                    Log.Warning($"Unable to set the SG frequency to {frequencyMhz} MHz");
-                    _frequencyMhz = freqReplyMhz;
-                }
-                else
-                {
-                    _frequencyMhz = frequencyMhz;
-                }
+                    throw new InvalidOperationException($"Unable to set frequency to {frequencyMhz} MHz");
+
+                _frequencyMhz = freqReplyMhz;
 
                 if (LoggingLevel >= ELoggingLevel.Normal)
-                    Log.Debug($"Set frequency to {_frequencyMhz} MHz");
+                    Log.Debug($"Set frequency to {freqReplyMhz} MHz");
             }
         }
 
         public void SetOutputLevel(double outputLevelDbm)
         {
-            // Check if amplitude is out-of-range
-            if (outputLevelDbm > MaxAmplitude)
-                throw new ArgumentOutOfRangeException(nameof(outputLevelDbm),
-                    $@"Cannot set amplitude above {MaxAmplitude} dBm");
-            if (outputLevelDbm < MinAmplitude)
-                throw new ArgumentOutOfRangeException(nameof(outputLevelDbm),
-                    $@"Cannot set amplitude below {MinAmplitude} dBm");
+            // Amplitude constants
+            const double defaultAmplitude = 0; // Default amplitude (in dBm), when power is set to 'a3'.
+            const double stepAmplitude = 3; // Step (in dB), between power levels of 'a3', 'a2', 'a1', and 'a0'.
+            const double maxAmplitude = defaultAmplitude + 0.5 * stepAmplitude;
+            const double highAmplitude = defaultAmplitude - 0.5 * stepAmplitude;
+            const double midAmplitude = defaultAmplitude - 1.5 * stepAmplitude;
+            const double lowAmplitude = defaultAmplitude - 2.5 * stepAmplitude;
+            const double minAmplitude = defaultAmplitude - 3.5 * stepAmplitude;
 
-            var a = 0;
+            // Check if amplitude is out-of-range
+            if (outputLevelDbm > maxAmplitude)
+                throw new ArgumentOutOfRangeException(nameof(outputLevelDbm),
+                    $@"Cannot set amplitude above {maxAmplitude} dBm");
+            if (outputLevelDbm < minAmplitude)
+                throw new ArgumentOutOfRangeException(nameof(outputLevelDbm),
+                    $@"Cannot set amplitude below {minAmplitude} dBm");
+
+            var a = 3;
+            var coarseAmplitude = defaultAmplitude;
             switch (outputLevelDbm)
             {
-                case double x when x >= HighAmplitude:
+                case double x when x >= highAmplitude:
+                    coarseAmplitude = defaultAmplitude;
                     a = 3;
                     break;
-                case double x when x < HighAmplitude && x >= MidAmplitude:
+
+                case double x when x < highAmplitude && x >= midAmplitude:
+                    coarseAmplitude = defaultAmplitude - 1 * stepAmplitude;
                     a = 2;
                     break;
-                case double x when x < MidAmplitude && x >= LowAmplitude:
+
+                case double x when x < midAmplitude && x >= lowAmplitude:
+                    coarseAmplitude = defaultAmplitude - 2 * stepAmplitude;
                     a = 1;
                     break;
-                case double x when x < LowAmplitude:
+
+                case double x when x < lowAmplitude:
+                    coarseAmplitude = defaultAmplitude - 3 * stepAmplitude;
                     a = 0;
                     break;
             }
 
-            SerialCommand($"a{a:D1}");
-            if (!SerialQuery("a?").Contains($"{a:D1}"))
-                throw new Exception($"Unable to set the SG RF Power to 'a{a:D1}'");
+            lock (_internalInstLock)
+            {
+                // Set amplitude
+                SerialCommand($"a{a:D1}");
+
+                // Check amplitude
+                if (!SerialQuery("a?").Contains($"{a:D1}"))
+                    throw new InvalidOperationException($"Unable to set amplitude to 'a{a:D1}'");
+
+                if (LoggingLevel >= ELoggingLevel.Normal)
+                    Log.Debug($"Set amplitude to {coarseAmplitude} dBm");
+            }
         }
 
         public void SetRfOutputState(EState state)
@@ -207,11 +217,11 @@ namespace TapExtensions.Instruments.SigGen
 
                     // Check output state (On=1 / Off=0)
                     if (!SerialQuery("o?").Contains("1"))
-                        throw new InvalidOperationException("Unable to set the SG output state to On");
+                        throw new InvalidOperationException("Unable to set the RF output state to On");
 
                     // Check phase lock status (lock=1 / unlock=0)
                     if (!SerialQuery("p").Contains("1"))
-                        throw new InvalidOperationException("Unable to set the SG output state to On (phase unlocked)");
+                        throw new InvalidOperationException("Unable to set the RF output state to On (phase unlocked)");
                 }
                 else
                 {
@@ -220,11 +230,11 @@ namespace TapExtensions.Instruments.SigGen
 
                     // Check output state (On=1 / Off=0)
                     if (!SerialQuery("o?").Contains("0"))
-                        throw new InvalidOperationException("Unable to set the SG output state to Off");
+                        throw new InvalidOperationException("Unable to set the RF output state to Off");
 
                     // Check phase lock status (lock=1 / unlock=0)
                     if (!SerialQuery("p").Contains("0"))
-                        throw new InvalidOperationException("Unable to set the SG output state to Off (phase locked)");
+                        throw new InvalidOperationException("Unable to set the RF output state to Off (phase locked)");
                 }
 
                 if (LoggingLevel >= ELoggingLevel.Normal)
