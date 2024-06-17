@@ -8,7 +8,7 @@ using TapExtensions.Shared.Win32;
 
 namespace TapExtensions.Instruments.SigGen
 {
-    public abstract class SerialInstrument : Instrument
+    public abstract class UsbSerialInstrument : Instrument
     {
         #region Settings
 
