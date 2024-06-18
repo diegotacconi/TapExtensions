@@ -30,7 +30,7 @@ namespace TapExtensions.Instruments.SigGen
             SerialPortName = "COM6";
             UseAutoDetection = true;
             UsbDeviceAddresses = new List<string> { @"USB\VID_16D0&PID_0557" };
-            LoggingLevel = ELoggingLevel.Normal;
+            LoggingLevel = ELoggingLevel.Verbose;
         }
 
         public override void Open()
