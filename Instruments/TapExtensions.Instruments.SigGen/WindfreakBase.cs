@@ -25,37 +25,6 @@ namespace TapExtensions.Instruments.SigGen
                          @"Example: 'USB\VID_1234&PID_5678\SERIALNUMBER'")]
         public List<string> UsbDeviceAddresses { get; set; }
 
-        /*
-        [Browsable(true)]
-        [Display("Show available USB Devices", Order: 5, Group: "Serial Port AutoDetection", Collapsed: true)]
-        [EnabledIf(nameof(UseAutoDetection))]
-        public void ShowAvailableUsbDevicesButton()
-        {
-            var devices = UsbSerialDevices.GetAllSerialDevices();
-
-            var msg = "";
-            foreach (var device in devices)
-                msg += $"'{device.ComPort}', '{device.UsbAddress}', '{device.Description}'\n";
-
-            UserInput.Request(new DialogWindow(msg), true);
-        }
-
-        [Browsable(true)]
-        [Display("Try AutoDetection", Order: 6, Group: "Serial Port AutoDetection", Collapsed: true,
-            Description: "Click this button to try to find a \nUSB device that matches the search criteria")]
-        [EnabledIf(nameof(UseAutoDetection))]
-        public void TryAutoDetectionButton()
-        {
-            var found = UsbSerialDevices.FindUsbAddress(UsbDeviceAddresses);
-
-            var msg = $"Found serial port at '{found.ComPort}' " +
-                      $"with USB Address of '{found.UsbAddress}' " +
-                      $"and Description of '{found.Description}'";
-
-            UserInput.Request(new DialogWindow(msg), true);
-        }
-        */
-
         public enum ELoggingLevel
         {
             None = 0,
@@ -70,15 +39,6 @@ namespace TapExtensions.Instruments.SigGen
         #endregion
 
         private SerialPort _sp;
-
-        /*
-        private void ShowAvailableUsbDevices()
-        {
-            var devices = UsbSerialDevices.GetAllSerialDevices();
-            foreach (var device in devices)
-                Log.Debug($"'{device.ComPort}', '{device.UsbAddress}', '{device.Description}'");
-        }
-        */
 
         public override void Open()
         {
@@ -199,28 +159,4 @@ namespace TapExtensions.Instruments.SigGen
             _sp.WriteLine(command);
         }
     }
-
-    /*
-    [Display("Auto-Detection Dialog")]
-    internal class DialogWindow
-    {
-        public DialogWindow(string message)
-        {
-            Message = message;
-        }
-
-        [Browsable(true)]
-        [Layout(LayoutMode.FullRow, 2)]
-        public string Message { get; }
-
-        [Layout(LayoutMode.FloatBottom | LayoutMode.FullRow)]
-        [Submit]
-        public EDialogButton Response { get; set; } = EDialogButton.Ok;
-    }
-
-    internal enum EDialogButton
-    {
-        Ok
-    }
-    */
 }
