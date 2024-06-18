@@ -16,6 +16,9 @@ namespace TapExtensions.Instruments.SigGen
         private const double MinFreqMhz = 35;
         private const double MaxFreqMhz = 4400;
 
+        // Default amplitude (in dBm), when power is set to 'a3', and frequency is set to 1 GHz
+        private const double DefaultAmplitude = 1;
+
         private readonly object _internalInstLock = new object();
         private double _frequencyMhz;
         private bool _isOpen;
@@ -55,7 +58,7 @@ namespace TapExtensions.Instruments.SigGen
                 throw new InvalidOperationException("Unable to set the SG RF Power to High");
 
             // a) set amplitude
-            SetOutputLevel(0);
+            SetOutputLevel(DefaultAmplitude);
 
             // g) run sweep (on=1 / off=0)
             SerialCommand("g0");
@@ -111,11 +114,9 @@ namespace TapExtensions.Instruments.SigGen
         {
             // Check if frequency is out-of-range
             if (frequencyMhz < MinFreqMhz)
-                throw new ArgumentOutOfRangeException(nameof(frequencyMhz),
-                    $@"Cannot set frequency below {MinFreqMhz} MHz");
+                throw new InvalidOperationException($"Cannot set frequency below {MinFreqMhz} MHz.");
             if (frequencyMhz > MaxFreqMhz)
-                throw new ArgumentOutOfRangeException(nameof(frequencyMhz),
-                    $@"Cannot set frequency above {MaxFreqMhz} MHz");
+                throw new InvalidOperationException($"Cannot set frequency above {MaxFreqMhz} MHz.");
 
             lock (_internalInstLock)
             {
@@ -123,9 +124,9 @@ namespace TapExtensions.Instruments.SigGen
                 //  Example: a communication for programming the frequency to 1GHz would be sent as "f1000.0"
                 //   Please keep in mind that the device expects the format shown. For example if you send
                 //   simply just an "f" the device will sit there and wait for the rest of the data and may
-                //   appear locked up. If you don't send the decimal point and at least one digit afterward, it
-                //   will have unexpected results. Also, please send data without hidden characters such as a
-                //   carriage return at the end.
+                //   appear locked up. If you don't send the decimal point and at least one digit afterward,
+                //   it will have unexpected results. Also, please send data without hidden characters such
+                //   as a carriage return at the end.
                 SerialCommand("f" + frequencyMhz.ToString("0.0########", CultureInfo.InvariantCulture));
 
                 // A delay may be needed for the instrument to complete the previous command
@@ -133,57 +134,57 @@ namespace TapExtensions.Instruments.SigGen
 
                 // Check frequency
                 var freqReplyMhz = GetFrequency();
-                const double tolerance = 1e-6;
-                if (Math.Abs(frequencyMhz - freqReplyMhz) > tolerance)
-                    throw new InvalidOperationException($"Unable to set frequency to {frequencyMhz} MHz");
-
                 _frequencyMhz = freqReplyMhz;
 
                 if (LoggingLevel >= ELoggingLevel.Normal)
-                    Log.Debug($"Set frequency to {freqReplyMhz} MHz");
+                {
+                    const double tolerance = 1e-6;
+                    if (Math.Abs(frequencyMhz - freqReplyMhz) > tolerance)
+                        Log.Warning($"Set frequency to {freqReplyMhz} MHz, with a frequency error of " +
+                                    $"{Math.Round(Math.Abs(frequencyMhz - freqReplyMhz) * 1e+6, 3)} Hz, " +
+                                    $"for the requested frequency of {frequencyMhz} MHz");
+                    else
+                        Log.Debug($"Set frequency to {freqReplyMhz} MHz");
+                }
             }
         }
 
         public void SetOutputLevel(double outputLevelDbm)
         {
-            // Amplitude constants
-            const double defaultAmplitude = 0; // Default amplitude (in dBm), when power is set to 'a3'.
             const double stepAmplitude = 3; // Step (in dB), between power levels of 'a3', 'a2', 'a1', and 'a0'.
-            const double maxAmplitude = defaultAmplitude + 0.5 * stepAmplitude;
-            const double highAmplitude = defaultAmplitude - 0.5 * stepAmplitude;
-            const double midAmplitude = defaultAmplitude - 1.5 * stepAmplitude;
-            const double lowAmplitude = defaultAmplitude - 2.5 * stepAmplitude;
-            const double minAmplitude = defaultAmplitude - 3.5 * stepAmplitude;
+            const double maxAmplitude = DefaultAmplitude + 0.5 * stepAmplitude;
+            const double highAmplitude = DefaultAmplitude - 0.5 * stepAmplitude;
+            const double midAmplitude = DefaultAmplitude - 1.5 * stepAmplitude;
+            const double lowAmplitude = DefaultAmplitude - 2.5 * stepAmplitude;
+            const double minAmplitude = DefaultAmplitude - 3.5 * stepAmplitude;
 
             // Check if amplitude is out-of-range
             if (outputLevelDbm > maxAmplitude)
-                throw new ArgumentOutOfRangeException(nameof(outputLevelDbm),
-                    $@"Cannot set amplitude above {maxAmplitude} dBm");
+                throw new InvalidOperationException($"Cannot set amplitude above {maxAmplitude} dBm");
             if (outputLevelDbm < minAmplitude)
-                throw new ArgumentOutOfRangeException(nameof(outputLevelDbm),
-                    $@"Cannot set amplitude below {minAmplitude} dBm");
+                throw new InvalidOperationException($"Cannot set amplitude below {minAmplitude} dBm");
 
             var a = 3;
-            var coarseAmplitude = defaultAmplitude;
+            var coarseAmplitude = DefaultAmplitude;
             switch (outputLevelDbm)
             {
                 case double x when x >= highAmplitude:
-                    coarseAmplitude = defaultAmplitude;
+                    coarseAmplitude = DefaultAmplitude;
                     a = 3;
                     break;
 
                 case double x when x < highAmplitude && x >= midAmplitude:
-                    coarseAmplitude = defaultAmplitude - 1 * stepAmplitude;
+                    coarseAmplitude = DefaultAmplitude - 1 * stepAmplitude;
                     a = 2;
                     break;
 
                 case double x when x < midAmplitude && x >= lowAmplitude:
-                    coarseAmplitude = defaultAmplitude - 2 * stepAmplitude;
+                    coarseAmplitude = DefaultAmplitude - 2 * stepAmplitude;
                     a = 1;
                     break;
 
                 case double x when x < lowAmplitude:
-                    coarseAmplitude = defaultAmplitude - 3 * stepAmplitude;
+                    coarseAmplitude = DefaultAmplitude - 3 * stepAmplitude;
                     a = 0;
                     break;
             }
@@ -198,7 +199,16 @@ namespace TapExtensions.Instruments.SigGen
                     throw new InvalidOperationException($"Unable to set amplitude to 'a{a:D1}'");
 
                 if (LoggingLevel >= ELoggingLevel.Normal)
-                    Log.Debug($"Set amplitude to {coarseAmplitude} dBm");
+                {
+                    const double tolerance = 0.01;
+                    if (Math.Abs(outputLevelDbm - coarseAmplitude) > tolerance)
+                        Log.Warning($"Set amplitude to approximately {coarseAmplitude} dBm, " +
+                                    $"when range is within ({coarseAmplitude - 0.5 * stepAmplitude}, " +
+                                    $"{coarseAmplitude + 0.5 * stepAmplitude}), " +
+                                    $"for the requested amplitude of {outputLevelDbm} dBm");
+                    else
+                        Log.Debug($"Set amplitude to approximately {coarseAmplitude} dBm");
+                }
             }
         }
 
