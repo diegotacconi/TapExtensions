@@ -10,7 +10,7 @@ namespace TapExtensions.Instruments.SigGen
     [Display("Windfreak SynthUSB2",
         Groups: new[] { "TapExtensions", "Instruments", "SigGen" },
         Description: "Windfreak SynthUSB2 RF Signal Generator, 34MHz to 4.4GHz")]
-    public class WindfreakSynthUsb2 : UsbSerialInstrument, ISigGen
+    public class WindfreakSynthUsb2 : WindfreakBase, ISigGen
     {
         // Frequency range
         private const double MinFreqMhz = 35;

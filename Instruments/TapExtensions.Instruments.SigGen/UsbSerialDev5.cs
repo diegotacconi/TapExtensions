@@ -8,7 +8,7 @@ namespace TapExtensions.Instruments.SigGen
 {
     [Display("UsbSerialDev5",
         Groups: new[] { "TapExtensions", "Instruments", "SigGen" })]
-    public class UsbSerialDev5 : UsbSerialInstrument, ISigGen
+    public class UsbSerialDev5 : WindfreakBase, ISigGen
     {
         public UsbSerialDev5()
         {
