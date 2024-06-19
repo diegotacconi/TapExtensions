@@ -93,8 +93,10 @@ namespace TapExtensions.Instruments.SigGen
             lock (InstLock)
             {
                 var response = SerialQuery("f?");
-                if (!double.TryParse(response, out freqMhz))
+                if (!double.TryParse(response, out var freqKhz))
                     throw new InvalidOperationException($"Unable to parse response of '{response}'");
+
+                freqMhz = freqKhz * 0.001;
             }
 
             return freqMhz;
