@@ -9,12 +9,13 @@ namespace TapExtensions.Instruments.SigGen
 {
     [Display("Windfreak SynthUSB2",
         Groups: new[] { "TapExtensions", "Instruments", "SigGen" },
-        Description: "Windfreak SynthUSB2 RF Signal Generator, 34MHz to 4.4GHz")]
+        Description: "Windfreak SynthUSBII RF Signal Generator, 34MHz to 4.4GHz")]
     public class WindfreakSynthUsb2 : WindfreakBase, ISigGen
     {
         // Frequency range
         private const double MinFreqMhz = 35;
         private const double MaxFreqMhz = 4400;
+        private const double FreqResolutionHz = 1;
         private const double DefaultFreqMhz = 1000;
 
         // Default approximate amplitude (in dBm), when power is set to 'a3'.
@@ -123,13 +124,7 @@ namespace TapExtensions.Instruments.SigGen
             lock (InstLock)
             {
                 // Set frequency
-                //  Example: a communication for programming the frequency to 1GHz would be sent as "f1000.0"
-                //   Please keep in mind that the device expects the format shown. For example if you send
-                //   simply just an "f" the device will sit there and wait for the rest of the data and may
-                //   appear locked up. If you don't send the decimal point and at least one digit afterward,
-                //   it will have unexpected results. Also, please send data without hidden characters such
-                //   as a carriage return at the end.
-                SerialCommand("f" + frequencyMhz.ToString("0.0########", CultureInfo.InvariantCulture));
+                SerialCommand("f" + frequencyMhz.ToString("0.0#######", CultureInfo.InvariantCulture));
 
                 // Check frequency
                 var freqReplyMhz = GetFrequency();
@@ -137,7 +132,7 @@ namespace TapExtensions.Instruments.SigGen
 
                 if (LoggingLevel >= ELoggingLevel.Normal)
                 {
-                    const double tolerance = 1e-6;
+                    const double tolerance = FreqResolutionHz * 1e-6;
                     if (Math.Abs(frequencyMhz - freqReplyMhz) > tolerance)
                         Log.Warning($"Set frequency to {freqReplyMhz} MHz, with a frequency error of " +
                                     $"{Math.Round(Math.Abs(frequencyMhz - freqReplyMhz) * 1e+6, 3)} Hz, " +
