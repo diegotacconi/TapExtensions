@@ -76,7 +76,7 @@ namespace TapExtensions.Instruments.SigGen
             _sp = new SerialPort
             {
                 PortName = portName,
-                BaudRate = 9600,
+                BaudRate = 9600, // Not applicable
                 Parity = Parity.None,
                 DataBits = 8,
                 StopBits = StopBits.One,
