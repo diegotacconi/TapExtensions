@@ -15,11 +15,13 @@ namespace TapExtensions.Instruments.SigGen
         // Frequency range
         private const double MinFreqMhz = 35;
         private const double MaxFreqMhz = 4400;
+        private const double DefaultFreqMhz = 1000;
 
-        // Default amplitude (in dBm), when power is set to 'a3', and frequency is set to 1 GHz
-        private const double DefaultAmplitude = 1;
+        // Default approximate amplitude (in dBm), when power is set to 'a3'.
+        // Amplitude varies from 0 to +3 dBm, depending on frequency
+        private const double DefaultAmplitude = 0;
 
-        private readonly object _internalInstLock = new object();
+        private static readonly object InstLock = new object();
         private double _frequencyMhz;
         private bool _isOpen;
 
@@ -39,13 +41,13 @@ namespace TapExtensions.Instruments.SigGen
 
             if (LoggingLevel >= ELoggingLevel.Normal)
             {
-                // +) Model Type
+                // +) Show model type
                 Log.Debug("Model Type: " + SerialQuery("+").Trim('\n'));
 
-                // -) Serial Number
+                // -) Show serial number
                 Log.Debug("Serial Number: " + SerialQuery("-").Trim('\n'));
 
-                // v) show firmware version
+                // v) Show firmware version
                 Log.Debug("Firmware Version: " + SerialQuery("v").Trim('\n'));
             }
 
@@ -65,13 +67,13 @@ namespace TapExtensions.Instruments.SigGen
             if (!SerialQuery("g?").Contains("0"))
                 throw new InvalidOperationException("Unable to set the SG sweep state to Off");
 
-            // x) set internal reference (external=0 / internal=1)
+            // x) Set reference (0=external / 1=internal)
             SerialCommand("x1");
             if (!SerialQuery("x?").Contains("1"))
-                throw new InvalidOperationException("Unable to set the SG internal reference to internal");
+                throw new InvalidOperationException("Unable to set reference to internal");
 
             // f) set frequency
-            SetFrequency(1000);
+            SetFrequency(DefaultFreqMhz);
 
             _isOpen = true;
         }
@@ -88,13 +90,11 @@ namespace TapExtensions.Instruments.SigGen
         {
             double freqMhz;
 
-            lock (_internalInstLock)
+            lock (InstLock)
             {
                 var response = SerialQuery("f?");
-                if (!double.TryParse(response, out var freqKhz))
+                if (!double.TryParse(response, out freqMhz))
                     throw new InvalidOperationException($"Unable to parse response of '{response}'");
-
-                freqMhz = freqKhz * 0.001;
             }
 
             return freqMhz;
@@ -118,7 +118,7 @@ namespace TapExtensions.Instruments.SigGen
             if (frequencyMhz > MaxFreqMhz)
                 throw new InvalidOperationException($"Cannot set frequency above {MaxFreqMhz} MHz.");
 
-            lock (_internalInstLock)
+            lock (InstLock)
             {
                 // Set frequency
                 //  Example: a communication for programming the frequency to 1GHz would be sent as "f1000.0"
@@ -128,9 +128,6 @@ namespace TapExtensions.Instruments.SigGen
                 //   it will have unexpected results. Also, please send data without hidden characters such
                 //   as a carriage return at the end.
                 SerialCommand("f" + frequencyMhz.ToString("0.0########", CultureInfo.InvariantCulture));
-
-                // A delay may be needed for the instrument to complete the previous command
-                // TapThread.Sleep(100);
 
                 // Check frequency
                 var freqReplyMhz = GetFrequency();
@@ -189,7 +186,7 @@ namespace TapExtensions.Instruments.SigGen
                     break;
             }
 
-            lock (_internalInstLock)
+            lock (InstLock)
             {
                 // Set amplitude
                 SerialCommand($"a{a:D1}");
@@ -214,7 +211,7 @@ namespace TapExtensions.Instruments.SigGen
 
         public void SetRfOutputState(EState state)
         {
-            lock (_internalInstLock)
+            lock (InstLock)
             {
                 if (state == EState.On)
                 {
