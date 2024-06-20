@@ -156,7 +156,7 @@ namespace TapExtensions.Instruments.SigGen
 
             _sp.DiscardInBuffer();
             _sp.DiscardOutBuffer();
-            _sp.WriteLine(command);
+            _sp.Write(command);
         }
     }
 }
