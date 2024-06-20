@@ -15,7 +15,6 @@ namespace TapExtensions.Instruments.SigGen
         // Frequency range
         private const double MinFreqMhz = 35;
         private const double MaxFreqMhz = 4400;
-        private const double FreqResolutionHz = 1;
         private const double DefaultFreqMhz = 1000;
 
         // Default approximate amplitude (in dBm), when power is set to 'a3'.
@@ -33,24 +32,20 @@ namespace TapExtensions.Instruments.SigGen
             SerialPortName = "COM6";
             UseAutoDetection = true;
             UsbDeviceAddresses = new List<string> { @"USB\VID_16D0&PID_0557" };
-            LoggingLevel = ELoggingLevel.Verbose;
         }
 
         public override void Open()
         {
             base.Open();
 
-            if (LoggingLevel >= ELoggingLevel.Normal)
-            {
-                // +) Show model type
-                Log.Debug("Model Type: " + SerialQuery("+").Trim('\n'));
+            // +) Show model type
+            Log.Debug("Model Type: " + SerialQuery("+").Trim('\n'));
 
-                // -) Show serial number
-                Log.Debug("Serial Number: " + SerialQuery("-").Trim('\n'));
+            // -) Show serial number
+            Log.Debug("Serial Number: " + SerialQuery("-").Trim('\n'));
 
-                // v) Show firmware version
-                Log.Debug("Firmware Version: " + SerialQuery("v").Trim('\n'));
-            }
+            // v) Show firmware version
+            Log.Debug("Firmware Version: " + SerialQuery("v").Trim('\n'));
 
             // o) set RF On(1) or Off(0)
             SetRfOutputState(EState.Off);
@@ -84,6 +79,7 @@ namespace TapExtensions.Instruments.SigGen
             if (_isOpen)
                 SetRfOutputState(EState.Off);
 
+            _isOpen = false;
             base.Close();
         }
 
@@ -130,16 +126,13 @@ namespace TapExtensions.Instruments.SigGen
                 var freqReplyMhz = GetFrequency();
                 _frequencyMhz = freqReplyMhz;
 
-                if (LoggingLevel >= ELoggingLevel.Normal)
-                {
-                    const double tolerance = FreqResolutionHz * 1e-6;
-                    if (Math.Abs(frequencyMhz - freqReplyMhz) > tolerance)
-                        Log.Warning($"Set frequency to {freqReplyMhz} MHz, with a frequency error of " +
-                                    $"{Math.Round(Math.Abs(frequencyMhz - freqReplyMhz) * 1e+6, 3)} Hz, " +
-                                    $"for the requested frequency of {frequencyMhz} MHz");
-                    else
-                        Log.Debug($"Set frequency to {freqReplyMhz} MHz");
-                }
+                const double tolerance = 1e-7;
+                if (Math.Abs(frequencyMhz - freqReplyMhz) > tolerance)
+                    Log.Warning($"Set frequency to {freqReplyMhz} MHz, with a frequency error of " +
+                                $"{Math.Round(Math.Abs(frequencyMhz - freqReplyMhz) * 1e+6, 3)} Hz, " +
+                                $"for the requested frequency of {frequencyMhz} MHz");
+                else
+                    Log.Debug($"Set frequency to {freqReplyMhz} MHz");
             }
         }
 
@@ -192,17 +185,14 @@ namespace TapExtensions.Instruments.SigGen
                 if (!SerialQuery("a?").Contains($"{a:D1}"))
                     throw new InvalidOperationException($"Unable to set amplitude to 'a{a:D1}'");
 
-                if (LoggingLevel >= ELoggingLevel.Normal)
-                {
-                    const double tolerance = 0.01;
-                    if (Math.Abs(outputLevelDbm - coarseAmplitude) > tolerance)
-                        Log.Warning($"Set amplitude to approximately {coarseAmplitude} dBm, " +
-                                    $"when range is within ({coarseAmplitude - 0.5 * stepAmplitude}, " +
-                                    $"{coarseAmplitude + 0.5 * stepAmplitude}), " +
-                                    $"for the requested amplitude of {outputLevelDbm} dBm");
-                    else
-                        Log.Debug($"Set amplitude to approximately {coarseAmplitude} dBm");
-                }
+                const double tolerance = 0.001;
+                if (Math.Abs(outputLevelDbm - coarseAmplitude) > tolerance)
+                    Log.Warning($"Set amplitude to approximately {coarseAmplitude} dBm, " +
+                                $"when range is within ({coarseAmplitude - 0.5 * stepAmplitude}, " +
+                                $"{coarseAmplitude + 0.5 * stepAmplitude}), " +
+                                $"for the requested amplitude of {outputLevelDbm} dBm");
+                else
+                    Log.Debug($"Set amplitude to approximately {coarseAmplitude} dBm");
             }
         }
 
@@ -241,8 +231,7 @@ namespace TapExtensions.Instruments.SigGen
                         throw new InvalidOperationException("Unable to set the RF output state to Off (phase locked)");
                 }
 
-                if (LoggingLevel >= ELoggingLevel.Normal)
-                    Log.Debug($"Set RF output state to {state}");
+                Log.Debug($"Set RF output state to {state}");
             }
         }
     }

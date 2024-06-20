@@ -15,7 +15,6 @@ namespace TapExtensions.Instruments.SigGen
         // Frequency range
         private const double MinFreqMhz = 12.5;
         private const double MaxFreqMhz = 6400;
-        private const double FreqResolutionHz = 0.1;
         private const double DefaultFreqMhz = 1000;
 
         // Amplitude range
@@ -34,27 +33,23 @@ namespace TapExtensions.Instruments.SigGen
             SerialPortName = "COM6";
             UseAutoDetection = true;
             UsbDeviceAddresses = new List<string> { @"USB\VID_16D0&PID_0000" }; // ToDo: PID
-            LoggingLevel = ELoggingLevel.Verbose;
         }
 
         public override void Open()
         {
             base.Open();
 
-            if (LoggingLevel >= ELoggingLevel.Normal)
-            {
-                // +) Show model type
-                Log.Debug("Model Type: " + SerialQuery("+").Trim('\n'));
+            // +) Show model type
+            Log.Debug("Model Type: " + SerialQuery("+").Trim('\n'));
 
-                // -) Show serial number
-                Log.Debug("Serial Number: " + SerialQuery("-").Trim('\n'));
+            // -) Show serial number
+            Log.Debug("Serial Number: " + SerialQuery("-").Trim('\n'));
 
-                // v0) Show firmware version
-                Log.Debug("Firmware Version: " + SerialQuery("v0").Trim('\n'));
+            // v0) Show firmware version
+            Log.Debug("Firmware Version: " + SerialQuery("v0").Trim('\n'));
 
-                // v1) Shows hardware version
-                Log.Debug("Hardware Version: " + SerialQuery("v1").Trim('\n'));
-            }
+            // v1) Shows hardware version
+            Log.Debug("Hardware Version: " + SerialQuery("v1").Trim('\n'));
 
             // x) Set reference (0=external / 1=internal)
             SerialCommand("x1");
@@ -73,6 +68,7 @@ namespace TapExtensions.Instruments.SigGen
             if (_isOpen)
                 SetRfOutputState(EState.Off);
 
+            _isOpen = false;
             base.Close();
         }
 
@@ -131,16 +127,13 @@ namespace TapExtensions.Instruments.SigGen
                 if (!SerialQuery("V").Contains("1"))
                     throw new InvalidOperationException("Self-calibration failed (output not leveled)");
 
-                if (LoggingLevel >= ELoggingLevel.Normal)
-                {
-                    const double tolerance = FreqResolutionHz * 1e-6;
-                    if (Math.Abs(frequencyMhz - freqReplyMhz) > tolerance)
-                        Log.Warning($"Set frequency to {freqReplyMhz} MHz, with a frequency error of " +
-                                    $"{Math.Round(Math.Abs(frequencyMhz - freqReplyMhz) * 1e+6, 3)} Hz, " +
-                                    $"for the requested frequency of {frequencyMhz} MHz");
-                    else
-                        Log.Debug($"Set frequency to {freqReplyMhz} MHz");
-                }
+                const double tolerance = 1e-7;
+                if (Math.Abs(frequencyMhz - freqReplyMhz) > tolerance)
+                    Log.Warning($"Set frequency to {freqReplyMhz} MHz, with a frequency error of " +
+                                $"{Math.Round(Math.Abs(frequencyMhz - freqReplyMhz) * 1e+6, 3)} Hz, " +
+                                $"for the requested frequency of {frequencyMhz} MHz");
+                else
+                    Log.Debug($"Set frequency to {freqReplyMhz} MHz");
             }
         }
 
@@ -164,15 +157,12 @@ namespace TapExtensions.Instruments.SigGen
                 if (!SerialQuery("V").Contains("1"))
                     throw new InvalidOperationException("Self-calibration failed (output not leveled)");
 
-                if (LoggingLevel >= ELoggingLevel.Normal)
-                {
-                    if (Math.Abs(outputLevelDbm - replyDbm) > AmplitudeResolution)
-                        Log.Warning($"Set amplitude to {replyDbm} dBm, with a amplitude error of " +
-                                    $"{Math.Round(Math.Abs(outputLevelDbm - replyDbm), 3)} dB, " +
-                                    $"for the requested amplitude of {outputLevelDbm} dBm");
-                    else
-                        Log.Debug($"Set amplitude to {replyDbm} dBm");
-                }
+                if (Math.Abs(outputLevelDbm - replyDbm) > AmplitudeResolution)
+                    Log.Warning($"Set amplitude to {replyDbm} dBm, with a amplitude error of " +
+                                $"{Math.Round(Math.Abs(outputLevelDbm - replyDbm), 3)} dB, " +
+                                $"for the requested amplitude of {outputLevelDbm} dBm");
+                else
+                    Log.Debug($"Set amplitude to {replyDbm} dBm");
             }
         }
 

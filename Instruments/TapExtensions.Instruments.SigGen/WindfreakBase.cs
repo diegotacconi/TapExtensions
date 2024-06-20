@@ -4,8 +4,6 @@ using System.IO.Ports;
 using OpenTap;
 using TapExtensions.Shared.Win32;
 
-// using System.ComponentModel;
-
 namespace TapExtensions.Instruments.SigGen
 {
     public abstract class WindfreakBase : Instrument
@@ -25,16 +23,9 @@ namespace TapExtensions.Instruments.SigGen
                          @"Example: 'USB\VID_1234&PID_5678\SERIALNUMBER'")]
         public List<string> UsbDeviceAddresses { get; set; }
 
-        public enum ELoggingLevel
-        {
-            None = 0,
-            Normal = 1,
-            Verbose = 2
-        }
-
-        [Display("Logging Level", Order: 20, Group: "Debug", Collapsed: true,
-            Description: "Level of verbose logging for serial port (UART) communication.")]
-        public ELoggingLevel LoggingLevel { get; set; } = ELoggingLevel.Normal;
+        [Display("Verbose Logging", Order: 20, Group: "Debug", Collapsed: true,
+            Description: "Enables verbose logging of serial port (UART) communication.")]
+        public bool VerboseLoggingEnabled { get; set; } = true;
 
         #endregion
 
@@ -53,16 +44,15 @@ namespace TapExtensions.Instruments.SigGen
                 throw new InvalidOperationException(
                     "List of USB Device Address cannot be empty");
 
-            if (LoggingLevel >= ELoggingLevel.Verbose)
+            if (VerboseLoggingEnabled)
                 Log.Debug("Searching for USB Address(es) of " +
                           $"'{string.Join("', '", UsbDeviceAddresses)}'");
 
             var found = UsbSerialDevices.FindUsbAddress(UsbDeviceAddresses);
 
-            if (LoggingLevel >= ELoggingLevel.Normal)
-                Log.Debug($"Found serial port '{found.ComPort}' " +
-                          $"with USB Address of '{found.UsbAddress}' " +
-                          $"and Description of '{found.Description}'");
+            Log.Debug($"Found serial port '{found.ComPort}' " +
+                      $"with USB Address of '{found.UsbAddress}' " +
+                      $"and Description of '{found.Description}'");
 
             return found.ComPort;
         }
@@ -90,8 +80,7 @@ namespace TapExtensions.Instruments.SigGen
             // Close serial port if already opened
             CloseSerialPort();
 
-            if (LoggingLevel >= ELoggingLevel.Normal)
-                Log.Debug($"Opening serial port ({_sp.PortName})");
+            Log.Debug($"Opening serial port ({_sp.PortName})");
 
             // Open serial port
             _sp.Open();
@@ -107,23 +96,15 @@ namespace TapExtensions.Instruments.SigGen
 
         private void CloseSerialPort()
         {
-            try
+            if (_sp.IsOpen)
             {
-                if (_sp.IsOpen)
-                {
-                    if (LoggingLevel >= ELoggingLevel.Normal)
-                        Log.Debug($"Closing serial port ({_sp.PortName})");
+                Log.Debug($"Closing serial port ({_sp.PortName})");
 
-                    // Close serial port
-                    _sp.DiscardInBuffer();
-                    _sp.DiscardOutBuffer();
-                    _sp.Close();
-                    _sp.Dispose();
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Warning(ex.Message);
+                // Close serial port
+                _sp.DiscardInBuffer();
+                _sp.DiscardOutBuffer();
+                _sp.Close();
+                _sp.Dispose();
             }
         }
 
@@ -143,7 +124,7 @@ namespace TapExtensions.Instruments.SigGen
                 TapThread.Sleep(intervalMs);
             } while (!response.Contains("\n") && loopCount < maxCount);
 
-            if (LoggingLevel >= ELoggingLevel.Verbose)
+            if (VerboseLoggingEnabled)
                 Log.Debug("{0} << {1}", _sp.PortName, response.Trim('\n'));
 
             return response;
@@ -151,7 +132,7 @@ namespace TapExtensions.Instruments.SigGen
 
         public virtual void SerialCommand(string command)
         {
-            if (LoggingLevel >= ELoggingLevel.Verbose)
+            if (VerboseLoggingEnabled)
                 Log.Debug("{0} >> {1}", _sp.PortName, command);
 
             _sp.DiscardInBuffer();
