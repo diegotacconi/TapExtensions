@@ -25,13 +25,13 @@
     <File Path="Packages/TapExtensions/TapExtensions.Instruments.DcPwr.dll" SourcePath="TapExtensions.Instruments.DcPwr.dll">
       <SetAssemblyInfo Attributes="Version" />
     </File>
-    <File Path="Packages/TapExtensions/TapExtensions.Instruments.RasPi.dll" SourcePath="TapExtensions.Instruments.RasPi.dll">
-      <SetAssemblyInfo Attributes="Version" />
-    </File>
     <File Path="Packages/TapExtensions/TapExtensions.Instruments.SigGen.dll" SourcePath="TapExtensions.Instruments.SigGen.dll">
       <SetAssemblyInfo Attributes="Version" />
     </File>
     <File Path="Packages/TapExtensions/TapExtensions.Interfaces.dll" SourcePath="TapExtensions.Interfaces.dll">
+      <SetAssemblyInfo Attributes="Version" />
+    </File>
+    <File Path="Packages/TapExtensions/TapExtensions.Resources.RasPi.dll" SourcePath="TapExtensions.Resources.RasPi.dll">
       <SetAssemblyInfo Attributes="Version" />
     </File>
     <File Path="Packages/TapExtensions/TapExtensions.Results.dll" SourcePath="TapExtensions.Results.dll">
@@ -54,9 +54,9 @@
     <File Path="Packages/TapExtensions/TapExtensions.Gui.Wpf.pdb" SourcePath="TapExtensions.Gui.Wpf.pdb" />
     <File Path="Packages/TapExtensions/TapExtensions.Instruments.BarcodeScanner.pdb" SourcePath="TapExtensions.Instruments.BarcodeScanner.pdb" />
     <File Path="Packages/TapExtensions/TapExtensions.Instruments.DcPwr.pdb" SourcePath="TapExtensions.Instruments.DcPwr.pdb" />
-    <File Path="Packages/TapExtensions/TapExtensions.Instruments.RasPi.pdb" SourcePath="TapExtensions.Instruments.RasPi.pdb" />
     <File Path="Packages/TapExtensions/TapExtensions.Instruments.SigGen.pdb" SourcePath="TapExtensions.Instruments.SigGen.pdb" />
     <File Path="Packages/TapExtensions/TapExtensions.Interfaces.pdb" SourcePath="TapExtensions.Interfaces.pdb" />
+    <File Path="Packages/TapExtensions/TapExtensions.Resources.RasPi.pdb" SourcePath="TapExtensions.Resources.RasPi.pdb" />
     <File Path="Packages/TapExtensions/TapExtensions.Results.pdb" SourcePath="TapExtensions.Results.pdb" />
     <File Path="Packages/TapExtensions/TapExtensions.Shared.pdb" SourcePath="TapExtensions.Shared.pdb" />
     <File Path="Packages/TapExtensions/TapExtensions.Shared.Win32.pdb" SourcePath="TapExtensions.Shared.Win32.pdb" />
