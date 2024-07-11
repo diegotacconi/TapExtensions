@@ -1,9 +1,10 @@
 ﻿using System;
 using TapExtensions.Interfaces.Gpio;
 
-namespace TapExtensions.Instruments.RasPi
+namespace TapExtensions.Resources.RasPi
 {
-    public class RasPiGpio : RasPiResource, IGpio
+    /*
+    public class RasPiGpio : RasPiSsh, IGpio
     {
         public void SetPinState(int pin, EPinState state)
         {
@@ -11,12 +12,10 @@ namespace TapExtensions.Instruments.RasPi
             try
             {
                 // ToDo:
-                /*
-                    /sys/class/gpio/gpio11/direction
-                    /sys/class/gpio/gpio11/value
-                    /dev/gpiochipN
-                    sudo usermod -a -G gpio <username>
-                */
+                //    /sys/class/gpio/gpio11/direction
+                //    /sys/class/gpio/gpio11/value
+                //    /dev/gpiochipN
+                //    sudo usermod -a -G gpio <username>
             }
             finally
             {
@@ -29,4 +28,5 @@ namespace TapExtensions.Instruments.RasPi
             throw new NotImplementedException();
         }
     }
+    */
 }

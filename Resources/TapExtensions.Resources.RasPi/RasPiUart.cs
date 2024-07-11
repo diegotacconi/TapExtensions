@@ -3,11 +3,11 @@ using System.IO.Ports;
 using OpenTap;
 using TapExtensions.Interfaces.Gpio;
 
-namespace TapExtensions.Instruments.RasPi
+namespace TapExtensions.Resources.RasPi
 {
     [Display("RasPiUart",
-        Groups: new[] { "TapExtensions", "Instruments", "RasPi" })]
-    public class RasPiUart : Instrument, IGpio
+        Groups: new[] { "TapExtensions", "Resources", "RasPi" })]
+    public class RasPiUart : Resource, IGpio
     {
         #region Settings
 
