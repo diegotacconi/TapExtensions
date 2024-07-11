@@ -1,14 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using OpenTap;
 using Renci.SshNet;
-using TapExtensions.Interfaces.Gpio;
+using TapExtensions.Interfaces.Ssh;
 
 namespace TapExtensions.Instruments.RasPi
 {
     [Display("RasPiSsh",
         Groups: new[] { "TapExtensions", "Instruments", "RasPi" })]
-    public class RasPiSsh : Instrument, IGpio
+    public class RasPiSsh : Dut, ISecureShell
     {
         #region Settings
 
@@ -28,23 +29,50 @@ namespace TapExtensions.Instruments.RasPi
         [Unit("s")]
         public int KeepAliveInterval { get; set; }
 
-        [Display("Verbose Logging", Order: 6, Group: "Debug", Collapsed: true,
+        [Display("Use SSH Tunnel", Order: 10, Groups: new[] { "SSH Settings", "SSH Tunnel" }, Collapsed: true)]
+        public bool UseSshTunnel { get; set; }
+
+        [EnabledIf(nameof(UseSshTunnel), HideIfDisabled = true)]
+        [Display("Bound Host", Order: 11, Groups: new[] { "SSH Settings", "SSH Tunnel" }, Collapsed: true)]
+        public string SshTunnelBoundHost { get; set; }
+
+        [EnabledIf(nameof(UseSshTunnel), HideIfDisabled = true)]
+        [Display("Bound Port", Order: 12, Groups: new[] { "SSH Settings", "SSH Tunnel" }, Collapsed: true)]
+        public uint SshTunnelBoundPort { get; set; }
+
+        [EnabledIf(nameof(UseSshTunnel), HideIfDisabled = true)]
+        [Display("Forwarded Host", Order: 13, Groups: new[] { "SSH Settings", "SSH Tunnel" }, Collapsed: true)]
+        public string SshTunnelForwardedHost { get; set; }
+
+        [EnabledIf(nameof(UseSshTunnel), HideIfDisabled = true)]
+        [Display("Forwarded Port", Order: 14, Groups: new[] { "SSH Settings", "SSH Tunnel" }, Collapsed: true)]
+        public uint SshTunnelForwardedPort { get; set; }
+
+        [Display("Verbose Logging", Order: 20, Group: "Debug", Collapsed: true,
             Description: "Enables verbose logging of SSH communication.")]
         public bool VerboseLoggingEnabled { get; set; } = true;
 
         #endregion
 
         private SshClient _sshClient;
+        private ForwardedPortLocal _forwardedPortLocal;
 
         public RasPiSsh()
         {
-            // Default values
+            // Default SSH Setting values
             Name = nameof(RasPiSsh);
             IpAddress = "192.168.100.1";
             TcpPort = 22;
             Username = "pi";
             Password = "";
             KeepAliveInterval = 30;
+
+            // Default SSH Tunnel values
+            UseSshTunnel = false;
+            SshTunnelBoundHost = "127.0.0.1";
+            SshTunnelBoundPort = 4444;
+            SshTunnelForwardedHost = "localhost";
+            SshTunnelForwardedPort = 4444;
 
             // Validation rules
             Rules.Add(() => IPAddress.TryParse(IpAddress, out _),
@@ -61,10 +89,50 @@ namespace TapExtensions.Instruments.RasPi
 
         public override void Close()
         {
-            SshDisconnect();
+            Disconnect();
             base.Close();
             IsConnected = false;
         }
+
+        public void Connect()
+        {
+            SshConnect();
+            StartSshTunnel();
+        }
+
+        public void Disconnect()
+        {
+            StopSshTunnel();
+            SshDisconnect();
+        }
+
+        public void UploadFiles(List<(string localFile, string remoteFile)> files)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DownloadFiles(List<(string remoteFile, string localFile)> files)
+        {
+            throw new NotImplementedException();
+        }
+
+        // https://davemateer.com/2021/06/15/ssh-and-sftp-with-ssh-net
+        public bool SendSshQuery(string command, int timeout, out string response)
+        {
+            if (_sshClient == null || !_sshClient.IsConnected)
+                throw new InvalidOperationException($"{Name} is not connected");
+
+            var cmd = _sshClient.CreateCommand(command);
+            cmd.CommandTimeout = TimeSpan.FromSeconds(timeout);
+            Log.Debug($"SSH >> {cmd.CommandText}");
+
+            response = cmd.Execute();
+            Log.Debug($"SSH << {response}");
+
+            return cmd.ExitStatus == 0;
+        }
+
+        #region Private Methods
 
         private void SshConnect()
         {
@@ -72,14 +140,14 @@ namespace TapExtensions.Instruments.RasPi
                 _sshClient = new SshClient(IpAddress, TcpPort, Username, Password)
                     { KeepAliveInterval = TimeSpan.FromSeconds(KeepAliveInterval) };
 
-            if (!_sshClient.IsConnected)
-            {
-                if (VerboseLoggingEnabled)
-                    Log.Debug($"Connecting to {IpAddress} on port {TcpPort}");
+            if (_sshClient.IsConnected)
+                return;
 
-                _sshClient.Connect();
-                IsConnected = true;
-            }
+            if (VerboseLoggingEnabled)
+                Log.Debug($"Connecting to {_sshClient.ConnectionInfo.Host}:{_sshClient.ConnectionInfo.Port}");
+
+            _sshClient.Connect();
+            IsConnected = true;
         }
 
         private void SshDisconnect()
@@ -87,8 +155,11 @@ namespace TapExtensions.Instruments.RasPi
             if (_sshClient == null)
                 return;
 
+            if (!_sshClient.IsConnected)
+                return;
+
             if (VerboseLoggingEnabled)
-                Log.Debug($"Disconnecting from {IpAddress}");
+                Log.Debug($"Disconnecting from {_sshClient.ConnectionInfo.Host}:{_sshClient.ConnectionInfo.Port}");
 
             _sshClient.Disconnect();
             _sshClient.Dispose();
@@ -96,28 +167,44 @@ namespace TapExtensions.Instruments.RasPi
             IsConnected = false;
         }
 
-        public void SetPinState(int pin, EPinState state)
+        private void StartSshTunnel()
         {
-            SshConnect();
-            try
-            {
-                // ToDo:
-                /*
-                    /sys/class/gpio/gpio11/direction
-                    /sys/class/gpio/gpio11/value
-                    /dev/gpiochipN
-                    sudo usermod -a -G gpio <username>
-                */
-            }
-            finally
-            {
-                SshDisconnect();
-            }
+            if (!UseSshTunnel)
+                return;
+
+            if (_forwardedPortLocal == null)
+                _forwardedPortLocal = new ForwardedPortLocal(SshTunnelBoundHost, SshTunnelBoundPort,
+                    SshTunnelForwardedHost, SshTunnelForwardedPort);
+
+            if (_forwardedPortLocal.IsStarted)
+                return;
+
+            if (VerboseLoggingEnabled)
+                Log.Debug(
+                    $"Starting SSH Tunnel {_forwardedPortLocal.BoundHost}:{_forwardedPortLocal.BoundPort}:" +
+                    $"{_forwardedPortLocal.Host}:{_forwardedPortLocal.Port}");
+
+            _sshClient.AddForwardedPort(_forwardedPortLocal);
+            _forwardedPortLocal.Start();
         }
 
-        public EPinState GetPinState(int pin)
+        private void StopSshTunnel()
         {
-            throw new NotImplementedException();
+            if (_forwardedPortLocal == null)
+                return;
+
+            if (!_forwardedPortLocal.IsStarted)
+                return;
+
+            if (VerboseLoggingEnabled)
+                Log.Debug(
+                    $"Stopping SSH Tunnel {_forwardedPortLocal.BoundHost}:{_forwardedPortLocal.BoundPort}:" +
+                    $"{_forwardedPortLocal.Host}:{_forwardedPortLocal.Port}");
+
+            _forwardedPortLocal.Stop();
+            _sshClient.RemoveForwardedPort(_forwardedPortLocal);
         }
+
+        #endregion
     }
 }
