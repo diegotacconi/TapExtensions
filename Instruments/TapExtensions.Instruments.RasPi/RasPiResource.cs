@@ -7,9 +7,9 @@ using TapExtensions.Interfaces.Ssh;
 
 namespace TapExtensions.Instruments.RasPi
 {
-    [Display("RasPiSsh",
+    [Display("RasPiResource",
         Groups: new[] { "TapExtensions", "Instruments", "RasPi" })]
-    public class RasPiSsh : Dut, ISecureShell
+    public class RasPiResource : Resource, ISecureShell
     {
         #region Settings
 
@@ -61,10 +61,10 @@ namespace TapExtensions.Instruments.RasPi
         private SshClient _sshClient;
         private ForwardedPortLocal _forwardedPortLocal;
 
-        public RasPiSsh()
+        public RasPiResource()
         {
             // Default SSH Setting values
-            Name = nameof(RasPiSsh);
+            Name = nameof(RasPiResource);
             IpAddress = "192.168.100.1";
             TcpPort = 22;
             Username = "pi";

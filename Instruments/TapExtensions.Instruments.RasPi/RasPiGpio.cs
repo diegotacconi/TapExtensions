@@ -3,7 +3,7 @@ using TapExtensions.Interfaces.Gpio;
 
 namespace TapExtensions.Instruments.RasPi
 {
-    public class RasPiGpio : RasPiSsh, IGpio
+    public class RasPiGpio : RasPiResource, IGpio
     {
         public void SetPinState(int pin, EPinState state)
         {

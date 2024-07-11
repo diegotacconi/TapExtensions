@@ -2,7 +2,7 @@
 
 namespace TapExtensions.Interfaces.Uart
 {
-    public interface IUart : IDut
+    public interface IUart : IResource
     {
         string PortName { get; }
 
