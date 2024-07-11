@@ -9,11 +9,9 @@ namespace TapExtensions.Steps.Network
         Groups: new[] { "TapExtensions", "Steps", "Network" })]
     public class SimpleTcpClient : TestStep
     {
-        [Display("IP Address", Order: 1)]
-        public string IpAddress { get; set; } = "127.0.0.1";
+        [Display("IP Address", Order: 1)] public string IpAddress { get; set; } = "localhost";
 
-        [Display("Port", Order: 2)]
-        public int TcpPort { get; set; } = 4444;
+        [Display("Port", Order: 2)] public int TcpPort { get; set; } = 4444;
 
         private TcpClient _tcpClient;
         private NetworkStream _tcpStream;

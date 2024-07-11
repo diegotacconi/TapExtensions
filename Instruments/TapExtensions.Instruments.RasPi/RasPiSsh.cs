@@ -33,19 +33,23 @@ namespace TapExtensions.Instruments.RasPi
         public bool UseSshTunnel { get; set; }
 
         [EnabledIf(nameof(UseSshTunnel), HideIfDisabled = true)]
-        [Display("Bound Host", Order: 11, Groups: new[] { "SSH Settings", "SSH Tunnel" }, Collapsed: true)]
+        [Display("Bound Host", Order: 11, Groups: new[] { "SSH Settings", "SSH Tunnel" }, Collapsed: true,
+            Description: "local computer (i.e. 'localhost', '127.0.0.1', or empty string)")]
         public string SshTunnelBoundHost { get; set; }
 
         [EnabledIf(nameof(UseSshTunnel), HideIfDisabled = true)]
-        [Display("Bound Port", Order: 12, Groups: new[] { "SSH Settings", "SSH Tunnel" }, Collapsed: true)]
+        [Display("Bound Port", Order: 12, Groups: new[] { "SSH Settings", "SSH Tunnel" }, Collapsed: true,
+            Description: "local computer")]
         public uint SshTunnelBoundPort { get; set; }
 
         [EnabledIf(nameof(UseSshTunnel), HideIfDisabled = true)]
-        [Display("Forwarded Host", Order: 13, Groups: new[] { "SSH Settings", "SSH Tunnel" }, Collapsed: true)]
+        [Display("Forwarded Host", Order: 13, Groups: new[] { "SSH Settings", "SSH Tunnel" }, Collapsed: true,
+            Description: "remote server (i.e. 'localhost' or '127.0.0.1')")]
         public string SshTunnelForwardedHost { get; set; }
 
         [EnabledIf(nameof(UseSshTunnel), HideIfDisabled = true)]
-        [Display("Forwarded Port", Order: 14, Groups: new[] { "SSH Settings", "SSH Tunnel" }, Collapsed: true)]
+        [Display("Forwarded Port", Order: 14, Groups: new[] { "SSH Settings", "SSH Tunnel" }, Collapsed: true,
+            Description: "remote server")]
         public uint SshTunnelForwardedPort { get; set; }
 
         [Display("Verbose Logging", Order: 20, Group: "Debug", Collapsed: true,
@@ -69,7 +73,7 @@ namespace TapExtensions.Instruments.RasPi
 
             // Default SSH Tunnel values
             UseSshTunnel = false;
-            SshTunnelBoundHost = "127.0.0.1";
+            SshTunnelBoundHost = "localhost";
             SshTunnelBoundPort = 4444;
             SshTunnelForwardedHost = "localhost";
             SshTunnelForwardedPort = 4444;
@@ -172,12 +176,11 @@ namespace TapExtensions.Instruments.RasPi
             if (!UseSshTunnel)
                 return;
 
-            if (_forwardedPortLocal == null)
-                _forwardedPortLocal = new ForwardedPortLocal(SshTunnelBoundHost, SshTunnelBoundPort,
-                    SshTunnelForwardedHost, SshTunnelForwardedPort);
-
-            if (_forwardedPortLocal.IsStarted)
+            if (_forwardedPortLocal != null && _forwardedPortLocal.IsStarted)
                 return;
+
+            _forwardedPortLocal = new ForwardedPortLocal(SshTunnelBoundHost, SshTunnelBoundPort,
+                SshTunnelForwardedHost, SshTunnelForwardedPort);
 
             if (VerboseLoggingEnabled)
                 Log.Debug(
