@@ -113,24 +113,20 @@ namespace TapExtensions.Steps.Dialog
                     IsResizable = IsResizable,
                     BorderColor = BorderColor.IsEnabled ? BorderColor.Value : "",
                 };
-                var result = gui.ShowDialog();
+                var okayButton = gui.ShowDialog();
 
                 // Check response from the user
-                if (result)
+                if (okayButton)
                     Log.Debug("User approved the dialog window");
                 else
                     Log.Warning("User canceled the dialog window");
 
-                // CheckSerialNumber(dut.SerialNumber);
-
-                // CheckProductCode(dut.ProductCode);
-
-                // Publish(Name, result, true, true, "bool");
+                UpgradeVerdict(okayButton ? Verdict.Pass : Verdict.Fail);
             }
             catch (Exception ex)
             {
                 Log.Error(ex.Message);
-                // Publish(Name, false, true, true, "bool");
+                UpgradeVerdict(Verdict.Fail);
             }
         }
 

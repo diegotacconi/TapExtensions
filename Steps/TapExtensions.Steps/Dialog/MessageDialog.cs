@@ -30,22 +30,21 @@ namespace TapExtensions.Steps.Dialog
         {
             try
             {
-                // Show dialog window
                 IGui gui = new PictureDialogGui { Title = Title, Message = Message };
-                var result = gui.ShowDialog();
+                var okayButton = gui.ShowDialog();
 
                 // Check response from the user
-                if (result)
+                if (okayButton)
                     Log.Debug("User approved the dialog window");
                 else
                     Log.Warning("User canceled the dialog window");
 
-                // Publish(Name, result, true, true, "bool");
+                UpgradeVerdict(okayButton ? Verdict.Pass : Verdict.Fail);
             }
             catch (Exception ex)
             {
                 Log.Error(ex.Message);
-                // Publish(Name, false, true, true, "bool");
+                UpgradeVerdict(Verdict.Fail);
             }
         }
     }

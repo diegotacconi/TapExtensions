@@ -35,18 +35,19 @@ namespace TapExtensions.Steps.Dialog
 
                 // Check and log the selected button
                 var logMsg = $"User selected the '{dialog.Response}' button";
-                var result = dialog.Response == EDialogButton.Ok;
-                if (result)
+                var okayButton = dialog.Response == EDialogButton.Ok;
+
+                if (okayButton)
                     Log.Debug(logMsg);
                 else
                     Log.Warning(logMsg);
 
-                // Publish(Name, result, true, true, "bool");
+                UpgradeVerdict(okayButton ? Verdict.Pass : Verdict.Fail);
             }
             catch (Exception ex)
             {
                 Log.Error(ex.Message);
-                // Publish(Name, false, true, true, "bool");
+                UpgradeVerdict(Verdict.Fail);
             }
         }
 
