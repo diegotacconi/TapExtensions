@@ -5,6 +5,9 @@
 // This instrument driver implements parts of the Zebra's Simple Serial Interface (SSI),
 // which enables barcode scanners to communicate with a host over a serial port (UART).
 // https://www.google.com/search?q=zebra+simple+serial+interface+programmer+guide
+//
+// Remember to configure the scanner as a USB Serial Device, not as a USB Keyboard
+// https://github.com/diegotacconi/TapExtensions/tree/main/Instruments/TapExtensions.Instruments.BarcodeScanner/ConfigDocs
 
 using System;
 using System.Collections.Generic;
@@ -12,6 +15,7 @@ using System.Diagnostics;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using OpenTap;
 using TapExtensions.Shared.Win32;
 
@@ -24,19 +28,12 @@ namespace TapExtensions.Instruments.BarcodeScanner
     {
         #region Settings
 
-        // https://github.com/diegotacconi/TapExtensions/tree/main/Instruments/TapExtensions.Instruments.BarcodeScanner/ConfigDocs
-        [EnabledIf(nameof(UseAutoDetection), false)]
-        [Display("Serial Port Name", Order: 1,
-            Description: "Remember to configure the scanner as a serial port (UART) device, over USB.")]
-        public string SerialPortName { get; set; }
-
-        [Display("Use AutoDetection", Order: 2, Group: "Serial Port AutoDetection", Collapsed: true)]
-        public bool UseAutoDetection { get; set; }
-
-        [EnabledIf(nameof(UseAutoDetection))]
-        [Display("USB Device Address", Order: 3, Group: "Serial Port AutoDetection", Collapsed: true,
-            Description: "List of USB device addresses to search for a match.")]
-        public List<string> UsbDeviceAddresses { get; set; }
+        [Display("Connection Address", Order: 1,
+            Description: "Examples:\n" +
+                         " COM3\n" +
+                         " USB\\VID_05E0&PID_1701\n" +
+                         " USB\\VID_05E0&PID_1701\\USB_CDC_SYMBOL_SCANNER")]
+        public string ConnectionAddress { get; set; }
 
         public enum ELoggingLevel
         {
@@ -45,7 +42,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
             Verbose = 2
         }
 
-        [Display("Logging Level", Order: 20, Group: "Debug", Collapsed: true,
+        [Display("Logging Level", Order: 20,
             Description: "Level of verbose logging for serial port (UART) communication.")]
         public ELoggingLevel LoggingLevel { get; set; }
 
@@ -58,17 +55,87 @@ namespace TapExtensions.Instruments.BarcodeScanner
         {
             // Default values
             Name = nameof(ZebraMS4717);
-            SerialPortName = "COM3";
-            UseAutoDetection = true;
-            UsbDeviceAddresses = new List<string> { @"USB\VID_05E0&PID_1701" };
+            ConnectionAddress = @"USB\VID_05E0&PID_1701";
             LoggingLevel = ELoggingLevel.Normal;
+
+            // Validation rules
+            Rules.Add(ValidateConnectionAddress, "Not valid", nameof(ConnectionAddress));
+        }
+
+        private enum EAddressType
+        {
+            ComPort,
+            UsbDevice
+        }
+
+        private bool ValidateConnectionAddress()
+        {
+            try
+            {
+                GetAddressType();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        private EAddressType GetAddressType()
+        {
+            // const string comPortPattern = "^COM[1-9][0-9]*$";
+            const string comPortPattern = "^[Cc][Oo][Mm][1-9][0-9]*$";
+            if (Regex.IsMatch(ConnectionAddress, comPortPattern))
+                return EAddressType.ComPort;
+
+            // const string usbDevicePattern = "^USB\\VID_[0-9A-Z]{4}&PID_[0-9A-Z]{4}[0-9A-Z&_\\]+";
+            const string usbDevicePattern = "^USB.*";
+            if (Regex.IsMatch(ConnectionAddress, usbDevicePattern))
+                return EAddressType.UsbDevice;
+
+            throw new InvalidOperationException(
+                "Connection Address is not valid");
+        }
+
+        private string GetSerialPortName()
+        {
+            if (GetAddressType() == EAddressType.ComPort)
+                return ConnectionAddress;
+
+            if (GetAddressType() == EAddressType.UsbDevice)
+                return FindUsbSerialDevice();
+
+            throw new InvalidOperationException(
+                "Connection Address is not valid");
+        }
+
+        private string FindUsbSerialDevice()
+        {
+            var usbDeviceAddresses = new List<string> { ConnectionAddress };
+
+            if (usbDeviceAddresses.Count == 0)
+                throw new InvalidOperationException(
+                    "List of USB Device Address cannot be empty");
+
+            if (LoggingLevel >= ELoggingLevel.Verbose)
+                Log.Debug("Searching for USB Address(es) of " +
+                          $"'{string.Join("', '", usbDeviceAddresses)}'");
+
+            var found = UsbSerialDevices.FindUsbAddress(usbDeviceAddresses);
+
+            if (LoggingLevel >= ELoggingLevel.Normal)
+                Log.Debug($"Found serial port '{found.ComPort}' " +
+                          $"with USB Address of '{found.UsbAddress}' " +
+                          $"and Description of '{found.Description}'");
+
+            return found.ComPort;
         }
 
         public override void Open()
         {
             base.Open();
 
-            _portName = UseAutoDetection ? FindSerialPort() : SerialPortName;
+            _portName = GetSerialPortName();
 
             // Check if barcode scanner is available
             OpenSerialPort();
@@ -81,26 +148,6 @@ namespace TapExtensions.Instruments.BarcodeScanner
             {
                 CloseSerialPort();
             }
-        }
-
-        private string FindSerialPort()
-        {
-            if (UsbDeviceAddresses.Count == 0)
-                throw new InvalidOperationException(
-                    "List of USB Device Address cannot be empty");
-
-            if (LoggingLevel >= ELoggingLevel.Verbose)
-                Log.Debug("Searching for USB Address(es) of " +
-                          $"'{string.Join("', '", UsbDeviceAddresses)}'");
-
-            var found = UsbSerialDevices.FindUsbAddress(UsbDeviceAddresses);
-
-            if (LoggingLevel >= ELoggingLevel.Normal)
-                Log.Debug($"Found serial port '{found.ComPort}' " +
-                          $"with USB Address of '{found.UsbAddress}' " +
-                          $"and Description of '{found.Description}'");
-
-            return found.ComPort;
         }
 
         private void OpenSerialPort()
