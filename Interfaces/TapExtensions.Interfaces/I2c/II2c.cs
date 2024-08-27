@@ -3,12 +3,6 @@ using TapExtensions.Interfaces.Common;
 
 namespace TapExtensions.Interfaces.I2c
 {
-    public enum ETargetPower
-    {
-        Off,
-        On5V0
-    }
-
     public interface II2C : IInstrument
     {
         void Write(ushort slaveAddress, ushort numOfBytes, byte[] dataOut);
@@ -20,8 +14,6 @@ namespace TapExtensions.Interfaces.I2c
         byte[] Read(ushort slaveAddress, ushort numOfBytes, byte[] regAddress);
 
         void SetBitRate(uint bitRateKhz);
-
-        void SetTargetPower(ETargetPower target);
 
         void SetPullUpState(EState state);
 
