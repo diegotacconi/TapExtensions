@@ -28,6 +28,9 @@
     <File Path="Packages/TapExtensions/TapExtensions.Instruments.SigGen.dll" SourcePath="TapExtensions.Instruments.SigGen.dll">
       <SetAssemblyInfo Attributes="Version" />
     </File>
+    <File Path="Packages/TapExtensions/TapExtensions.Instruments.MultipleInterfaces.Aardvark.dll" SourcePath="TapExtensions.Instruments.MultipleInterfaces.Aardvark.dll">
+      <SetAssemblyInfo Attributes="Version" />
+    </File>
     <File Path="Packages/TapExtensions/TapExtensions.Interfaces.dll" SourcePath="TapExtensions.Interfaces.dll">
       <SetAssemblyInfo Attributes="Version" />
     </File>
@@ -55,6 +58,7 @@
     <File Path="Packages/TapExtensions/TapExtensions.Instruments.BarcodeScanner.pdb" SourcePath="TapExtensions.Instruments.BarcodeScanner.pdb" />
     <File Path="Packages/TapExtensions/TapExtensions.Instruments.DcPwr.pdb" SourcePath="TapExtensions.Instruments.DcPwr.pdb" />
     <File Path="Packages/TapExtensions/TapExtensions.Instruments.SigGen.pdb" SourcePath="TapExtensions.Instruments.SigGen.pdb" />
+    <File Path="Packages/TapExtensions/TapExtensions.Instruments.MultipleInterfaces.Aardvark.pdb" SourcePath="TapExtensions.Instruments.MultipleInterfaces.Aardvark.pdb" />
     <File Path="Packages/TapExtensions/TapExtensions.Interfaces.pdb" SourcePath="TapExtensions.Interfaces.pdb" />
     <File Path="Packages/TapExtensions/TapExtensions.Resources.RasPi.pdb" SourcePath="TapExtensions.Resources.RasPi.pdb" />
     <File Path="Packages/TapExtensions/TapExtensions.Results.pdb" SourcePath="TapExtensions.Results.pdb" />

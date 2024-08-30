@@ -1,5 +1,4 @@
 ﻿using OpenTap;
-using TapExtensions.Interfaces.Common;
 
 namespace TapExtensions.Interfaces.I2c
 {
@@ -14,8 +13,6 @@ namespace TapExtensions.Interfaces.I2c
         byte[] Read(ushort slaveAddress, ushort numOfBytes, byte[] regAddress);
 
         void SetBitRate(uint bitRateKhz);
-
-        void SetPullUpState(EState state);
 
         void SetBusTimeOutInMs(ushort timeOutMs);
 
