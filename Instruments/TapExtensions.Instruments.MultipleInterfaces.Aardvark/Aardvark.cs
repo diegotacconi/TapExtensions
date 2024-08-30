@@ -1,6 +1,5 @@
 ﻿using System;
 using OpenTap;
-using TapExtensions.Interfaces.Common;
 
 namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
 {
@@ -11,25 +10,45 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
     {
         #region Settings
 
-        [Display("DeviceNumber", Order: 1)] public int DevNumber { get; set; }
+        [Display("Device Number", Order: 1)] public int DevNumber { get; set; }
 
         [Display("Config Mode", Order: 2)] public AardvarkConfig ConfigMode { get; set; }
-
-        [Display("I2C Bus bit rate", Order: 3)]
-        [Unit("kHz")]
-        public int BitRateKhz { get; set; }
 
         public enum ETargetPower
         {
             Off,
-            On5V0
+            [Display("5 Volts")] On5V0
         }
 
-        [Display("Target Power", Order: 4, Description: "(Pin 4, 6)")]
+        [Display("Target Power", Order: 3, Description: "(Pin 4, 6)")]
         public ETargetPower TargetPower { get; set; }
 
-        [Display("I2C Pull-ups State", Order: 5, Description: "Set pull-up resistors state on/off")]
-        public EState PullupState { get; set; }
+        public enum EPullupResistors
+        {
+            Off,
+            On
+        }
+
+        [Display("I2C Pull-ups", Order: 4, Description: "Set I2C pull-up resistors state to on/off")]
+        public EPullupResistors PullupResistors { get; set; }
+
+        // ReSharper disable once InconsistentNaming
+        public enum EI2cBitrate
+        {
+            [Display("100 KHz")] OneHundred = 100,
+            [Display("200 KHz")] TwoHundred = 200,
+            [Display("300 KHz")] ThreeHundred = 300,
+            [Display("400 KHz")] FourHundred = 400,
+            [Display("500 KHz")] FiveHundred = 500,
+            [Display("600 KHz")] SixHundred = 600,
+            [Display("700 KHz")] SevenHundred = 700,
+            [Display("800 KHz")] EightHundred = 800
+        }
+
+        [Display("I2C Bus bit rate", Order: 5)]
+        // ReSharper disable once InconsistentNaming
+        public EI2cBitrate I2cBitRateKhz { get; set; }
+        // public int I2cBitRateKhz { get; set; }
 
         #endregion
 
@@ -51,9 +70,10 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             // Default values
             Name = nameof(Aardvark);
             ConfigMode = AardvarkConfig.AA_CONFIG_SPI_I2C;
-            BitRateKhz = 100;
+            // I2cBitRateKhz = 100;
+            I2cBitRateKhz = EI2cBitrate.OneHundred;
             TargetPower = ETargetPower.Off;
-            PullupState = EState.Off;
+            PullupResistors = EPullupResistors.Off;
         }
 
         public override void Open()
@@ -131,7 +151,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
 
                 SetTargetPower(TargetPower);
 
-                SetPullUpState(PullupState);
+                SetPullUpState(PullupResistors);
 
                 // TODO: net_aa_version(aardvark, ref version);
 
@@ -229,20 +249,20 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             }
         }
 
-        public void SetPullUpState(EState state)
+        public void SetPullUpState(EPullupResistors state)
         {
             lock (_instLock)
             {
                 CheckIfInitialized();
-                Log.Debug($"Setting I2C pull-up resistors state to {state}");
+                Log.Debug($"Setting I2C pull-up resistors to {state}");
                 int status;
                 switch (state)
                 {
-                    case EState.Off:
+                    case EPullupResistors.Off:
                         status = AardvarkWrapper.aa_i2c_pullup(AardvarkHandle, 0x00);
                         if (status == 0x00) return;
                         break;
-                    case EState.On:
+                    case EPullupResistors.On:
                         status = AardvarkWrapper.aa_i2c_pullup(AardvarkHandle, 0x03);
                         if (status == 0x03) return;
                         break;

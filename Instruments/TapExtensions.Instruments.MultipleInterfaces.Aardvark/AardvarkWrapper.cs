@@ -103,8 +103,8 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         [Display("GPIO Only")] AA_CONFIG_GPIO_ONLY = 0x00,
         [Display("SPI + GPIO")] AA_CONFIG_SPI_GPIO = 0x01,
         [Display("I2C + GPIO")] AA_CONFIG_GPIO_I2C = 0x02,
-        [Display("I2C + SPI")] AA_CONFIG_SPI_I2C = 0x03,
-        [Display("QUERY")] AA_CONFIG_QUERY = 0x80
+        [Display("I2C + SPI")] AA_CONFIG_SPI_I2C = 0x03
+        // [Display("QUERY")] AA_CONFIG_QUERY = 0x80
     }
 
     public enum AardvarkI2cFlags
