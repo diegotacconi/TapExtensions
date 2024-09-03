@@ -43,8 +43,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Shared.Win32"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Instruments.SigGen", "Instruments\TapExtensions.Instruments.SigGen\TapExtensions.Instruments.SigGen.csproj", "{69E21D8E-51C8-4917-976E-EEC544A78D27}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{5D282F37-7B00-4F36-B794-0D086A6B71C6}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Instruments.MultipleInterfaces.Aardvark", "Instruments\TapExtensions.Instruments.MultipleInterfaces.Aardvark\TapExtensions.Instruments.MultipleInterfaces.Aardvark.csproj", "{4F7CE88E-10A9-4791-9683-A22CCDD331AF}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Instruments.MultipleInterfaces.RasPi", "Instruments\TapExtensions.Instruments.MultipleInterfaces.RasPi\TapExtensions.Instruments.MultipleInterfaces.RasPi.csproj", "{4AA85A6A-E307-49FD-A859-C4E77958968C}"

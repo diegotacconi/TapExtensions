@@ -37,9 +37,6 @@
     <File Path="Packages/TapExtensions/TapExtensions.Interfaces.dll" SourcePath="TapExtensions.Interfaces.dll">
       <SetAssemblyInfo Attributes="Version" />
     </File>
-    <File Path="Packages/TapExtensions/TapExtensions.Resources.RasPi.dll" SourcePath="TapExtensions.Resources.RasPi.dll">
-      <SetAssemblyInfo Attributes="Version" />
-    </File>
     <File Path="Packages/TapExtensions/TapExtensions.Results.dll" SourcePath="TapExtensions.Results.dll">
       <SetAssemblyInfo Attributes="Version" />
     </File>
@@ -64,7 +61,6 @@
     <File Path="Packages/TapExtensions/TapExtensions.Instruments.MultipleInterfaces.RasPi.pdb" SourcePath="TapExtensions.Instruments.MultipleInterfaces.RasPi.pdb" />
     <File Path="Packages/TapExtensions/TapExtensions.Instruments.SigGen.pdb" SourcePath="TapExtensions.Instruments.SigGen.pdb" />
     <File Path="Packages/TapExtensions/TapExtensions.Interfaces.pdb" SourcePath="TapExtensions.Interfaces.pdb" />
-    <File Path="Packages/TapExtensions/TapExtensions.Resources.RasPi.pdb" SourcePath="TapExtensions.Resources.RasPi.pdb" />
     <File Path="Packages/TapExtensions/TapExtensions.Results.pdb" SourcePath="TapExtensions.Results.pdb" />
     <File Path="Packages/TapExtensions/TapExtensions.Shared.pdb" SourcePath="TapExtensions.Shared.pdb" />
     <File Path="Packages/TapExtensions/TapExtensions.Shared.Win32.pdb" SourcePath="TapExtensions.Shared.Win32.pdb" />
