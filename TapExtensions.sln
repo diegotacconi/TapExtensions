@@ -45,9 +45,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Instruments.S
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{5D282F37-7B00-4F36-B794-0D086A6B71C6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Resources.RasPi", "Resources\TapExtensions.Resources.RasPi\TapExtensions.Resources.RasPi.csproj", "{DDF4AC4C-BECE-4A24-9E51-A9960EF13017}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Instruments.MultipleInterfaces.Aardvark", "Instruments\TapExtensions.Instruments.MultipleInterfaces.Aardvark\TapExtensions.Instruments.MultipleInterfaces.Aardvark.csproj", "{4F7CE88E-10A9-4791-9683-A22CCDD331AF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Instruments.MultipleInterfaces.RasPi", "Instruments\TapExtensions.Instruments.MultipleInterfaces.RasPi\TapExtensions.Instruments.MultipleInterfaces.RasPi.csproj", "{4AA85A6A-E307-49FD-A859-C4E77958968C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -103,14 +103,14 @@ Global
 		{69E21D8E-51C8-4917-976E-EEC544A78D27}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69E21D8E-51C8-4917-976E-EEC544A78D27}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69E21D8E-51C8-4917-976E-EEC544A78D27}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DDF4AC4C-BECE-4A24-9E51-A9960EF13017}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DDF4AC4C-BECE-4A24-9E51-A9960EF13017}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DDF4AC4C-BECE-4A24-9E51-A9960EF13017}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DDF4AC4C-BECE-4A24-9E51-A9960EF13017}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4F7CE88E-10A9-4791-9683-A22CCDD331AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4F7CE88E-10A9-4791-9683-A22CCDD331AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F7CE88E-10A9-4791-9683-A22CCDD331AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F7CE88E-10A9-4791-9683-A22CCDD331AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4AA85A6A-E307-49FD-A859-C4E77958968C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AA85A6A-E307-49FD-A859-C4E77958968C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AA85A6A-E307-49FD-A859-C4E77958968C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AA85A6A-E307-49FD-A859-C4E77958968C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -128,8 +128,8 @@ Global
 		{C8F7355B-620A-4BC9-9AE2-483F5169D652} = {34D8FC14-432B-43CC-BD77-697BD2B86294}
 		{D51EE740-E95F-4F44-A5A9-A62784FBF42B} = {34D8FC14-432B-43CC-BD77-697BD2B86294}
 		{69E21D8E-51C8-4917-976E-EEC544A78D27} = {6536E8DB-FFA1-4E97-91E7-DBA37839B386}
-		{DDF4AC4C-BECE-4A24-9E51-A9960EF13017} = {5D282F37-7B00-4F36-B794-0D086A6B71C6}
 		{4F7CE88E-10A9-4791-9683-A22CCDD331AF} = {6536E8DB-FFA1-4E97-91E7-DBA37839B386}
+		{4AA85A6A-E307-49FD-A859-C4E77958968C} = {6536E8DB-FFA1-4E97-91E7-DBA37839B386}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4A1F67F2-6AC5-4761-9B2F-17DE13AAFB3B}

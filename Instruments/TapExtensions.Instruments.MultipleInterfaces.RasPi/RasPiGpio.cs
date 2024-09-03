@@ -1,7 +1,7 @@
 ﻿using System;
 using TapExtensions.Interfaces.Gpio;
 
-namespace TapExtensions.Resources.RasPi
+namespace TapExtensions.Instruments.MultipleInterfaces.RasPi
 {
     /*
     public class RasPiGpio : RasPiSsh, IGpio

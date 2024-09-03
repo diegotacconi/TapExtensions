@@ -34,10 +34,10 @@
     <ProjectReference Include="..\..\Gui\TapExtensions.Gui.Wpf\TapExtensions.Gui.Wpf.csproj" />
     <ProjectReference Include="..\..\Instruments\TapExtensions.Instruments.BarcodeScanner\TapExtensions.Instruments.BarcodeScanner.csproj" />
     <ProjectReference Include="..\..\Instruments\TapExtensions.Instruments.DcPwr\TapExtensions.Instruments.DcPwr.csproj" />
-    <ProjectReference Include="..\..\Instruments\TapExtensions.Instruments.SigGen\TapExtensions.Instruments.SigGen.csproj" />
     <ProjectReference Include="..\..\Instruments\TapExtensions.Instruments.MultipleInterfaces.Aardvark\TapExtensions.Instruments.MultipleInterfaces.Aardvark.csproj" />
+    <ProjectReference Include="..\..\Instruments\TapExtensions.Instruments.MultipleInterfaces.RasPi\TapExtensions.Instruments.MultipleInterfaces.RasPi.csproj" />
+    <ProjectReference Include="..\..\Instruments\TapExtensions.Instruments.SigGen\TapExtensions.Instruments.SigGen.csproj" />
     <ProjectReference Include="..\..\Interfaces\TapExtensions.Interfaces\TapExtensions.Interfaces.csproj" />
-    <ProjectReference Include="..\..\Resources\TapExtensions.Resources.RasPi\TapExtensions.Resources.RasPi.csproj" />
     <ProjectReference Include="..\..\Results\TapExtensions.Results\TapExtensions.Results.csproj" />
     <ProjectReference Include="..\..\Shared\TapExtensions.Shared\TapExtensions.Shared.csproj" />
     <ProjectReference Include="..\..\Shared\TapExtensions.Shared.Win32\TapExtensions.Shared.Win32.csproj" />

@@ -5,10 +5,10 @@ using OpenTap;
 using Renci.SshNet;
 using TapExtensions.Interfaces.Ssh;
 
-namespace TapExtensions.Resources.RasPi
+namespace TapExtensions.Instruments.MultipleInterfaces.RasPi
 {
     [Display("RasPiSsh",
-        Groups: new[] { "TapExtensions", "Resources", "RasPi" })]
+        Groups: new[] { "TapExtensions", "Instruments", "MultipleInterfaces" })]
     public class RasPiSsh : Resource, ISecureShell
     {
         #region Settings

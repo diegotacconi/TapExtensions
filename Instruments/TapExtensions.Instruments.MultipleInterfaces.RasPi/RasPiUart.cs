@@ -3,10 +3,10 @@ using System.IO.Ports;
 using OpenTap;
 using TapExtensions.Interfaces.Gpio;
 
-namespace TapExtensions.Resources.RasPi
+namespace TapExtensions.Instruments.MultipleInterfaces.RasPi
 {
     [Display("RasPiUart",
-        Groups: new[] { "TapExtensions", "Resources", "RasPi" })]
+        Groups: new[] { "TapExtensions", "Instruments", "MultipleInterfaces" })]
     public class RasPiUart : Resource, IGpio
     {
         #region Settings
