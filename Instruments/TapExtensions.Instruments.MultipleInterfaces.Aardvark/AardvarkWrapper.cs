@@ -255,6 +255,299 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
 
         #endregion
 
+        #region TO BE REMOVED
+        public static int aa_find_devices(int num_devices, ushort[] devices)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            var devices_num_devices = (int)tp_min(num_devices, devices.Length);
+            return net_aa_find_devices(devices_num_devices, devices);
+        }
+
+        public static int aa_find_devices_ext(int num_devices, ushort[] devices, int num_ids, uint[] unique_ids)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            var devices_num_devices = (int)tp_min(num_devices, devices.Length);
+            var unique_ids_num_ids = (int)tp_min(num_ids, unique_ids.Length);
+            return net_aa_find_devices_ext(devices_num_devices, devices, unique_ids_num_ids, unique_ids);
+        }
+
+        public static int aa_open(int port_number)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_open(port_number);
+        }
+
+        public static int aa_open_ext(int port_number, ref AardvarkExt aa_ext)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_open_ext(port_number, ref aa_ext);
+        }
+
+        public static int aa_close(int aardvark)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_close(aardvark);
+        }
+
+        public static int aa_port(int aardvark)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_port(aardvark);
+        }
+
+        public static int aa_features(int aardvark)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_features(aardvark);
+        }
+
+        public static uint aa_unique_id(int aardvark)
+        {
+            if (!AA_LIBRARY_LOADED) return 0;
+            return net_aa_unique_id(aardvark);
+        }
+
+        public static string aa_status_string(int status)
+        {
+            if (!AA_LIBRARY_LOADED) return null;
+            return Marshal.PtrToStringAnsi(net_aa_status_string(status));
+        }
+
+        public static int aa_log(int aardvark, int level, int handle)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_log(aardvark, level, handle);
+        }
+
+        public static int aa_version(int aardvark, ref AardvarkVersion version)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_version(aardvark, ref version);
+        }
+
+        public static int aa_configure(int aardvark, AardvarkConfig config)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_configure(aardvark, config);
+        }
+
+        public static int aa_target_power(int aardvark, byte power_mask)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_target_power(aardvark, power_mask);
+        }
+
+        public static uint aa_sleep_ms(uint milliseconds)
+        {
+            if (!AA_LIBRARY_LOADED) return 0;
+            return net_aa_sleep_ms(milliseconds);
+        }
+
+        public static int aa_async_poll(int aardvark, int timeout)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_async_poll(aardvark, timeout);
+        }
+
+        public static int aa_i2c_free_bus(int aardvark)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_i2c_free_bus(aardvark);
+        }
+
+        public static int aa_i2c_bitrate(int aardvark, int bitrate_khz)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_i2c_bitrate(aardvark, bitrate_khz);
+        }
+
+        public static int aa_i2c_bus_timeout(int aardvark, ushort timeout_ms)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_i2c_bus_timeout(aardvark, timeout_ms);
+        }
+
+        public static int aa_i2c_read(int aardvark, ushort slave_addr, AardvarkI2cFlags flags, ushort num_bytes,
+            byte[] data_in)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            var data_in_num_bytes = (ushort)tp_min(num_bytes, data_in.Length);
+            return net_aa_i2c_read(aardvark, slave_addr, flags, data_in_num_bytes, data_in);
+        }
+
+        public static int aa_i2c_read_ext(int aardvark, ushort slave_addr, AardvarkI2cFlags flags, ushort num_bytes,
+            byte[] data_in, ref ushort num_read)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            var data_in_num_bytes = (ushort)tp_min(num_bytes, data_in.Length);
+            return net_aa_i2c_read_ext(aardvark, slave_addr, flags, data_in_num_bytes, data_in, ref num_read);
+        }
+
+        public static int aa_i2c_write(int aardvark, ushort slave_addr, AardvarkI2cFlags flags, ushort num_bytes,
+            byte[] data_out)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            var data_out_num_bytes = (ushort)tp_min(num_bytes, data_out.Length);
+            return net_aa_i2c_write(aardvark, slave_addr, flags, data_out_num_bytes, data_out);
+        }
+
+        public static int aa_i2c_write_ext(int aardvark, ushort slave_addr, AardvarkI2cFlags flags, ushort num_bytes,
+            byte[] data_out, ref ushort num_written)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            var data_out_num_bytes = (ushort)tp_min(num_bytes, data_out.Length);
+            return net_aa_i2c_write_ext(aardvark, slave_addr, flags, data_out_num_bytes, data_out, ref num_written);
+        }
+
+        public static int aa_i2c_write_read(int aardvark, ushort slave_addr, AardvarkI2cFlags flags,
+            ushort out_num_bytes, byte[] out_data, ref ushort num_written, ushort in_num_bytes, byte[] in_data,
+            ref ushort num_read)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            var out_data_out_num_bytes = (ushort)tp_min(out_num_bytes, out_data.Length);
+            var in_data_in_num_bytes = (ushort)tp_min(in_num_bytes, in_data.Length);
+            return net_aa_i2c_write_read(aardvark, slave_addr, flags, out_data_out_num_bytes, out_data, ref num_written,
+                in_data_in_num_bytes, in_data, ref num_read);
+        }
+
+        public static int aa_i2c_slave_enable(int aardvark, byte addr, ushort maxTxBytes, ushort maxRxBytes)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_i2c_slave_enable(aardvark, addr, maxTxBytes, maxRxBytes);
+        }
+
+        public static int aa_i2c_slave_disable(int aardvark)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_i2c_slave_disable(aardvark);
+        }
+
+        public static int aa_i2c_slave_set_response(int aardvark, byte num_bytes, byte[] data_out)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            var data_out_num_bytes = (byte)tp_min(num_bytes, data_out.Length);
+            return net_aa_i2c_slave_set_response(aardvark, data_out_num_bytes, data_out);
+        }
+
+        public static int aa_i2c_slave_write_stats(int aardvark)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_i2c_slave_write_stats(aardvark);
+        }
+
+        public static int aa_i2c_slave_read(int aardvark, ref byte addr, ushort num_bytes, byte[] data_in)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            var data_in_num_bytes = (ushort)tp_min(num_bytes, data_in.Length);
+            return net_aa_i2c_slave_read(aardvark, ref addr, data_in_num_bytes, data_in);
+        }
+
+        public static int aa_i2c_slave_write_stats_ext(int aardvark, ref ushort num_written)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_i2c_slave_write_stats_ext(aardvark, ref num_written);
+        }
+
+        public static int aa_i2c_slave_read_ext(int aardvark, ref byte addr, ushort num_bytes, byte[] data_in,
+            ref ushort num_read)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            var data_in_num_bytes = (ushort)tp_min(num_bytes, data_in.Length);
+            return net_aa_i2c_slave_read_ext(aardvark, ref addr, data_in_num_bytes, data_in, ref num_read);
+        }
+
+        public static int aa_i2c_pullup(int aardvark, byte pullup_mask)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_i2c_pullup(aardvark, pullup_mask);
+        }
+
+        public static int aa_spi_bitrate(int aardvark, int bitrate_khz)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_spi_bitrate(aardvark, bitrate_khz);
+        }
+
+        public static int aa_spi_configure(int aardvark, AardvarkSpiPolarity polarity, AardvarkSpiPhase phase,
+            AardvarkSpiBitorder bitorder)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_spi_configure(aardvark, polarity, phase, bitorder);
+        }
+
+        public static int aa_spi_write(int aardvark, ushort out_num_bytes, byte[] data_out, ushort in_num_bytes,
+            byte[] data_in)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            var data_out_out_num_bytes = (ushort)tp_min(out_num_bytes, data_out.Length);
+            var data_in_in_num_bytes = (ushort)tp_min(in_num_bytes, data_in.Length);
+            return net_aa_spi_write(aardvark, data_out_out_num_bytes, data_out, data_in_in_num_bytes, data_in);
+        }
+
+        public static int aa_spi_slave_enable(int aardvark)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_spi_slave_enable(aardvark);
+        }
+
+        public static int aa_spi_slave_disable(int aardvark)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_spi_slave_disable(aardvark);
+        }
+
+        public static int aa_spi_slave_set_response(int aardvark, byte num_bytes, byte[] data_out)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            var data_out_num_bytes = (byte)tp_min(num_bytes, data_out.Length);
+            return net_aa_spi_slave_set_response(aardvark, data_out_num_bytes, data_out);
+        }
+
+        public static int aa_spi_slave_read(int aardvark, ushort num_bytes, byte[] data_in)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            var data_in_num_bytes = (ushort)tp_min(num_bytes, data_in.Length);
+            return net_aa_spi_slave_read(aardvark, data_in_num_bytes, data_in);
+        }
+
+        public static int aa_spi_master_ss_polarity(int aardvark, AardvarkSpiSSPolarity polarity)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_spi_master_ss_polarity(aardvark, polarity);
+        }
+
+        public static int aa_gpio_direction(int aardvark, byte direction_mask)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_gpio_direction(aardvark, direction_mask);
+        }
+
+        public static int aa_gpio_pullup(int aardvark, byte pullup_mask)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_gpio_pullup(aardvark, pullup_mask);
+        }
+
+        public static int aa_gpio_get(int aardvark)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_gpio_get(aardvark);
+        }
+
+        public static int aa_gpio_set(int aardvark, byte value)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_gpio_set(aardvark, value);
+        }
+
+        public static int aa_gpio_change(int aardvark, ushort timeout)
+        {
+            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
+            return net_aa_gpio_change(aardvark, timeout);
+        }
+
+        #endregion
+
         #region GENERAL API
 
         /*
@@ -279,12 +572,8 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
          */
         public const ushort AA_PORT_NOT_FREE = 0x8000;
 
-        public static int aa_find_devices(int num_devices, ushort[] devices)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            var devices_num_devices = (int)tp_min(num_devices, devices.Length);
-            return net_aa_find_devices(devices_num_devices, devices);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_find_devices(int num_devices, [Out] ushort[] devices);
 
         /*
          * Get a list of ports to which Aardvark devices are attached.
@@ -296,13 +585,9 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
          * The IDs are the unsigned integer representation of the 10-digit
          * serial numbers.
          */
-        public static int aa_find_devices_ext(int num_devices, ushort[] devices, int num_ids, uint[] unique_ids)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            var devices_num_devices = (int)tp_min(num_devices, devices.Length);
-            var unique_ids_num_ids = (int)tp_min(num_ids, unique_ids.Length);
-            return net_aa_find_devices_ext(devices_num_devices, devices, unique_ids_num_ids, unique_ids);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_find_devices_ext(int num_devices, [Out] ushort[] devices, int num_ids,
+            [Out] uint[] unique_ids);
 
         /*
          * Open the Aardvark port.
@@ -319,11 +604,8 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
          * where extended information is not required.  For more complex
          * applications, the use of aa_open_ext() is recommended.
          */
-        public static int aa_open(int port_number)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_open(port_number);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_open(int port_number);
 
         /*
          * Open the Aardvark port, returning extended information
@@ -351,28 +633,19 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             public int features;
         }
 
-        public static int aa_open_ext(int port_number, ref AardvarkExt aa_ext)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_open_ext(port_number, ref aa_ext);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_open_ext(int port_number, ref AardvarkExt aa_ext);
 
         /* Close the Aardvark port. */
-        public static int aa_close(int aardvark)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_close(aardvark);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_close(int aardvark);
 
         /*
          * Return the port for this Aardvark handle.
          * The port number is a zero-indexed integer.
          */
-        public static int aa_port(int aardvark)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_port(aardvark);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_port(int aardvark);
 
         /*
          * Return the device features as a bit-mask of values, or
@@ -382,11 +655,8 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         public const int AA_FEATURE_I2C = 0x00000002;
         public const int AA_FEATURE_GPIO = 0x00000008;
 
-        public static int aa_features(int aardvark)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_features(aardvark);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_features(int aardvark);
 
         /*
          * Return the unique ID for this Aardvark adapter.
@@ -394,22 +664,16 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
          * The ID is the unsigned integer representation of the
          * 10-digit serial number.
          */
-        public static uint aa_unique_id(int aardvark)
-        {
-            if (!AA_LIBRARY_LOADED) return 0;
-            return net_aa_unique_id(aardvark);
-        }
+        [DllImport("aardvark")]
+        private static extern uint net_aa_unique_id(int aardvark);
 
         /*
          * Return the status string for the given status code.
          * If the code is not valid or the library function cannot
          * be loaded, return a NULL string.
          */
-        public static string aa_status_string(int status)
-        {
-            if (!AA_LIBRARY_LOADED) return null;
-            return Marshal.PtrToStringAnsi(net_aa_status_string(status));
-        }
+        [DllImport("aardvark")]
+        private static extern IntPtr net_aa_status_string(int status);
 
         /*
          * Enable logging to a file.  The handle must be standard file
@@ -422,22 +686,16 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         public const int AA_LOG_STDOUT = 1;
         public const int AA_LOG_STDERR = 2;
 
-        public static int aa_log(int aardvark, int level, int handle)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_log(aardvark, level, handle);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_log(int aardvark, int level, int handle);
 
         /*
          * Return the version matrix for the device attached to the
          * given handle.  If the handle is 0 or invalid, only the
          * software and required api versions are set.
          */
-        public static int aa_version(int aardvark, ref AardvarkVersion version)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_version(aardvark, ref version);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_version(int aardvark, ref AardvarkVersion version);
 
         /*
          * Configure the device by enabling/disabling I2C, SPI, and
@@ -446,11 +704,8 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         public const int AA_CONFIG_SPI_MASK = 0x00000001;
         public const int AA_CONFIG_I2C_MASK = 0x00000002;
 
-        public static int aa_configure(int aardvark, AardvarkConfig config)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_configure(aardvark, config);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_configure(int aardvark, AardvarkConfig config);
 
         /*
          * Configure the target power pins.
@@ -460,22 +715,16 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         public const byte AA_TARGET_POWER_BOTH = 0x03;
         public const byte AA_TARGET_POWER_QUERY = 0x80;
 
-        public static int aa_target_power(int aardvark, byte power_mask)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_target_power(aardvark, power_mask);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_target_power(int aardvark, byte power_mask);
 
         /*
          * Sleep for the specified number of milliseconds
          * Accuracy depends on the operating system scheduler
          * Returns the number of milliseconds slept
          */
-        public static uint aa_sleep_ms(uint milliseconds)
-        {
-            if (!AA_LIBRARY_LOADED) return 0;
-            return net_aa_sleep_ms(milliseconds);
-        }
+        [DllImport("aardvark")]
+        private static extern uint net_aa_sleep_ms(uint milliseconds);
 
         #endregion
 
@@ -493,52 +742,36 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         public const int AA_ASYNC_I2C_WRITE = 0x00000002;
         public const int AA_ASYNC_SPI = 0x00000004;
 
-        public static int aa_async_poll(int aardvark, int timeout)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_async_poll(aardvark, timeout);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_async_poll(int aardvark, int timeout);
 
         #endregion
 
         #region I2C API
 
         /* Free the I2C bus. */
-        public static int aa_i2c_free_bus(int aardvark)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_i2c_free_bus(aardvark);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_i2c_free_bus(int aardvark);
 
         /*
          * Set the I2C bit rate in kilohertz.  If a zero is passed as the
          * bitrate, the bitrate is unchanged and the current bitrate is
          * returned.
          */
-        public static int aa_i2c_bitrate(int aardvark, int bitrate_khz)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_i2c_bitrate(aardvark, bitrate_khz);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_i2c_bitrate(int aardvark, int bitrate_khz);
 
         /*
          * Set the bus lock timeout.  If a zero is passed as the timeout,
          * the timeout is unchanged and the current timeout is returned.
          */
-        public static int aa_i2c_bus_timeout(int aardvark, ushort timeout_ms)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_i2c_bus_timeout(aardvark, timeout_ms);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_i2c_bus_timeout(int aardvark, ushort timeout_ms);
 
         /* Read a stream of bytes from the I2C slave device. */
-        public static int aa_i2c_read(int aardvark, ushort slave_addr, AardvarkI2cFlags flags, ushort num_bytes,
-            byte[] data_in)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            var data_in_num_bytes = (ushort)tp_min(num_bytes, data_in.Length);
-            return net_aa_i2c_read(aardvark, slave_addr, flags, data_in_num_bytes, data_in);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_i2c_read(int aardvark, ushort slave_addr, AardvarkI2cFlags flags,
+            ushort num_bytes, [Out] byte[] data_in);
 
         /*
          * Read a stream of bytes from the I2C slave device.
@@ -546,22 +779,14 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
          * the num_read variable.  The return value of the function
          * is a status code.
          */
-        public static int aa_i2c_read_ext(int aardvark, ushort slave_addr, AardvarkI2cFlags flags, ushort num_bytes,
-            byte[] data_in, ref ushort num_read)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            var data_in_num_bytes = (ushort)tp_min(num_bytes, data_in.Length);
-            return net_aa_i2c_read_ext(aardvark, slave_addr, flags, data_in_num_bytes, data_in, ref num_read);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_i2c_read_ext(int aardvark, ushort slave_addr, AardvarkI2cFlags flags,
+            ushort num_bytes, [Out] byte[] data_in, ref ushort num_read);
 
         /* Write a stream of bytes to the I2C slave device. */
-        public static int aa_i2c_write(int aardvark, ushort slave_addr, AardvarkI2cFlags flags, ushort num_bytes,
-            byte[] data_out)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            var data_out_num_bytes = (ushort)tp_min(num_bytes, data_out.Length);
-            return net_aa_i2c_write(aardvark, slave_addr, flags, data_out_num_bytes, data_out);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_i2c_write(int aardvark, ushort slave_addr, AardvarkI2cFlags flags,
+            ushort num_bytes, [In] byte[] data_out);
 
         /*
          * Write a stream of bytes to the I2C slave device.
@@ -569,13 +794,9 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
          * the num_written variable.  The return value of the function
          * is a status code.
          */
-        public static int aa_i2c_write_ext(int aardvark, ushort slave_addr, AardvarkI2cFlags flags, ushort num_bytes,
-            byte[] data_out, ref ushort num_written)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            var data_out_num_bytes = (ushort)tp_min(num_bytes, data_out.Length);
-            return net_aa_i2c_write_ext(aardvark, slave_addr, flags, data_out_num_bytes, data_out, ref num_written);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_i2c_write_ext(int aardvark, ushort slave_addr, AardvarkI2cFlags flags,
+            ushort num_bytes, [In] byte[] data_out, ref ushort num_written);
 
         /*
          * Do an atomic write+read to an I2C slave device by first
@@ -586,40 +807,25 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
          * the num_read variable.  The return value of the function is
          * the status given as (read_status << 8) | (write_status).
          */
-        public static int aa_i2c_write_read(int aardvark, ushort slave_addr, AardvarkI2cFlags flags,
-            ushort out_num_bytes, byte[] out_data, ref ushort num_written, ushort in_num_bytes, byte[] in_data,
-            ref ushort num_read)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            var out_data_out_num_bytes = (ushort)tp_min(out_num_bytes, out_data.Length);
-            var in_data_in_num_bytes = (ushort)tp_min(in_num_bytes, in_data.Length);
-            return net_aa_i2c_write_read(aardvark, slave_addr, flags, out_data_out_num_bytes, out_data, ref num_written,
-                in_data_in_num_bytes, in_data, ref num_read);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_i2c_write_read(int aardvark, ushort slave_addr, AardvarkI2cFlags flags,
+            ushort out_num_bytes, [In] byte[] out_data, ref ushort num_written, ushort in_num_bytes,
+            [Out] byte[] in_data, ref ushort num_read);
 
         /* Enable/Disable the Aardvark as an I2C slave device */
-        public static int aa_i2c_slave_enable(int aardvark, byte addr, ushort maxTxBytes, ushort maxRxBytes)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_i2c_slave_enable(aardvark, addr, maxTxBytes, maxRxBytes);
-        }
+        [DllImport("aardvark")]
+        private static extern int
+            net_aa_i2c_slave_enable(int aardvark, byte addr, ushort maxTxBytes, ushort maxRxBytes);
 
-        public static int aa_i2c_slave_disable(int aardvark)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_i2c_slave_disable(aardvark);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_i2c_slave_disable(int aardvark);
 
         /*
          * Set the slave response in the event the Aardvark is put
          * into slave mode and contacted by a Master.
          */
-        public static int aa_i2c_slave_set_response(int aardvark, byte num_bytes, byte[] data_out)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            var data_out_num_bytes = (byte)tp_min(num_bytes, data_out.Length);
-            return net_aa_i2c_slave_set_response(aardvark, data_out_num_bytes, data_out);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_i2c_slave_set_response(int aardvark, byte num_bytes, [In] byte[] data_out);
 
         /*
          * Return number of bytes written from a previous
@@ -628,34 +834,21 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
          * software, there could be responses queued up from many
          * previous write transactions.
          */
-        public static int aa_i2c_slave_write_stats(int aardvark)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_i2c_slave_write_stats(aardvark);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_i2c_slave_write_stats(int aardvark);
 
         /* Read the bytes from an I2C slave reception */
-        public static int aa_i2c_slave_read(int aardvark, ref byte addr, ushort num_bytes, byte[] data_in)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            var data_in_num_bytes = (ushort)tp_min(num_bytes, data_in.Length);
-            return net_aa_i2c_slave_read(aardvark, ref addr, data_in_num_bytes, data_in);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_i2c_slave_read(int aardvark, ref byte addr, ushort num_bytes,
+            [Out] byte[] data_in);
 
         /* Extended functions that return status code */
-        public static int aa_i2c_slave_write_stats_ext(int aardvark, ref ushort num_written)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_i2c_slave_write_stats_ext(aardvark, ref num_written);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_i2c_slave_write_stats_ext(int aardvark, ref ushort num_written);
 
-        public static int aa_i2c_slave_read_ext(int aardvark, ref byte addr, ushort num_bytes, byte[] data_in,
-            ref ushort num_read)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            var data_in_num_bytes = (ushort)tp_min(num_bytes, data_in.Length);
-            return net_aa_i2c_slave_read_ext(aardvark, ref addr, data_in_num_bytes, data_in, ref num_read);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_i2c_slave_read_ext(int aardvark, ref byte addr, ushort num_bytes,
+            [Out] byte[] data_in, ref ushort num_read);
 
         /*
          * Configure the I2C pullup resistors.
@@ -665,11 +858,8 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         public const byte AA_I2C_PULLUP_BOTH = 0x03;
         public const byte AA_I2C_PULLUP_QUERY = 0x80;
 
-        public static int aa_i2c_pullup(int aardvark, byte pullup_mask)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_i2c_pullup(aardvark, pullup_mask);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_i2c_pullup(int aardvark, byte pullup_mask);
 
         #endregion
 
@@ -680,11 +870,8 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
          * bitrate, the bitrate is unchanged and the current bitrate is
          * returned.
          */
-        public static int aa_spi_bitrate(int aardvark, int bitrate_khz)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_spi_bitrate(aardvark, bitrate_khz);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_spi_bitrate(int aardvark, int bitrate_khz);
 
         /*
          * These configuration parameters specify how to clock the
@@ -711,54 +898,32 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
          */
 
         /* Configure the SPI master or slave interface */
-        public static int aa_spi_configure(int aardvark, AardvarkSpiPolarity polarity, AardvarkSpiPhase phase,
-            AardvarkSpiBitorder bitorder)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_spi_configure(aardvark, polarity, phase, bitorder);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_spi_configure(int aardvark, AardvarkSpiPolarity polarity,
+            AardvarkSpiPhase phase, AardvarkSpiBitorder bitorder);
 
         /* Write a stream of bytes to the downstream SPI slave device. */
-        public static int aa_spi_write(int aardvark, ushort out_num_bytes, byte[] data_out, ushort in_num_bytes,
-            byte[] data_in)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            var data_out_out_num_bytes = (ushort)tp_min(out_num_bytes, data_out.Length);
-            var data_in_in_num_bytes = (ushort)tp_min(in_num_bytes, data_in.Length);
-            return net_aa_spi_write(aardvark, data_out_out_num_bytes, data_out, data_in_in_num_bytes, data_in);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_spi_write(int aardvark, ushort out_num_bytes, [In] byte[] data_out,
+            ushort in_num_bytes, [Out] byte[] data_in);
 
         /* Enable/Disable the Aardvark as an SPI slave device */
-        public static int aa_spi_slave_enable(int aardvark)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_spi_slave_enable(aardvark);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_spi_slave_enable(int aardvark);
 
-        public static int aa_spi_slave_disable(int aardvark)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_spi_slave_disable(aardvark);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_spi_slave_disable(int aardvark);
 
         /*
          * Set the slave response in the event the Aardvark is put
          * into slave mode and contacted by a Master.
          */
-        public static int aa_spi_slave_set_response(int aardvark, byte num_bytes, byte[] data_out)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            var data_out_num_bytes = (byte)tp_min(num_bytes, data_out.Length);
-            return net_aa_spi_slave_set_response(aardvark, data_out_num_bytes, data_out);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_spi_slave_set_response(int aardvark, byte num_bytes, [In] byte[] data_out);
 
         /* Read the bytes from an SPI slave reception */
-        public static int aa_spi_slave_read(int aardvark, ushort num_bytes, byte[] data_in)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            var data_in_num_bytes = (ushort)tp_min(num_bytes, data_in.Length);
-            return net_aa_spi_slave_read(aardvark, data_in_num_bytes, data_in);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_spi_slave_read(int aardvark, ushort num_bytes, [Out] byte[] data_in);
 
         /*
          * Change the output polarity on the SS line.
@@ -767,11 +932,8 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
          * always be setup with SS as active low.  Hence this function
          * only affects the SPI master functions on the Aardvark.
          */
-        public static int aa_spi_master_ss_polarity(int aardvark, AardvarkSpiSSPolarity polarity)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_spi_master_ss_polarity(aardvark, polarity);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_spi_master_ss_polarity(int aardvark, AardvarkSpiSSPolarity polarity);
 
         #endregion
 
@@ -805,11 +967,8 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         public const byte AA_GPIO_DIR_INPUT = 0;
         public const byte AA_GPIO_DIR_OUTPUT = 1;
 
-        public static int aa_gpio_direction(int aardvark, byte direction_mask)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_gpio_direction(aardvark, direction_mask);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_gpio_direction(int aardvark, byte direction_mask);
 
         /*
          * Enable an internal pullup on any of the GPIO input lines.
@@ -823,11 +982,8 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         public const byte AA_GPIO_PULLUP_OFF = 0;
         public const byte AA_GPIO_PULLUP_ON = 1;
 
-        public static int aa_gpio_pullup(int aardvark, byte pullup_mask)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_gpio_pullup(aardvark, pullup_mask);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_gpio_pullup(int aardvark, byte pullup_mask);
 
         /*
          * Read the current digital values on the GPIO input lines.
@@ -836,11 +992,8 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
          * line is configured as an output, its corresponding bit
          * position in the mask will be undefined.
          */
-        public static int aa_gpio_get(int aardvark)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_gpio_get(aardvark);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_gpio_get(int aardvark);
 
         /*
          * Set the outputs on the GPIO lines.
@@ -850,11 +1003,8 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
          * will be cached in the event that the line is later
          * configured as an output.
          */
-        public static int aa_gpio_set(int aardvark, byte value)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_gpio_set(aardvark, value);
-        }
+        [DllImport("aardvark")]
+        private static extern int net_aa_gpio_set(int aardvark, byte value);
 
         /*
          * Block until there is a change on the GPIO input lines.
@@ -875,157 +1025,6 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
          * aa_gpio_change, aa_gpio_change will only register any changes
          * from the value last returned by aa_gpio_get.
          */
-        public static int aa_gpio_change(int aardvark, ushort timeout)
-        {
-            if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
-            return net_aa_gpio_change(aardvark, timeout);
-        }
-
-        #endregion
-
-        #region NATIVE DLL BINDINGS
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_find_devices(int num_devices, [Out] ushort[] devices);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_find_devices_ext(int num_devices, [Out] ushort[] devices, int num_ids,
-            [Out] uint[] unique_ids);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_open(int port_number);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_open_ext(int port_number, ref AardvarkExt aa_ext);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_close(int aardvark);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_port(int aardvark);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_features(int aardvark);
-
-        [DllImport("aardvark")]
-        private static extern uint net_aa_unique_id(int aardvark);
-
-        [DllImport("aardvark")]
-        private static extern IntPtr net_aa_status_string(int status);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_log(int aardvark, int level, int handle);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_version(int aardvark, ref AardvarkVersion version);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_configure(int aardvark, AardvarkConfig config);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_target_power(int aardvark, byte power_mask);
-
-        [DllImport("aardvark")]
-        private static extern uint net_aa_sleep_ms(uint milliseconds);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_async_poll(int aardvark, int timeout);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_i2c_free_bus(int aardvark);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_i2c_bitrate(int aardvark, int bitrate_khz);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_i2c_bus_timeout(int aardvark, ushort timeout_ms);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_i2c_read(int aardvark, ushort slave_addr, AardvarkI2cFlags flags,
-            ushort num_bytes, [Out] byte[] data_in);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_i2c_read_ext(int aardvark, ushort slave_addr, AardvarkI2cFlags flags,
-            ushort num_bytes, [Out] byte[] data_in, ref ushort num_read);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_i2c_write(int aardvark, ushort slave_addr, AardvarkI2cFlags flags,
-            ushort num_bytes, [In] byte[] data_out);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_i2c_write_ext(int aardvark, ushort slave_addr, AardvarkI2cFlags flags,
-            ushort num_bytes, [In] byte[] data_out, ref ushort num_written);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_i2c_write_read(int aardvark, ushort slave_addr, AardvarkI2cFlags flags,
-            ushort out_num_bytes, [In] byte[] out_data, ref ushort num_written, ushort in_num_bytes,
-            [Out] byte[] in_data, ref ushort num_read);
-
-        [DllImport("aardvark")]
-        private static extern int
-            net_aa_i2c_slave_enable(int aardvark, byte addr, ushort maxTxBytes, ushort maxRxBytes);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_i2c_slave_disable(int aardvark);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_i2c_slave_set_response(int aardvark, byte num_bytes, [In] byte[] data_out);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_i2c_slave_write_stats(int aardvark);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_i2c_slave_read(int aardvark, ref byte addr, ushort num_bytes,
-            [Out] byte[] data_in);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_i2c_slave_write_stats_ext(int aardvark, ref ushort num_written);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_i2c_slave_read_ext(int aardvark, ref byte addr, ushort num_bytes,
-            [Out] byte[] data_in, ref ushort num_read);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_i2c_pullup(int aardvark, byte pullup_mask);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_spi_bitrate(int aardvark, int bitrate_khz);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_spi_configure(int aardvark, AardvarkSpiPolarity polarity,
-            AardvarkSpiPhase phase, AardvarkSpiBitorder bitorder);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_spi_write(int aardvark, ushort out_num_bytes, [In] byte[] data_out,
-            ushort in_num_bytes, [Out] byte[] data_in);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_spi_slave_enable(int aardvark);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_spi_slave_disable(int aardvark);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_spi_slave_set_response(int aardvark, byte num_bytes, [In] byte[] data_out);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_spi_slave_read(int aardvark, ushort num_bytes, [Out] byte[] data_in);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_spi_master_ss_polarity(int aardvark, AardvarkSpiSSPolarity polarity);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_gpio_direction(int aardvark, byte direction_mask);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_gpio_pullup(int aardvark, byte pullup_mask);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_gpio_get(int aardvark);
-
-        [DllImport("aardvark")]
-        private static extern int net_aa_gpio_set(int aardvark, byte value);
-
         [DllImport("aardvark")]
         private static extern int net_aa_gpio_change(int aardvark, ushort timeout);
 
