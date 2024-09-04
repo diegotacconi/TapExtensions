@@ -1,4 +1,16 @@
-﻿using System;
+﻿/*
+ *    Connector Pinout:
+ *    https://www.totalphase.com/support/articles/200468316-aardvark-i2c-spi-host-adapter-user-manual/#s2.1
+ *
+ *                     ┌──────────┐
+ *    ┌────────────────┘          └────────────────┐
+ *    │ 1 SCL    3 SDA    5 MISO   7 SCLK    9 SS  │
+ *    │                                            │
+ *    │ 2 GND    4 PWR    6 PWR    8 MOSI   10 GND │
+ *    └────────────────────────────────────────────┘
+ */
+
+using System;
 using OpenTap;
 
 namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
@@ -29,26 +41,16 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             On
         }
 
+        [EnabledIf(nameof(ConfigMode), AardvarkConfig.AA_CONFIG_GPIO_I2C,
+            AardvarkConfig.AA_CONFIG_SPI_I2C, HideIfDisabled = true)]
         [Display("I2C Pull-ups", Order: 4, Description: "Set I2C pull-up resistors state to on/off")]
-        public EPullupResistors PullupResistors { get; set; }
+        public EPullupResistors I2CPullupResistors { get; set; }
 
-        // ReSharper disable once InconsistentNaming
-        public enum EI2cBitrate
-        {
-            [Display("100 KHz")] OneHundred = 100,
-            [Display("200 KHz")] TwoHundred = 200,
-            [Display("300 KHz")] ThreeHundred = 300,
-            [Display("400 KHz")] FourHundred = 400,
-            [Display("500 KHz")] FiveHundred = 500,
-            [Display("600 KHz")] SixHundred = 600,
-            [Display("700 KHz")] SevenHundred = 700,
-            [Display("800 KHz")] EightHundred = 800
-        }
-
+        [EnabledIf(nameof(ConfigMode), AardvarkConfig.AA_CONFIG_GPIO_I2C,
+            AardvarkConfig.AA_CONFIG_SPI_I2C, HideIfDisabled = true)]
         [Display("I2C Bus bit rate", Order: 5)]
-        // ReSharper disable once InconsistentNaming
-        public EI2cBitrate I2cBitRateKhz { get; set; }
-        // public int I2cBitRateKhz { get; set; }
+        [Unit("kHz")]
+        public int I2CBitRateKhz { get; set; }
 
         #endregion
 
@@ -70,10 +72,13 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             // Default values
             Name = nameof(Aardvark);
             ConfigMode = AardvarkConfig.AA_CONFIG_SPI_I2C;
-            // I2cBitRateKhz = 100;
-            I2cBitRateKhz = EI2cBitrate.OneHundred;
             TargetPower = ETargetPower.Off;
-            PullupResistors = EPullupResistors.Off;
+            I2CPullupResistors = EPullupResistors.Off;
+            I2CBitRateKhz = 100;
+
+            // Validation rules
+            Rules.Add(() => I2CBitRateKhz >= 1 && I2CBitRateKhz <= 800,
+                "I2C bit rate must be between 1 and 800 kHz", nameof(I2CBitRateKhz));
         }
 
         public override void Open()
@@ -131,6 +136,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
 
                 try
                 {
+                    Log.Debug($"Setting config mode to {ConfigMode}");
                     var stat = AardvarkWrapper.aa_configure(AardvarkHandle, ConfigMode);
                     if (stat != (int)ConfigMode)
                         throw new ApplicationException("ERRor[" + stat +
@@ -148,10 +154,35 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                     throw;
                 }
 
-
                 SetTargetPower(TargetPower);
 
-                SetPullUpState(PullupResistors);
+
+                // I2C Configuration
+                if (ConfigMode == AardvarkConfig.AA_CONFIG_GPIO_I2C ||
+                    ConfigMode == AardvarkConfig.AA_CONFIG_SPI_I2C)
+                {
+                    SetI2CPullupResistors(I2CPullupResistors);
+                    SetBitRate((uint)I2CBitRateKhz);
+                }
+
+
+                // SPI Configuration
+                if (ConfigMode == AardvarkConfig.AA_CONFIG_SPI_GPIO ||
+                    ConfigMode == AardvarkConfig.AA_CONFIG_SPI_I2C)
+                {
+                    // throw new NotImplementedException();
+                }
+
+
+                // GPIO Configuration
+                if (ConfigMode == AardvarkConfig.AA_CONFIG_GPIO_ONLY ||
+                    ConfigMode == AardvarkConfig.AA_CONFIG_GPIO_I2C ||
+                    ConfigMode == AardvarkConfig.AA_CONFIG_SPI_GPIO)
+                {
+                    // throw new NotImplementedException();
+                }
+
+
 
                 // TODO: net_aa_version(aardvark, ref version);
 
@@ -167,6 +198,11 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         public override void Close()
         {
             CheckIfInitialized();
+
+            // Restore target power to off
+            if (TargetPower != ETargetPower.Off)
+                SetTargetPower(ETargetPower.Off);
+
             AardvarkWrapper.aa_close(AardvarkHandle);
             AardvarkHandle = 0;
             _isInitialized = false;
@@ -249,7 +285,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             }
         }
 
-        public void SetPullUpState(EPullupResistors state)
+        public void SetI2CPullupResistors(EPullupResistors state)
         {
             lock (_instLock)
             {

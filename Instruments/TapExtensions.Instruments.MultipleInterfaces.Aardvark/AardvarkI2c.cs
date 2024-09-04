@@ -142,10 +142,11 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             lock (_instLock)
             {
                 CheckIfInitialized();
-                Log.Debug("I2C: Setting bit rate to " + bitRateKhz + " kHz");
-                var status = AardvarkWrapper.aa_i2c_bitrate(AardvarkHandle, (int)bitRateKhz);
-                if (status != bitRateKhz)
-                    throw new ApplicationException("I2C: Set bit rate error! Trying to set " + bitRateKhz + " kHz");
+                Log.Debug($"Setting I2C bit rate to {bitRateKhz} kHz");
+                var actualBitRateKhz = AardvarkWrapper.aa_i2c_bitrate(AardvarkHandle, (int)bitRateKhz);
+                if (actualBitRateKhz != bitRateKhz)
+                    throw new InvalidOperationException(
+                        $"Error trying to set the I2C bit rate to {bitRateKhz} kHz. Actual bit rate was {actualBitRateKhz} kHz.");
             }
         }
 
