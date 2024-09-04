@@ -6,7 +6,9 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
 {
     public partial class Aardvark : II2C
     {
-        public void Write(ushort slaveAddress, ushort numOfBytes, byte[] dataOut)
+        #region I2C Interface Implementation
+
+        void II2C.Write(ushort slaveAddress, ushort numOfBytes, byte[] dataOut)
         {
             lock (_instLock)
             {
@@ -34,7 +36,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             }
         }
 
-        public void Write(ushort slaveAddress, byte[] registerAddress, ushort numOfBytes, byte[] dataOut)
+        void II2C.Write(ushort slaveAddress, byte[] registerAddress, ushort numOfBytes, byte[] dataOut)
         {
             lock (_instLock)
             {
@@ -68,7 +70,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             }
         }
 
-        public byte[] Read(ushort slaveAddress, ushort numOfBytes)
+        byte[] II2C.Read(ushort slaveAddress, ushort numOfBytes)
         {
             lock (_instLock)
             {
@@ -89,7 +91,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             }
         }
 
-        public byte[] Read(ushort slaveAddress, ushort numOfBytes, byte[] regAddress)
+        byte[] II2C.Read(ushort slaveAddress, ushort numOfBytes, byte[] regAddress)
         {
             var dataIn = new byte[numOfBytes];
             var addrWidth = (ushort)regAddress.Length;
@@ -137,7 +139,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             }
         }
 
-        public void SetBitRate(uint bitRateKhz)
+        void II2C.SetBitRate(uint bitRateKhz)
         {
             lock (_instLock)
             {
@@ -150,7 +152,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             }
         }
 
-        public void SetBusTimeOutInMs(ushort timeOutMs)
+        void II2C.SetBusTimeOutInMs(ushort timeOutMs)
         {
             lock (_instLock)
             {
@@ -162,7 +164,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             }
         }
 
-        public void SlaveEnable(byte slaveAddress, ushort maxTxBytes, ushort maxRxBytes)
+        void II2C.SlaveEnable(byte slaveAddress, ushort maxTxBytes, ushort maxRxBytes)
         {
             if (maxTxBytes <= 0 || MaxTxRxBytes < maxTxBytes)
                 throw new ArgumentOutOfRangeException(nameof(maxTxBytes),
@@ -196,7 +198,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             }
         }
 
-        public void SlaveDisable()
+        void II2C.SlaveDisable()
         {
             CheckIfInitialized();
             lock (_instLock)
@@ -221,7 +223,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             }
         }
 
-        public byte[] SlaveRead(byte slaveAddress, ushort numOfBytesMax, out int numOfBytesRead)
+        byte[] II2C.SlaveRead(byte slaveAddress, ushort numOfBytesMax, out int numOfBytesRead)
         {
             if (slaveAddress <= 0)
                 throw new ArgumentOutOfRangeException(nameof(slaveAddress),
@@ -246,5 +248,38 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                                                slaveAddress);
             }
         }
+
+        #endregion
+
+        #region Private Methods
+
+        private void SetPullupResistors(EPullupResistors state)
+        {
+            lock (_instLock)
+            {
+                CheckIfInitialized();
+                Log.Debug($"Setting I2C pull-up resistors to {state}");
+                int status;
+                switch (state)
+                {
+                    case EPullupResistors.Off:
+                        status = AardvarkWrapper.aa_i2c_pullup(AardvarkHandle, 0x00);
+                        if (status == 0x00) return;
+                        break;
+                    case EPullupResistors.On:
+                        status = AardvarkWrapper.aa_i2c_pullup(AardvarkHandle, 0x03);
+                        if (status == 0x03) return;
+                        break;
+                    default:
+                        throw new ArgumentException(
+                            $"{Name}: Case not found for {nameof(state)}={state}");
+                }
+
+                var errorMsg = AardvarkWrapper.aa_status_string(status);
+                throw new InvalidOperationException($"{Name}: Error {status}, {errorMsg}");
+            }
+        }
+
+        #endregion
     }
 }

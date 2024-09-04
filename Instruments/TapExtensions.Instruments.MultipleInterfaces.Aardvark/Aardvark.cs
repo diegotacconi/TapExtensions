@@ -12,6 +12,7 @@
 
 using System;
 using OpenTap;
+using TapExtensions.Interfaces.I2c;
 
 namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
 {
@@ -161,8 +162,8 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                 if (ConfigMode == AardvarkConfig.AA_CONFIG_GPIO_I2C ||
                     ConfigMode == AardvarkConfig.AA_CONFIG_SPI_I2C)
                 {
-                    SetI2CPullupResistors(I2CPullupResistors);
-                    SetBitRate((uint)I2CBitRateKhz);
+                    SetPullupResistors(I2CPullupResistors);
+                    ((II2C)this).SetBitRate((uint)I2CBitRateKhz);
                 }
 
 
@@ -209,10 +210,39 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             base.Close();
         }
 
-        protected void CheckIfInitialized()
+        #region Private Methods
+
+        private void CheckIfInitialized()
         {
             if (!_isInitialized)
                 throw new InvalidOperationException($"{Name} not initialized");
+        }
+
+        private void SetTargetPower(ETargetPower target)
+        {
+            lock (_instLock)
+            {
+                CheckIfInitialized();
+                Log.Debug($"Setting target power to {target}");
+                int status;
+                switch (target)
+                {
+                    case ETargetPower.Off:
+                        status = AardvarkWrapper.aa_target_power(AardvarkHandle, 0x00);
+                        if (status == 0x00) return;
+                        break;
+                    case ETargetPower.On5V0:
+                        status = AardvarkWrapper.aa_target_power(AardvarkHandle, 0x03);
+                        if (status == 0x03) return;
+                        break;
+                    default:
+                        throw new ArgumentException(
+                            $"{Name}: Case not found for {nameof(target)}={target}");
+                }
+
+                var errorMsg = AardvarkWrapper.aa_status_string(status);
+                throw new InvalidOperationException($"{Name}: Error {status}, {errorMsg}");
+            }
         }
 
         private void LogDebugData(string infoStart, byte[] data, int stat = 0)
@@ -258,58 +288,6 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             }
         }
 
-        public void SetTargetPower(ETargetPower target)
-        {
-            lock (_instLock)
-            {
-                CheckIfInitialized();
-                Log.Debug($"Setting target power to {target}");
-                int status;
-                switch (target)
-                {
-                    case ETargetPower.Off:
-                        status = AardvarkWrapper.aa_target_power(AardvarkHandle, 0x00);
-                        if (status == 0x00) return;
-                        break;
-                    case ETargetPower.On5V0:
-                        status = AardvarkWrapper.aa_target_power(AardvarkHandle, 0x03);
-                        if (status == 0x03) return;
-                        break;
-                    default:
-                        throw new ArgumentException(
-                            $"{Name}: Case not found for {nameof(target)}={target}");
-                }
-
-                var errorMsg = AardvarkWrapper.aa_status_string(status);
-                throw new InvalidOperationException($"{Name}: Error {status}, {errorMsg}");
-            }
-        }
-
-        public void SetI2CPullupResistors(EPullupResistors state)
-        {
-            lock (_instLock)
-            {
-                CheckIfInitialized();
-                Log.Debug($"Setting I2C pull-up resistors to {state}");
-                int status;
-                switch (state)
-                {
-                    case EPullupResistors.Off:
-                        status = AardvarkWrapper.aa_i2c_pullup(AardvarkHandle, 0x00);
-                        if (status == 0x00) return;
-                        break;
-                    case EPullupResistors.On:
-                        status = AardvarkWrapper.aa_i2c_pullup(AardvarkHandle, 0x03);
-                        if (status == 0x03) return;
-                        break;
-                    default:
-                        throw new ArgumentException(
-                            $"{Name}: Case not found for {nameof(state)}={state}");
-                }
-
-                var errorMsg = AardvarkWrapper.aa_status_string(status);
-                throw new InvalidOperationException($"{Name}: Error {status}, {errorMsg}");
-            }
-        }
+        #endregion
     }
 }
