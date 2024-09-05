@@ -27,13 +27,18 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
 
         [Display("Config Mode", Order: 2)] public AardvarkConfig ConfigMode { get; set; }
 
+        [Display("Connect on Open", Order: 3)] public bool ConnectOnOpen { get; set; }
+
+
+
         public enum ETargetPower
         {
             Off,
             [Display("5 Volts")] On5V0
         }
 
-        [Display("Target Power", Order: 3, Description: "(Pin 4, 6)")]
+        [EnabledIf(nameof(ConnectOnOpen), true, HideIfDisabled = true)]
+        [Display("Target Power", Order: 4, Description: "(Pin 4, 6)")]
         public ETargetPower TargetPower { get; set; }
 
         public enum EPullupResistors
@@ -42,16 +47,25 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             On
         }
 
+        [EnabledIf(nameof(ConnectOnOpen), true, HideIfDisabled = true)]
         [EnabledIf(nameof(ConfigMode), AardvarkConfig.AA_CONFIG_GPIO_I2C,
             AardvarkConfig.AA_CONFIG_SPI_I2C, HideIfDisabled = true)]
-        [Display("I2C Pull-ups", Order: 4, Description: "Set I2C pull-up resistors state to on/off")]
+        [Display("I2C Pull-ups", Order: 5, Description: "Set I2C pull-up resistors state to on/off")]
         public EPullupResistors I2CPullupResistors { get; set; }
 
+        [EnabledIf(nameof(ConnectOnOpen), true, HideIfDisabled = true)]
         [EnabledIf(nameof(ConfigMode), AardvarkConfig.AA_CONFIG_GPIO_I2C,
             AardvarkConfig.AA_CONFIG_SPI_I2C, HideIfDisabled = true)]
-        [Display("I2C Bus bit rate", Order: 5)]
+        [Display("I2C Bus bit rate", Order: 6)]
         [Unit("kHz")]
         public int I2CBitRateKhz { get; set; }
+
+        [EnabledIf(nameof(ConnectOnOpen), true, HideIfDisabled = true)]
+        [EnabledIf(nameof(ConfigMode), AardvarkConfig.AA_CONFIG_SPI_GPIO,
+            AardvarkConfig.AA_CONFIG_SPI_I2C, HideIfDisabled = true)]
+        [Display("SPI Bus bit rate", Order: 7)]
+        [Unit("kHz")]
+        public int SpiBitRateKhz { get; set; }
 
         #endregion
 
@@ -59,27 +73,24 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         internal int AardvarkHandle;
         private bool _isInitialized;
 
-        // The Aardvark adapter SPI master can operate at bitrates of 125 kHz, 250 Khz, 500 Khz, 1 Mhz, 2 MHz, 4 Mhz, and 8 Mhz.
-        public readonly int[] ArdvarkSpiMasterClockFreqsKhz = { 125, 250, 500, 1000, 2000, 4000, 8000 };
-
-        // TotalPhase/aardvark-v5.15.pdf/Chapter5.5.1/4
-        // It is not possible to receive messages larger than approximately 4 KiB as a slave
-        // due to operating system limitations on the asynchronous incoming buffer. As such,
-        // one should not queue up more than 4 KiB of total slave data between calls to the Aardvark API.
-        private const ushort MaxTxRxBytes = 4000;
-
         public Aardvark()
         {
             // Default values
             Name = nameof(Aardvark);
             ConfigMode = AardvarkConfig.AA_CONFIG_SPI_I2C;
+            ConnectOnOpen = true;
             TargetPower = ETargetPower.Off;
             I2CPullupResistors = EPullupResistors.Off;
             I2CBitRateKhz = 100;
+            SpiBitRateKhz = 1000;
 
             // Validation rules
+            Rules.Add(() => DevNumber >= 0,
+                "Must be greater or equal to zero", nameof(DevNumber));
             Rules.Add(() => I2CBitRateKhz >= 1 && I2CBitRateKhz <= 800,
                 "I2C bit rate must be between 1 and 800 kHz", nameof(I2CBitRateKhz));
+            Rules.Add(() => SpiBitRateKhz >= 125 && SpiBitRateKhz <= 8000,
+                "SPI bit rate must be between 125 kHz and 8 MHz", nameof(SpiBitRateKhz));
         }
 
         public override void Open()
@@ -96,6 +107,9 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             {
                 if (_isInitialized)
                     throw new ApplicationException("Aardvark(s) already initialized!");
+
+                if (!ConnectOnOpen)
+                    return;
 
                 // Find Devices
                 var maxNumDevices = 16;

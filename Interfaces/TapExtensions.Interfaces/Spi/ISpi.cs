@@ -132,13 +132,6 @@ namespace TapExtensions.Interfaces.Spi
         byte[] Query(byte[] data, ESpiSsSignal eSsSignal);
 
         /// <summary>
-        ///     Check that bitrate is included in the list of device clock frequencies
-        /// </summary>
-        /// <param name="bitRatekHz">Value to be checked</param>
-        /// <returns>Result of check. True = found / False = NOT found.</returns>
-        bool CheckBitRateValueValid(uint bitRatekHz);
-
-        /// <summary>
         ///     Queue a delay value on the bus
         /// </summary>
         /// <param name="value">
