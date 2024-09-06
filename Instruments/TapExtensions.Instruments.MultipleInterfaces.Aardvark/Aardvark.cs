@@ -35,18 +35,16 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
 
         [EnabledIf(nameof(ConnectOnOpen), true, HideIfDisabled = true)]
         [Display("I2C Pull-up Resistors", Order: 5, Description: "(Pin 1, 3)")]
-        public EI2cPullup I2CPullupResistors { get; set; }
+        public EI2cPullup I2CPullup { get; set; }
 
         [EnabledIf(nameof(ConnectOnOpen), true, HideIfDisabled = true)]
-        [EnabledIf(nameof(ConfigMode), EConfigMode.GPIO_I2C,
-            EConfigMode.SPI_I2C, HideIfDisabled = true)]
+        [EnabledIf(nameof(ConfigMode), EConfigMode.GPIO_I2C, EConfigMode.SPI_I2C, HideIfDisabled = true)]
         [Display("I2C Bus bit rate", Order: 6)]
         [Unit("kHz")]
         public int I2CBitRateKhz { get; set; }
 
         [EnabledIf(nameof(ConnectOnOpen), true, HideIfDisabled = true)]
-        [EnabledIf(nameof(ConfigMode), EConfigMode.SPI_GPIO,
-            EConfigMode.SPI_I2C, HideIfDisabled = true)]
+        [EnabledIf(nameof(ConfigMode), EConfigMode.SPI_GPIO, EConfigMode.SPI_I2C, HideIfDisabled = true)]
         [Display("SPI Bus bit rate", Order: 7)]
         [Unit("kHz")]
         public int SpiBitRateKhz { get; set; }
@@ -64,7 +62,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             ConfigMode = EConfigMode.SPI_I2C;
             ConnectOnOpen = true;
             TargetPower = ETargetPower.Off;
-            I2CPullupResistors = EI2cPullup.Off;
+            I2CPullup = EI2cPullup.Off;
             I2CBitRateKhz = 100;
             SpiBitRateKhz = 1000;
 
@@ -154,32 +152,24 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                 }
 
                 SetTargetPower(TargetPower);
-                SetPullupResistors(I2CPullupResistors);
+                SetPullupResistors(I2CPullup);
 
 
                 // I2C Configuration
-                if (ConfigMode == EConfigMode.GPIO_I2C ||
-                    ConfigMode == EConfigMode.SPI_I2C)
-                {
+                if (ConfigMode == EConfigMode.GPIO_I2C || ConfigMode == EConfigMode.SPI_I2C)
                     ((II2C)this).SetBitRate((uint)I2CBitRateKhz);
-                }
 
 
                 // SPI Configuration
-                if (ConfigMode == EConfigMode.SPI_GPIO ||
-                    ConfigMode == EConfigMode.SPI_I2C)
+                if (ConfigMode == EConfigMode.SPI_GPIO || ConfigMode == EConfigMode.SPI_I2C)
                 {
                     // throw new NotImplementedException();
                 }
 
 
                 // GPIO Configuration
-                if (ConfigMode == EConfigMode.GPIO_ONLY ||
-                    ConfigMode == EConfigMode.GPIO_I2C ||
+                if (ConfigMode == EConfigMode.GPIO_ONLY || ConfigMode == EConfigMode.GPIO_I2C ||
                     ConfigMode == EConfigMode.SPI_GPIO)
-                {
-
-
                     if (ConfigMode == EConfigMode.GPIO_ONLY)
                     {
                         // Make sure the charge has dissipated on those lines
@@ -204,7 +194,6 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                         // The get method will return the line states of all inputs.
                         // If a line is not configured as an input the value of
                         // that particular bit position in the mask will be 0.
-
                         var val = (byte)AardvarkWrapper.aa_gpio_get(AardvarkHandle);
 
                         // Check the state of SCK
@@ -235,7 +224,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
 
 
                         // Now do a 1000 gets from the GPIO to test performance
-                        for (int i = 0; i < 1000; ++i)
+                        for (var i = 0; i < 1000; ++i)
                             AardvarkWrapper.aa_gpio_get(AardvarkHandle);
 
                         int oldval, newval;
@@ -252,8 +241,6 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                         else
                             Log.Debug("  GPIO inputs did not change.\n");
                     }
-                }
-
 
 
                 // TODO: net_aa_version(aardvark, ref version);
