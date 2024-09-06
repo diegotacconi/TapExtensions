@@ -1,13 +1,12 @@
 ﻿using System;
 using System.IO.Ports;
 using OpenTap;
-using TapExtensions.Interfaces.Gpio;
 
 namespace TapExtensions.Instruments.MultipleInterfaces.RasPi
 {
     [Display("RasPiUart",
         Groups: new[] { "TapExtensions", "Instruments", "MultipleInterfaces" })]
-    public class RasPiUart : Resource, IGpio
+    public class RasPiUart : Resource
     {
         #region Settings
 
@@ -93,30 +92,6 @@ namespace TapExtensions.Instruments.MultipleInterfaces.RasPi
             {
                 Log.Warning(ex.Message);
             }
-        }
-
-        public void SetPinState(int pin, EPinState state)
-        {
-            OpenSerialPort();
-            try
-            {
-                // ToDo:
-                /*
-                    /sys/class/gpio/gpio11/direction
-                    /sys/class/gpio/gpio11/value
-                    /dev/gpiochipN
-                    sudo usermod -a -G gpio <username>
-                */
-            }
-            finally
-            {
-                CloseSerialPort();
-            }
-        }
-
-        public EPinState GetPinState(int pin)
-        {
-            throw new NotImplementedException();
         }
     }
 }

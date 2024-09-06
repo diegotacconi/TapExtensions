@@ -6,6 +6,8 @@ namespace TapExtensions.Interfaces.Gpio
 {
     public interface IGpio : IInstrument
     {
+        void SetPinMode(int pin, EPinMode mode);
+
         void SetPinState(int pin, EPinState state);
 
         EPinState GetPinState(int pin);
@@ -23,6 +25,16 @@ namespace TapExtensions.Interfaces.Gpio
         InputPullDown,
         InputPullUp,
         Output
+    }
+
+    public enum EAardvarkPin
+    {
+        GPIO_00_PINHDR_01_SCL = 0x01,
+        GPIO_01_PINHDR_03_SDA = 0x02,
+        GPIO_02_PINHDR_05_MISO = 0x04,
+        GPIO_03_PINHDR_07_SCLK = 0x08,
+        GPIO_04_PINHDR_08_MOSI = 0x10,
+        GPIO_05_PINHDR_09_SS = 0x20
     }
 
     public enum ERasPiPin
@@ -52,6 +64,6 @@ namespace TapExtensions.Interfaces.Gpio
         GPIO_16_PINHDR_36 = 36,
         GPIO_26_PINHDR_37 = 37,
         GPIO_20_PINHDR_38 = 38,
-        GPIO_21_PINHDR_40 = 40,
+        GPIO_21_PINHDR_40 = 40
     }
 }

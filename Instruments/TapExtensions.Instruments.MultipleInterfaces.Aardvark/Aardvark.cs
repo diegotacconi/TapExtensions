@@ -11,7 +11,10 @@
  */
 
 using System;
+using System.ComponentModel;
+using System.Xml.Serialization;
 using OpenTap;
+using TapExtensions.Interfaces.Gpio;
 using TapExtensions.Interfaces.I2c;
 
 namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
@@ -48,6 +51,67 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         [Display("SPI Bus bit rate", Order: 7)]
         [Unit("kHz")]
         public int SpiBitRateKhz { get; set; }
+
+        #endregion
+
+        #region Debug GPIO Control
+
+        [XmlIgnore]
+        [Browsable(true)]
+        [EnabledIf(nameof(ConfigMode), EConfigMode.GPIO_ONLY, EConfigMode.GPIO_I2C,
+            EConfigMode.SPI_GPIO, HideIfDisabled = true)]
+        [Display("Debug GPIO Control", Order: 20, Group: "Debug")]
+        public bool DebugGpioControl { get; set; } = false;
+
+        [XmlIgnore]
+        [Browsable(true)]
+        [EnabledIf(nameof(ConfigMode), EConfigMode.GPIO_ONLY, EConfigMode.GPIO_I2C,
+            EConfigMode.SPI_GPIO, HideIfDisabled = true)]
+        [EnabledIf(nameof(DebugGpioControl), HideIfDisabled = true)]
+        [Display("Pin", Order: 21, Group: "Debug")]
+        public EAardvarkPin Pin { get; set; } = EAardvarkPin.GPIO_05_PINHDR_09_SS;
+
+        [XmlIgnore]
+        [Browsable(true)]
+        [EnabledIf(nameof(ConfigMode), EConfigMode.GPIO_ONLY, EConfigMode.GPIO_I2C,
+            EConfigMode.SPI_GPIO, HideIfDisabled = true)]
+        [EnabledIf(nameof(DebugGpioControl), HideIfDisabled = true)]
+        [Display("Pin Mode", Order: 22, Group: "Debug")]
+        public EPinMode PinMode { get; set; } = EPinMode.Input;
+
+        [XmlIgnore]
+        [Browsable(true)]
+        [EnabledIf(nameof(ConfigMode), EConfigMode.GPIO_ONLY, EConfigMode.GPIO_I2C,
+            EConfigMode.SPI_GPIO, HideIfDisabled = true)]
+        [EnabledIf(nameof(DebugGpioControl), HideIfDisabled = true)]
+        [EnabledIf(nameof(PinMode), EPinMode.Output, HideIfDisabled = true)]
+        [Display("Pin State", Order: 22, Group: "Debug")]
+        public EPinState PinState { get; set; } = EPinState.Low;
+
+        [Browsable(true)]
+        [EnabledIf(nameof(ConfigMode), EConfigMode.GPIO_ONLY, EConfigMode.GPIO_I2C,
+            EConfigMode.SPI_GPIO, HideIfDisabled = true)]
+        [EnabledIf(nameof(DebugGpioControl), HideIfDisabled = true)]
+        [EnabledIf(nameof(PinMode), EPinMode.Output, HideIfDisabled = true)]
+        [Display("Set", Order: 23, Group: "Debug")]
+        public void SetPinStateButton()
+        {
+            SetPinMode((int)Pin, PinMode);
+            SetPinState((int)Pin, PinState);
+        }
+
+        [Browsable(true)]
+        [EnabledIf(nameof(ConfigMode), EConfigMode.GPIO_ONLY, EConfigMode.GPIO_I2C,
+            EConfigMode.SPI_GPIO, HideIfDisabled = true)]
+        [EnabledIf(nameof(DebugGpioControl), HideIfDisabled = true)]
+        [EnabledIf(nameof(PinMode), EPinMode.Input, EPinMode.InputPullDown, EPinMode.InputPullUp,
+            HideIfDisabled = true)]
+        [Display("Get", Order: 24, Group: "Debug")]
+        public void GetPinStateButton()
+        {
+            SetPinMode((int)Pin, PinMode);
+            GetPinState((int)Pin);
+        }
 
         #endregion
 
