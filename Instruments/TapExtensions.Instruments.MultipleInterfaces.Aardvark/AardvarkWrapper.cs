@@ -722,7 +722,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         private static extern int net_aa_configure(int aardvark, EConfigMode config);
 
         /*
-         * Configure the target power pins.
+         * Configure the Aardvark adapter's target power supply pins (5 Volts).
          *
          * AA_TARGET_POWER_NONE = 0x00
          * AA_TARGET_POWER_BOTH = 0x03
@@ -864,7 +864,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             [Out] byte[] data_in, ref ushort num_read);
 
         /*
-         * Configure the I2C pullup resistors.
+         * Configure the I2C pullup resistors (2.2k resistors).
          *
          * AA_I2C_PULLUP_NONE = 0x00
          * AA_I2C_PULLUP_BOTH = 0x03
