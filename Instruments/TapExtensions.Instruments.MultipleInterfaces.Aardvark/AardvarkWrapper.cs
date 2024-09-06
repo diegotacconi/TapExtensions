@@ -98,13 +98,24 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         AA_GPIO_NOT_AVAILABLE = -400
     }
 
-    public enum AardvarkConfig
+    public enum EConfigMode
     {
-        [Display("GPIO Only")] AA_CONFIG_GPIO_ONLY = 0x00,
-        [Display("SPI + GPIO")] AA_CONFIG_SPI_GPIO = 0x01,
-        [Display("I2C + GPIO")] AA_CONFIG_GPIO_I2C = 0x02,
-        [Display("I2C + SPI")] AA_CONFIG_SPI_I2C = 0x03
-        // [Display("QUERY")] AA_CONFIG_QUERY = 0x80
+        [Display("GPIO Only")] GPIO_ONLY = 0x00,
+        [Display("SPI + GPIO")] SPI_GPIO = 0x01,
+        [Display("I2C + GPIO")] GPIO_I2C = 0x02,
+        [Display("I2C + SPI")] SPI_I2C = 0x03
+    }
+
+    public enum ETargetPower
+    {
+        Off = 0x00,
+        [Display("5 Volts")] On5V0 = 0x03,
+    }
+
+    public enum EI2cPullup
+    {
+        Off = 0x00,
+        On = 0x03
     }
 
     public enum AardvarkI2cFlags
@@ -153,6 +164,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         AA_SPI_SS_ACTIVE_HIGH = 1
     }
 
+    [Flags]
     public enum AardvarkGpioBits
     {
         AA_GPIO_SCL = 0x01,
@@ -325,7 +337,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             return net_aa_version(aardvark, ref version);
         }
 
-        public static int aa_configure(int aardvark, AardvarkConfig config)
+        public static int aa_configure(int aardvark, EConfigMode config)
         {
             if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
             return net_aa_configure(aardvark, config);
@@ -650,11 +662,11 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         /*
          * Return the device features as a bit-mask of values, or
          * an error code if the handle is not valid.
+         *
+         * AA_FEATURE_SPI = 0x01
+         * AA_FEATURE_I2C = 0x02
+         * AA_FEATURE_GPIO = 0x08
          */
-        public const int AA_FEATURE_SPI = 0x00000001;
-        public const int AA_FEATURE_I2C = 0x00000002;
-        public const int AA_FEATURE_GPIO = 0x00000008;
-
         [DllImport("aardvark")]
         private static extern int net_aa_features(int aardvark);
 
@@ -698,23 +710,24 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         private static extern int net_aa_version(int aardvark, ref AardvarkVersion version);
 
         /*
-         * Configure the device by enabling/disabling I2C, SPI, and
-         * GPIO functions.
+         * Configure the device by enabling/disabling I2C, SPI, and GPIO functions.
+         *
+         * AA_CONFIG_GPIO_ONLY = 0x00
+         * AA_CONFIG_SPI_GPIO = 0x01
+         * AA_CONFIG_GPIO_I2C = 0x02
+         * AA_CONFIG_SPI_I2C = 0x03
+         * AA_CONFIG_QUERY = 0x80
          */
-        public const int AA_CONFIG_SPI_MASK = 0x00000001;
-        public const int AA_CONFIG_I2C_MASK = 0x00000002;
-
         [DllImport("aardvark")]
-        private static extern int net_aa_configure(int aardvark, AardvarkConfig config);
+        private static extern int net_aa_configure(int aardvark, EConfigMode config);
 
         /*
          * Configure the target power pins.
-         * This is only supported on hardware versions >= 2.00
+         *
+         * AA_TARGET_POWER_NONE = 0x00
+         * AA_TARGET_POWER_BOTH = 0x03
+         * AA_TARGET_POWER_QUERY = 0x80
          */
-        public const byte AA_TARGET_POWER_NONE = 0x00;
-        public const byte AA_TARGET_POWER_BOTH = 0x03;
-        public const byte AA_TARGET_POWER_QUERY = 0x80;
-
         [DllImport("aardvark")]
         private static extern int net_aa_target_power(int aardvark, byte power_mask);
 
@@ -852,12 +865,11 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
 
         /*
          * Configure the I2C pullup resistors.
-         * This is only supported on hardware versions >= 2.00
+         *
+         * AA_I2C_PULLUP_NONE = 0x00
+         * AA_I2C_PULLUP_BOTH = 0x03
+         * AA_I2C_PULLUP_QUERY = 0x80
          */
-        public const byte AA_I2C_PULLUP_NONE = 0x00;
-        public const byte AA_I2C_PULLUP_BOTH = 0x03;
-        public const byte AA_I2C_PULLUP_QUERY = 0x80;
-
         [DllImport("aardvark")]
         private static extern int net_aa_i2c_pullup(int aardvark, byte pullup_mask);
 

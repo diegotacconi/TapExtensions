@@ -25,44 +25,28 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
 
         [Display("Device Number", Order: 1)] public int DevNumber { get; set; }
 
-        [Display("Config Mode", Order: 2)] public AardvarkConfig ConfigMode { get; set; }
+        [Display("Config Mode", Order: 2)] public EConfigMode ConfigMode { get; set; }
 
         [Display("Connect on Open", Order: 3)] public bool ConnectOnOpen { get; set; }
-
-
-
-        public enum ETargetPower
-        {
-            Off,
-            [Display("5 Volts")] On5V0
-        }
 
         [EnabledIf(nameof(ConnectOnOpen), true, HideIfDisabled = true)]
         [Display("Target Power", Order: 4, Description: "(Pin 4, 6)")]
         public ETargetPower TargetPower { get; set; }
 
-        public enum EPullupResistors
-        {
-            Off,
-            On
-        }
+        [EnabledIf(nameof(ConnectOnOpen), true, HideIfDisabled = true)]
+        [Display("I2C Pull-up Resistors", Order: 5, Description: "(Pin 1, 3)")]
+        public EI2cPullup I2CPullupResistors { get; set; }
 
         [EnabledIf(nameof(ConnectOnOpen), true, HideIfDisabled = true)]
-        [EnabledIf(nameof(ConfigMode), AardvarkConfig.AA_CONFIG_GPIO_I2C,
-            AardvarkConfig.AA_CONFIG_SPI_I2C, HideIfDisabled = true)]
-        [Display("I2C Pull-ups", Order: 5, Description: "Set I2C pull-up resistors state to on/off")]
-        public EPullupResistors I2CPullupResistors { get; set; }
-
-        [EnabledIf(nameof(ConnectOnOpen), true, HideIfDisabled = true)]
-        [EnabledIf(nameof(ConfigMode), AardvarkConfig.AA_CONFIG_GPIO_I2C,
-            AardvarkConfig.AA_CONFIG_SPI_I2C, HideIfDisabled = true)]
+        [EnabledIf(nameof(ConfigMode), EConfigMode.GPIO_I2C,
+            EConfigMode.SPI_I2C, HideIfDisabled = true)]
         [Display("I2C Bus bit rate", Order: 6)]
         [Unit("kHz")]
         public int I2CBitRateKhz { get; set; }
 
         [EnabledIf(nameof(ConnectOnOpen), true, HideIfDisabled = true)]
-        [EnabledIf(nameof(ConfigMode), AardvarkConfig.AA_CONFIG_SPI_GPIO,
-            AardvarkConfig.AA_CONFIG_SPI_I2C, HideIfDisabled = true)]
+        [EnabledIf(nameof(ConfigMode), EConfigMode.SPI_GPIO,
+            EConfigMode.SPI_I2C, HideIfDisabled = true)]
         [Display("SPI Bus bit rate", Order: 7)]
         [Unit("kHz")]
         public int SpiBitRateKhz { get; set; }
@@ -77,10 +61,10 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         {
             // Default values
             Name = nameof(Aardvark);
-            ConfigMode = AardvarkConfig.AA_CONFIG_SPI_I2C;
+            ConfigMode = EConfigMode.SPI_I2C;
             ConnectOnOpen = true;
             TargetPower = ETargetPower.Off;
-            I2CPullupResistors = EPullupResistors.Off;
+            I2CPullupResistors = EI2cPullup.Off;
             I2CBitRateKhz = 100;
             SpiBitRateKhz = 1000;
 
@@ -170,31 +154,104 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                 }
 
                 SetTargetPower(TargetPower);
+                SetPullupResistors(I2CPullupResistors);
 
 
                 // I2C Configuration
-                if (ConfigMode == AardvarkConfig.AA_CONFIG_GPIO_I2C ||
-                    ConfigMode == AardvarkConfig.AA_CONFIG_SPI_I2C)
+                if (ConfigMode == EConfigMode.GPIO_I2C ||
+                    ConfigMode == EConfigMode.SPI_I2C)
                 {
-                    SetPullupResistors(I2CPullupResistors);
                     ((II2C)this).SetBitRate((uint)I2CBitRateKhz);
                 }
 
 
                 // SPI Configuration
-                if (ConfigMode == AardvarkConfig.AA_CONFIG_SPI_GPIO ||
-                    ConfigMode == AardvarkConfig.AA_CONFIG_SPI_I2C)
+                if (ConfigMode == EConfigMode.SPI_GPIO ||
+                    ConfigMode == EConfigMode.SPI_I2C)
                 {
                     // throw new NotImplementedException();
                 }
 
 
                 // GPIO Configuration
-                if (ConfigMode == AardvarkConfig.AA_CONFIG_GPIO_ONLY ||
-                    ConfigMode == AardvarkConfig.AA_CONFIG_GPIO_I2C ||
-                    ConfigMode == AardvarkConfig.AA_CONFIG_SPI_GPIO)
+                if (ConfigMode == EConfigMode.GPIO_ONLY ||
+                    ConfigMode == EConfigMode.GPIO_I2C ||
+                    ConfigMode == EConfigMode.SPI_GPIO)
                 {
-                    // throw new NotImplementedException();
+
+
+                    if (ConfigMode == EConfigMode.GPIO_ONLY)
+                    {
+                        // Make sure the charge has dissipated on those lines
+                        AardvarkWrapper.aa_gpio_set(AardvarkHandle, 0x00);
+                        AardvarkWrapper.aa_gpio_direction(AardvarkHandle, 0xff);
+
+                        // By default all GPIO pins are inputs.  Writing 1 to the
+                        // bit position corresponding to the appropriate line will
+                        // configure that line as an output
+                        AardvarkWrapper.aa_gpio_direction(AardvarkHandle,
+                            (byte)(AardvarkGpioBits.AA_GPIO_SS | AardvarkGpioBits.AA_GPIO_SCL));
+
+                        // By default all GPIO outputs are logic low.  Writing a 1
+                        // to the appropriate bit position will force that line
+                        // high provided it is configured as an output.  If it is
+                        // not configured as an output the line state will be
+                        // cached such that if the direction later changed, the
+                        // latest output value for the line will be enforced.
+                        AardvarkWrapper.aa_gpio_set(AardvarkHandle, (byte)AardvarkGpioBits.AA_GPIO_SCL);
+                        Log.Debug("Setting SCL to logic low");
+
+                        // The get method will return the line states of all inputs.
+                        // If a line is not configured as an input the value of
+                        // that particular bit position in the mask will be 0.
+
+                        var val = (byte)AardvarkWrapper.aa_gpio_get(AardvarkHandle);
+
+                        // Check the state of SCK
+                        if ((val & (byte)AardvarkGpioBits.AA_GPIO_SCK) != 0)
+                            Log.Debug("Read the SCK line as logic high");
+                        else
+                            Log.Debug("Read the SCK line as logic low");
+
+                        // Optionally we can set passive pullups on certain lines.
+                        // This can prevent input lines from floating.  The pullup
+                        // configuration is only valid for lines configured as inputs.
+                        // If the line is not currently input the requested pullup
+                        // state will take effect only if the line is later changed
+                        // to be an input line.
+                        AardvarkWrapper.aa_gpio_pullup(AardvarkHandle,
+                            (byte)(AardvarkGpioBits.AA_GPIO_MISO | AardvarkGpioBits.AA_GPIO_MOSI));
+
+                        // Now reading the MISO line should give a logic high,
+                        // provided there is nothing attached to the Aardvark
+                        // adapter that is driving the pin low.
+                        val = (byte)AardvarkWrapper.aa_gpio_get(AardvarkHandle);
+                        if ((val & (byte)AardvarkGpioBits.AA_GPIO_MISO) != 0)
+                            Log.Debug(
+                                "Read the MISO line as logic high (passive pullup)");
+                        else
+                            Log.Debug(
+                                "Read the MISO line as logic low (is pin driven low?)");
+
+
+                        // Now do a 1000 gets from the GPIO to test performance
+                        for (int i = 0; i < 1000; ++i)
+                            AardvarkWrapper.aa_gpio_get(AardvarkHandle);
+
+                        int oldval, newval;
+
+                        // Demonstrate use of aa_gpio_change
+                        AardvarkWrapper.aa_gpio_direction(AardvarkHandle, 0x00);
+                        oldval = AardvarkWrapper.aa_gpio_get(AardvarkHandle);
+
+                        Log.Debug("Calling aa_gpio_change for 2 seconds...");
+                        newval = AardvarkWrapper.aa_gpio_change(AardvarkHandle, 2000);
+
+                        if (newval != oldval)
+                            Log.Debug("  GPIO inputs changed.\n");
+                        else
+                            Log.Debug("  GPIO inputs did not change.\n");
+                    }
                 }
 
 
@@ -214,7 +271,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         {
             CheckIfInitialized();
 
-            // Restore target power to off
+            // Restore powerMask power to off
             if (TargetPower != ETargetPower.Off)
                 SetTargetPower(ETargetPower.Off);
 
@@ -232,27 +289,16 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                 throw new InvalidOperationException($"{Name} not initialized");
         }
 
-        private void SetTargetPower(ETargetPower target)
+        private void SetTargetPower(ETargetPower powerMask)
         {
             lock (_instLock)
             {
                 CheckIfInitialized();
-                Log.Debug($"Setting target power to {target}");
-                int status;
-                switch (target)
-                {
-                    case ETargetPower.Off:
-                        status = AardvarkWrapper.aa_target_power(AardvarkHandle, 0x00);
-                        if (status == 0x00) return;
-                        break;
-                    case ETargetPower.On5V0:
-                        status = AardvarkWrapper.aa_target_power(AardvarkHandle, 0x03);
-                        if (status == 0x03) return;
-                        break;
-                    default:
-                        throw new ArgumentException(
-                            $"{Name}: Case not found for {nameof(target)}={target}");
-                }
+                Log.Debug($"Setting target power to {powerMask}");
+
+                var status = AardvarkWrapper.aa_target_power(AardvarkHandle, (byte)powerMask);
+                if (status == (int)powerMask)
+                    return;
 
                 var errorMsg = AardvarkWrapper.aa_status_string(status);
                 throw new InvalidOperationException($"{Name}: Error {status}, {errorMsg}");

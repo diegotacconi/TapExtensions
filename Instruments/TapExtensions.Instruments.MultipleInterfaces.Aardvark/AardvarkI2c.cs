@@ -253,27 +253,16 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
 
         #region Private Methods
 
-        private void SetPullupResistors(EPullupResistors state)
+        private void SetPullupResistors(EI2cPullup pullupMask)
         {
             lock (_instLock)
             {
                 CheckIfInitialized();
-                Log.Debug($"Setting I2C pull-up resistors to {state}");
-                int status;
-                switch (state)
-                {
-                    case EPullupResistors.Off:
-                        status = AardvarkWrapper.aa_i2c_pullup(AardvarkHandle, 0x00);
-                        if (status == 0x00) return;
-                        break;
-                    case EPullupResistors.On:
-                        status = AardvarkWrapper.aa_i2c_pullup(AardvarkHandle, 0x03);
-                        if (status == 0x03) return;
-                        break;
-                    default:
-                        throw new ArgumentException(
-                            $"{Name}: Case not found for {nameof(state)}={state}");
-                }
+                Log.Debug($"Setting I2C pull-up resistors to {pullupMask}");
+
+                var status = AardvarkWrapper.aa_i2c_pullup(AardvarkHandle, (byte)pullupMask);
+                if (status == (int)pullupMask)
+                    return;
 
                 var errorMsg = AardvarkWrapper.aa_status_string(status);
                 throw new InvalidOperationException($"{Name}: Error {status}, {errorMsg}");
