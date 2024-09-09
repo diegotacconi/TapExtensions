@@ -11,10 +11,7 @@
  */
 
 using System;
-using System.ComponentModel;
-using System.Xml.Serialization;
 using OpenTap;
-using TapExtensions.Interfaces.Gpio;
 using TapExtensions.Interfaces.I2c;
 
 namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
@@ -28,90 +25,25 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
 
         [Display("Device Number", Order: 1)] public int DevNumber { get; set; }
 
-        [Display("Config Mode", Order: 2)] public EConfigMode ConfigMode { get; set; }
-
-        [Display("Connect on Open", Order: 3)] public bool ConnectOnOpen { get; set; }
+        [Display("Connect on Open", Order: 2)] public bool ConnectOnOpen { get; set; }
 
         [EnabledIf(nameof(ConnectOnOpen), true, HideIfDisabled = true)]
-        [Display("Target Power", Order: 4, Description: "(Pin 4, 6)")]
+        [Display("Target Power", Order: 3, Description: "(Pin 4, 6)")]
         public ETargetPower TargetPower { get; set; }
 
         [EnabledIf(nameof(ConnectOnOpen), true, HideIfDisabled = true)]
-        [Display("I2C Pull-up Resistors", Order: 5, Description: "(Pin 1, 3)")]
+        [Display("I2C Pull-up Resistors", Order: 4, Description: "(Pin 1, 3)")]
         public EI2cPullup I2CPullup { get; set; }
 
         [EnabledIf(nameof(ConnectOnOpen), true, HideIfDisabled = true)]
-        [EnabledIf(nameof(ConfigMode), EConfigMode.GPIO_I2C, EConfigMode.SPI_I2C, HideIfDisabled = true)]
-        [Display("I2C Bus bit rate", Order: 6)]
+        [Display("I2C Bus bit rate", Order: 5)]
         [Unit("kHz")]
         public int I2CBitRateKhz { get; set; }
 
         [EnabledIf(nameof(ConnectOnOpen), true, HideIfDisabled = true)]
-        [EnabledIf(nameof(ConfigMode), EConfigMode.SPI_GPIO, EConfigMode.SPI_I2C, HideIfDisabled = true)]
-        [Display("SPI Bus bit rate", Order: 7)]
+        [Display("SPI Bus bit rate", Order: 6)]
         [Unit("kHz")]
         public int SpiBitRateKhz { get; set; }
-
-        #endregion
-
-        #region Debug GPIO Control
-
-        [XmlIgnore]
-        [Browsable(true)]
-        [EnabledIf(nameof(ConfigMode), EConfigMode.GPIO_ONLY, EConfigMode.GPIO_I2C,
-            EConfigMode.SPI_GPIO, HideIfDisabled = true)]
-        [Display("Debug GPIO Control", Order: 20, Group: "Debug")]
-        public bool DebugGpioControl { get; set; } = false;
-
-        [XmlIgnore]
-        [Browsable(true)]
-        [EnabledIf(nameof(ConfigMode), EConfigMode.GPIO_ONLY, EConfigMode.GPIO_I2C,
-            EConfigMode.SPI_GPIO, HideIfDisabled = true)]
-        [EnabledIf(nameof(DebugGpioControl), HideIfDisabled = true)]
-        [Display("Pin", Order: 21, Group: "Debug")]
-        public EAardvarkPin Pin { get; set; } = EAardvarkPin.GPIO_05_PINHDR_09_SS;
-
-        [XmlIgnore]
-        [Browsable(true)]
-        [EnabledIf(nameof(ConfigMode), EConfigMode.GPIO_ONLY, EConfigMode.GPIO_I2C,
-            EConfigMode.SPI_GPIO, HideIfDisabled = true)]
-        [EnabledIf(nameof(DebugGpioControl), HideIfDisabled = true)]
-        [Display("Pin Mode", Order: 22, Group: "Debug")]
-        public EPinMode PinMode { get; set; } = EPinMode.Input;
-
-        [XmlIgnore]
-        [Browsable(true)]
-        [EnabledIf(nameof(ConfigMode), EConfigMode.GPIO_ONLY, EConfigMode.GPIO_I2C,
-            EConfigMode.SPI_GPIO, HideIfDisabled = true)]
-        [EnabledIf(nameof(DebugGpioControl), HideIfDisabled = true)]
-        [EnabledIf(nameof(PinMode), EPinMode.Output, HideIfDisabled = true)]
-        [Display("Pin State", Order: 22, Group: "Debug")]
-        public EPinState PinState { get; set; } = EPinState.Low;
-
-        [Browsable(true)]
-        [EnabledIf(nameof(ConfigMode), EConfigMode.GPIO_ONLY, EConfigMode.GPIO_I2C,
-            EConfigMode.SPI_GPIO, HideIfDisabled = true)]
-        [EnabledIf(nameof(DebugGpioControl), HideIfDisabled = true)]
-        [EnabledIf(nameof(PinMode), EPinMode.Output, HideIfDisabled = true)]
-        [Display("Set", Order: 23, Group: "Debug")]
-        public void SetPinStateButton()
-        {
-            SetPinMode((int)Pin, PinMode);
-            SetPinState((int)Pin, PinState);
-        }
-
-        [Browsable(true)]
-        [EnabledIf(nameof(ConfigMode), EConfigMode.GPIO_ONLY, EConfigMode.GPIO_I2C,
-            EConfigMode.SPI_GPIO, HideIfDisabled = true)]
-        [EnabledIf(nameof(DebugGpioControl), HideIfDisabled = true)]
-        [EnabledIf(nameof(PinMode), EPinMode.Input, EPinMode.InputPullDown, EPinMode.InputPullUp,
-            HideIfDisabled = true)]
-        [Display("Get", Order: 24, Group: "Debug")]
-        public void GetPinStateButton()
-        {
-            SetPinMode((int)Pin, PinMode);
-            GetPinState((int)Pin);
-        }
 
         #endregion
 
@@ -123,7 +55,6 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         {
             // Default values
             Name = nameof(Aardvark);
-            ConfigMode = EConfigMode.SPI_I2C;
             ConnectOnOpen = true;
             TargetPower = ETargetPower.Off;
             I2CPullup = EI2cPullup.Off;
@@ -197,9 +128,10 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
 
                 try
                 {
-                    Log.Debug($"Setting config mode to {ConfigMode}");
-                    var stat = AardvarkWrapper.aa_configure(AardvarkHandle, ConfigMode);
-                    if (stat != (int)ConfigMode)
+                    const EConfigMode configMode = EConfigMode.SPI_I2C;
+                    Log.Debug($"Setting config mode to {configMode}");
+                    var stat = AardvarkWrapper.aa_configure(AardvarkHandle, configMode);
+                    if (stat != (int)configMode)
                         throw new ApplicationException("ERRor[" + stat +
                                                        "] when configuring aardvark to SPI+I2C mode.");
 
@@ -220,94 +152,13 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
 
 
                 // I2C Configuration
-                if (ConfigMode == EConfigMode.GPIO_I2C || ConfigMode == EConfigMode.SPI_I2C)
-                    ((II2C)this).SetBitRate((uint)I2CBitRateKhz);
+                ((II2C)this).SetBitRate((uint)I2CBitRateKhz);
 
 
-                // SPI Configuration
-                if (ConfigMode == EConfigMode.SPI_GPIO || ConfigMode == EConfigMode.SPI_I2C)
-                {
-                    // throw new NotImplementedException();
-                }
+                // ToDo: SPI Configuration
 
 
-                // GPIO Configuration
-                if (ConfigMode == EConfigMode.GPIO_ONLY || ConfigMode == EConfigMode.GPIO_I2C ||
-                    ConfigMode == EConfigMode.SPI_GPIO)
-                    if (ConfigMode == EConfigMode.GPIO_ONLY)
-                    {
-                        // Make sure the charge has dissipated on those lines
-                        AardvarkWrapper.aa_gpio_set(AardvarkHandle, 0x00);
-                        AardvarkWrapper.aa_gpio_direction(AardvarkHandle, 0xff);
-
-                        // By default all GPIO pins are inputs.  Writing 1 to the
-                        // bit position corresponding to the appropriate line will
-                        // configure that line as an output
-                        AardvarkWrapper.aa_gpio_direction(AardvarkHandle,
-                            (byte)(AardvarkGpioBits.AA_GPIO_SS | AardvarkGpioBits.AA_GPIO_SCL));
-
-                        // By default all GPIO outputs are logic low.  Writing a 1
-                        // to the appropriate bit position will force that line
-                        // high provided it is configured as an output.  If it is
-                        // not configured as an output the line state will be
-                        // cached such that if the direction later changed, the
-                        // latest output value for the line will be enforced.
-                        AardvarkWrapper.aa_gpio_set(AardvarkHandle, (byte)AardvarkGpioBits.AA_GPIO_SCL);
-                        Log.Debug("Setting SCL to logic low");
-
-                        // The get method will return the line states of all inputs.
-                        // If a line is not configured as an input the value of
-                        // that particular bit position in the mask will be 0.
-                        var val = (byte)AardvarkWrapper.aa_gpio_get(AardvarkHandle);
-
-                        // Check the state of SCK
-                        if ((val & (byte)AardvarkGpioBits.AA_GPIO_SCK) != 0)
-                            Log.Debug("Read the SCK line as logic high");
-                        else
-                            Log.Debug("Read the SCK line as logic low");
-
-                        // Optionally we can set passive pullups on certain lines.
-                        // This can prevent input lines from floating.  The pullup
-                        // configuration is only valid for lines configured as inputs.
-                        // If the line is not currently input the requested pullup
-                        // state will take effect only if the line is later changed
-                        // to be an input line.
-                        AardvarkWrapper.aa_gpio_pullup(AardvarkHandle,
-                            (byte)(AardvarkGpioBits.AA_GPIO_MISO | AardvarkGpioBits.AA_GPIO_MOSI));
-
-                        // Now reading the MISO line should give a logic high,
-                        // provided there is nothing attached to the Aardvark
-                        // adapter that is driving the pin low.
-                        val = (byte)AardvarkWrapper.aa_gpio_get(AardvarkHandle);
-                        if ((val & (byte)AardvarkGpioBits.AA_GPIO_MISO) != 0)
-                            Log.Debug(
-                                "Read the MISO line as logic high (passive pullup)");
-                        else
-                            Log.Debug(
-                                "Read the MISO line as logic low (is pin driven low?)");
-
-
-                        // Now do a 1000 gets from the GPIO to test performance
-                        for (var i = 0; i < 1000; ++i)
-                            AardvarkWrapper.aa_gpio_get(AardvarkHandle);
-
-                        int oldval, newval;
-
-                        // Demonstrate use of aa_gpio_change
-                        AardvarkWrapper.aa_gpio_direction(AardvarkHandle, 0x00);
-                        oldval = AardvarkWrapper.aa_gpio_get(AardvarkHandle);
-
-                        Log.Debug("Calling aa_gpio_change for 2 seconds...");
-                        newval = AardvarkWrapper.aa_gpio_change(AardvarkHandle, 2000);
-
-                        if (newval != oldval)
-                            Log.Debug("  GPIO inputs changed.\n");
-                        else
-                            Log.Debug("  GPIO inputs did not change.\n");
-                    }
-
-
-                // TODO: net_aa_version(aardvark, ref version);
+                // ToDo: net_aa_version(aardvark, ref version);
 
                 // Status
                 //var status = AardvarkStatus.AaUnableToOpen;

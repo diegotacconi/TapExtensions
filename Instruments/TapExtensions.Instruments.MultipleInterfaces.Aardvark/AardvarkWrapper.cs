@@ -109,7 +109,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
     public enum ETargetPower
     {
         Off = 0x00,
-        [Display("5 Volts")] On5V0 = 0x03,
+        [Display("5 Volts")] On5V0 = 0x03
     }
 
     public enum EI2cPullup
@@ -268,6 +268,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         #endregion
 
         #region TO BE REMOVED
+
         public static int aa_find_devices(int num_devices, ushort[] devices)
         {
             if (!AA_LIBRARY_LOADED) return (int)AardvarkStatus.AA_INCOMPATIBLE_LIBRARY;
