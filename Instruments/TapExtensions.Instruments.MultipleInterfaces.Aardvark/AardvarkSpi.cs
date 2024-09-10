@@ -71,7 +71,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                 if (bitOrder == ESpiBitOrder.Msb)
                     spiBitOrder = AardvarkSpiBitorder.AA_SPI_BITORDER_MSB;
 
-                var stat = AardvarkWrapper.aa_spi_configure(AardvarkHandle, spiPolar, spiPhase, spiBitOrder);
+                var stat = AardvarkWrapper.net_aa_spi_configure(AardvarkHandle, spiPolar, spiPhase, spiBitOrder);
                 if (stat != (int)AardvarkStatus.AA_OK)
                     throw new ApplicationException("SPI set configure(spiPolar:" + spiPolar + ", spiPhase:" + spiPhase +
                                                    ", spiBitOrder:" + spiBitOrder + ") return: " + stat);
@@ -80,7 +80,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                 if (chipSelectPolarity == ESpiChipSelectPolarity.ActiveHigh)
                     spiSsPolar = AardvarkSpiSSPolarity.AA_SPI_SS_ACTIVE_HIGH;
 
-                stat = AardvarkWrapper.aa_spi_master_ss_polarity(AardvarkHandle, spiSsPolar);
+                stat = AardvarkWrapper.net_aa_spi_master_ss_polarity(AardvarkHandle, spiSsPolar);
                 if (stat != (int)AardvarkStatus.AA_OK)
                     throw new ApplicationException("SPI set master_ss_polarity(" + spiSsPolar + ") return: " + stat);
             }
@@ -91,31 +91,31 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             throw new NotImplementedException();
         }
 
-        byte[] ISpi.Query(byte[] data)
+        byte[] ISpi.Query(byte[] command)
         {
-            if (data == null)
-                throw new ArgumentNullException(nameof(data));
-            if (data.Length > MaxTxRxBytes)
-                throw new ArgumentException("Data size cannot be bigger than " + MaxTxRxBytes + ".", nameof(data));
+            if (command == null)
+                throw new ArgumentNullException(nameof(command));
+            if (command.Length > MaxTxRxBytes)
+                throw new ArgumentException("Data size cannot be bigger than " + MaxTxRxBytes + ".", nameof(command));
 
             CheckIfInitialized();
             lock (_instLock)
             {
-                var dataLength = Convert.ToUInt16(data.Length);
-                LogDebugData("SPI Master >> ", data);
+                var commandLength = Convert.ToUInt16(command.Length);
+                LogDebugData("SPI Master >> ", command);
 
-                var dataReceiv = new byte[dataLength];
-                var stat = AardvarkWrapper.aa_spi_write(AardvarkHandle, dataLength, data,
-                    dataLength, dataReceiv);
-                if (stat < 0 || stat != dataLength)
+                var response = new byte[commandLength];
+                var stat = AardvarkWrapper.net_aa_spi_write(AardvarkHandle, commandLength, command,
+                    commandLength, response);
+                if (stat < 0 || stat != commandLength)
                 {
-                    Log.Debug("SPI spi_write(" + dataLength + ") return: " + stat);
-                    throw new ApplicationException("SPI spi_write(" + dataLength + ") return: " + stat);
+                    Log.Debug("SPI spi_write(" + commandLength + ") return: " + stat);
+                    throw new ApplicationException("SPI spi_write(" + commandLength + ") return: " + stat);
                 }
 
-                LogDebugData("SPI Master << ", dataReceiv, stat);
+                LogDebugData("SPI Master << ", response, stat);
 
-                return dataReceiv;
+                return response;
             }
         }
 
@@ -132,7 +132,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             CheckIfInitialized();
             lock (_instLock)
             {
-                var stat = AardvarkWrapper.aa_spi_bitrate(AardvarkHandle, (int)bitrateKhz);
+                var stat = AardvarkWrapper.net_aa_spi_bitrate(AardvarkHandle, (int)bitrateKhz);
                 if (stat != bitrateKhz)
                     throw new ApplicationException("SPI set spi_bitrate(" + bitrateKhz + ") return: " + stat);
 
@@ -151,7 +151,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                 {
                     TapThread.Sleep(i * 100);
 
-                    status = AardvarkWrapper.aa_spi_slave_disable(AardvarkHandle);
+                    status = AardvarkWrapper.net_aa_spi_slave_disable(AardvarkHandle);
                     if (status == (int)AardvarkStatus.AA_OK)
                     {
                         Log.Debug("SPI SlaveDisable done with try " + (i + 1) + ".");
@@ -176,7 +176,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                 {
                     TapThread.Sleep(i * 100);
 
-                    status = AardvarkWrapper.aa_spi_slave_enable(AardvarkHandle);
+                    status = AardvarkWrapper.net_aa_spi_slave_enable(AardvarkHandle);
                     if (status == (int)AardvarkStatus.AA_OK)
                     {
                         Log.Debug("SPI SlaveEnable done with try " + (i + 1) + ".");
@@ -200,7 +200,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             lock (_instLock)
             {
                 var dataReceiv = new byte[numOfBytesMax];
-                numOfBytesRead = AardvarkWrapper.aa_spi_slave_read(AardvarkHandle, numOfBytesMax, dataReceiv);
+                numOfBytesRead = AardvarkWrapper.net_aa_spi_slave_read(AardvarkHandle, numOfBytesMax, dataReceiv);
                 if (numOfBytesRead < 0)
                     throw new ApplicationException("SPI spi_slave_read return: " + numOfBytesRead);
 
@@ -219,7 +219,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             CheckIfInitialized();
             lock (_instLock)
             {
-                var stat = AardvarkWrapper.aa_spi_slave_set_response(AardvarkHandle,
+                var stat = AardvarkWrapper.net_aa_spi_slave_set_response(AardvarkHandle,
                     Convert.ToByte(dataToResponse.Length), dataToResponse);
                 LogDebugData("SPI Slave SetR", dataToResponse, stat);
 

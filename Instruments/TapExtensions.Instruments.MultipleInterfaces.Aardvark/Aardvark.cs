@@ -91,7 +91,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                 // Find Devices
                 var maxNumDevices = 16;
                 var devices = new ushort[maxNumDevices];
-                var numDevicesFound = AardvarkWrapper.aa_find_devices(maxNumDevices, devices);
+                var numDevicesFound = AardvarkWrapper.net_aa_find_devices(maxNumDevices, devices);
 
                 if (numDevicesFound < 1)
                     throw new ApplicationException("Number of Aardvark devices found should be more than 0.");
@@ -106,7 +106,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                 {
                     TapThread.Sleep(tryDelay);
                     tryDelay += stepDelay; // 0, 333, 666, 999...
-                    AardvarkHandle = AardvarkWrapper.aa_open_ext(DevNumber, ref aExt);
+                    AardvarkHandle = AardvarkWrapper.net_aa_open_ext(DevNumber, ref aExt);
                 } while (AardvarkHandle < 0 && tryDelay < 1000);
 
                 if (AardvarkHandle < 0)
@@ -116,7 +116,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                 }
 
                 // Get Unique ID
-                var uniqueId = AardvarkWrapper.aa_unique_id(AardvarkHandle);
+                var uniqueId = AardvarkWrapper.net_aa_unique_id(AardvarkHandle);
                 if (uniqueId < 1)
                     throw new ApplicationException("Aardvark's unique ID should be non-zero if valid.");
 
@@ -130,7 +130,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                 {
                     const EConfigMode configMode = EConfigMode.SPI_I2C;
                     Log.Debug($"Setting config mode to {configMode}");
-                    var stat = AardvarkWrapper.aa_configure(AardvarkHandle, configMode);
+                    var stat = AardvarkWrapper.net_aa_configure(AardvarkHandle, configMode);
                     if (stat != (int)configMode)
                         throw new ApplicationException("ERRor[" + stat +
                                                        "] when configuring aardvark to SPI+I2C mode.");
@@ -177,7 +177,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             if (TargetPower != ETargetPower.Off)
                 SetTargetPower(ETargetPower.Off);
 
-            AardvarkWrapper.aa_close(AardvarkHandle);
+            AardvarkWrapper.net_aa_close(AardvarkHandle);
             AardvarkHandle = 0;
             _isInitialized = false;
             base.Close();
@@ -198,7 +198,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                 CheckIfInitialized();
                 Log.Debug($"Setting target power to {powerMask}");
 
-                var status = AardvarkWrapper.aa_target_power(AardvarkHandle, (byte)powerMask);
+                var status = AardvarkWrapper.net_aa_target_power(AardvarkHandle, (byte)powerMask);
                 if (status == (int)powerMask)
                     return;
 
