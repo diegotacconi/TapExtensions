@@ -4,10 +4,6 @@ namespace TapExtensions.Interfaces.I2c
 {
     public interface II2C : IInstrument
     {
-        void Write(ushort slaveAddress, ushort numOfBytes, byte[] dataOut);
-
-        void Write(ushort slaveAddress, byte[] registerAddress, ushort numOfBytes, byte[] dataOut);
-
         byte[] Read(ushort slaveAddress, ushort numOfBytes);
 
         byte[] Read(ushort slaveAddress, ushort numOfBytes, byte[] regAddress);
@@ -16,10 +12,14 @@ namespace TapExtensions.Interfaces.I2c
 
         void SetBusTimeOutInMs(ushort timeOutMs);
 
-        void SlaveEnable(byte slaveAddress, ushort maxTxBytes, ushort maxRxBytes);
-
         void SlaveDisable();
 
+        void SlaveEnable(byte slaveAddress, ushort maxTxBytes, ushort maxRxBytes);
+
         byte[] SlaveRead(byte slaveAddress, ushort numOfBytesMax, out int numOfBytesRead);
+
+        void Write(ushort slaveAddress, ushort numOfBytes, byte[] dataOut);
+
+        void Write(ushort slaveAddress, byte[] registerAddress, ushort numOfBytes, byte[] dataOut);
     }
 }

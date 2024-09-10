@@ -8,68 +8,6 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
     {
         #region I2C Interface Implementation
 
-        void II2C.Write(ushort slaveAddress, ushort numOfBytes, byte[] dataOut)
-        {
-            lock (_instLock)
-            {
-                CheckIfInitialized();
-                if (numOfBytes <= 0)
-                    throw new ApplicationException("Write: numOfBytes must have positive value.");
-                if (dataOut == null)
-                    throw new ApplicationException("Write: dataOut is null!");
-                if (numOfBytes > dataOut.Length)
-                    throw new ApplicationException("Write: numOfBytes is bigger than the length of dataOut!");
-
-                var error = AardvarkWrapper.aa_i2c_write(AardvarkHandle, slaveAddress,
-                    AardvarkI2cFlags.AA_I2C_NO_FLAGS, numOfBytes, dataOut);
-                if (error != numOfBytes)
-                {
-                    Log.Debug("I2C Write error, retry..");
-                    TapThread.Sleep(100);
-                    error = AardvarkWrapper.aa_i2c_write(AardvarkHandle, slaveAddress,
-                        AardvarkI2cFlags.AA_I2C_NO_FLAGS, numOfBytes, dataOut);
-                    if (error != numOfBytes) throw new ApplicationException("I2C: Write failed!");
-                }
-
-                Log.Debug("I2C Write >> 0x" + slaveAddress.ToString("X2") + ", 0x" +
-                          BitConverter.ToString(dataOut).Replace("-", " 0x"));
-            }
-        }
-
-        void II2C.Write(ushort slaveAddress, byte[] registerAddress, ushort numOfBytes, byte[] dataOut)
-        {
-            lock (_instLock)
-            {
-                CheckIfInitialized();
-                if (numOfBytes <= 0)
-                    throw new ApplicationException("I2C: numOfBytes must have positive value.");
-                if (dataOut == null)
-                    throw new ApplicationException("I2C: dataOut is null!");
-                if (numOfBytes > dataOut.Length)
-                    throw new ApplicationException("I2C: numOfBytes is bigger than the length of dataOut!");
-
-                var addrWidth = (ushort)registerAddress.Length;
-                var dataToWrite = new byte[addrWidth + numOfBytes];
-                for (var i = 0; i < addrWidth; i++) dataToWrite[i] = registerAddress[i];
-                for (int i = addrWidth; i < addrWidth + numOfBytes; i++) dataToWrite[i] = dataOut[i - addrWidth];
-                var numOfBytesToWrite = (ushort)(addrWidth + numOfBytes);
-
-                var error = AardvarkWrapper.aa_i2c_write(AardvarkHandle, slaveAddress,
-                    AardvarkI2cFlags.AA_I2C_NO_FLAGS, numOfBytesToWrite, dataToWrite);
-                if (error != numOfBytesToWrite)
-                {
-                    Log.Debug("I2C Write error, retry..");
-                    TapThread.Sleep(100);
-                    error = AardvarkWrapper.aa_i2c_write(AardvarkHandle, slaveAddress,
-                        AardvarkI2cFlags.AA_I2C_NO_FLAGS, numOfBytesToWrite, dataToWrite);
-                    if (error != numOfBytesToWrite) throw new ApplicationException("I2C: Write failed!");
-                }
-
-                Log.Debug("I2C Write >> 0x" + slaveAddress.ToString("X2") + ", 0x" +
-                          BitConverter.ToString(dataOut).Replace("-", " 0x"));
-            }
-        }
-
         byte[] II2C.Read(ushort slaveAddress, ushort numOfBytes)
         {
             lock (_instLock)
@@ -164,6 +102,31 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             }
         }
 
+        void II2C.SlaveDisable()
+        {
+            CheckIfInitialized();
+            lock (_instLock)
+            {
+                var status = -1;
+                int i;
+                for (i = 0; i < 2; i++)
+                {
+                    TapThread.Sleep(i * 100);
+
+                    status = AardvarkWrapper.aa_i2c_slave_disable(AardvarkHandle);
+                    if (status == (int)AardvarkStatus.AA_OK)
+                    {
+                        Log.Debug("I2C SlaveDisable done with try " + (i + 1) + ".");
+                        return;
+                    }
+
+                    Log.Debug("I2C SlaveDisable try " + (i + 1) + " return[" + status + "].");
+                }
+
+                throw new ApplicationException("I2C SlaveDisable return[" + status + "] with try " + i + ".");
+            }
+        }
+
         void II2C.SlaveEnable(byte slaveAddress, ushort maxTxBytes, ushort maxRxBytes)
         {
             if (maxTxBytes <= 0 || MaxTxRxBytes < maxTxBytes)
@@ -198,31 +161,6 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             }
         }
 
-        void II2C.SlaveDisable()
-        {
-            CheckIfInitialized();
-            lock (_instLock)
-            {
-                var status = -1;
-                int i;
-                for (i = 0; i < 2; i++)
-                {
-                    TapThread.Sleep(i * 100);
-
-                    status = AardvarkWrapper.aa_i2c_slave_disable(AardvarkHandle);
-                    if (status == (int)AardvarkStatus.AA_OK)
-                    {
-                        Log.Debug("I2C SlaveDisable done with try " + (i + 1) + ".");
-                        return;
-                    }
-
-                    Log.Debug("I2C SlaveDisable try " + (i + 1) + " return[" + status + "].");
-                }
-
-                throw new ApplicationException("I2C SlaveDisable return[" + status + "] with try " + i + ".");
-            }
-        }
-
         byte[] II2C.SlaveRead(byte slaveAddress, ushort numOfBytesMax, out int numOfBytesRead)
         {
             if (slaveAddress <= 0)
@@ -246,6 +184,68 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                 Log.Debug("I2C slave_read ERRor[" + numOfBytesRead + "] from addr:" + slaveAddress);
                 throw new ApplicationException("I2C slave_read ERRor[" + numOfBytesRead + "] from addr:" +
                                                slaveAddress);
+            }
+        }
+
+        void II2C.Write(ushort slaveAddress, ushort numOfBytes, byte[] dataOut)
+        {
+            lock (_instLock)
+            {
+                CheckIfInitialized();
+                if (numOfBytes <= 0)
+                    throw new ApplicationException("Write: numOfBytes must have positive value.");
+                if (dataOut == null)
+                    throw new ApplicationException("Write: dataOut is null!");
+                if (numOfBytes > dataOut.Length)
+                    throw new ApplicationException("Write: numOfBytes is bigger than the length of dataOut!");
+
+                var error = AardvarkWrapper.aa_i2c_write(AardvarkHandle, slaveAddress,
+                    AardvarkI2cFlags.AA_I2C_NO_FLAGS, numOfBytes, dataOut);
+                if (error != numOfBytes)
+                {
+                    Log.Debug("I2C Write error, retry..");
+                    TapThread.Sleep(100);
+                    error = AardvarkWrapper.aa_i2c_write(AardvarkHandle, slaveAddress,
+                        AardvarkI2cFlags.AA_I2C_NO_FLAGS, numOfBytes, dataOut);
+                    if (error != numOfBytes) throw new ApplicationException("I2C: Write failed!");
+                }
+
+                Log.Debug("I2C Write >> 0x" + slaveAddress.ToString("X2") + ", 0x" +
+                          BitConverter.ToString(dataOut).Replace("-", " 0x"));
+            }
+        }
+
+        void II2C.Write(ushort slaveAddress, byte[] registerAddress, ushort numOfBytes, byte[] dataOut)
+        {
+            lock (_instLock)
+            {
+                CheckIfInitialized();
+                if (numOfBytes <= 0)
+                    throw new ApplicationException("I2C: numOfBytes must have positive value.");
+                if (dataOut == null)
+                    throw new ApplicationException("I2C: dataOut is null!");
+                if (numOfBytes > dataOut.Length)
+                    throw new ApplicationException("I2C: numOfBytes is bigger than the length of dataOut!");
+
+                var addrWidth = (ushort)registerAddress.Length;
+                var dataToWrite = new byte[addrWidth + numOfBytes];
+                for (var i = 0; i < addrWidth; i++) dataToWrite[i] = registerAddress[i];
+                for (int i = addrWidth; i < addrWidth + numOfBytes; i++) dataToWrite[i] = dataOut[i - addrWidth];
+                var numOfBytesToWrite = (ushort)(addrWidth + numOfBytes);
+
+                var error = AardvarkWrapper.aa_i2c_write(AardvarkHandle, slaveAddress,
+                    AardvarkI2cFlags.AA_I2C_NO_FLAGS, numOfBytesToWrite, dataToWrite);
+                if (error != numOfBytesToWrite)
+                {
+                    Log.Debug("I2C Write error, retry..");
+                    TapThread.Sleep(100);
+                    error = AardvarkWrapper.aa_i2c_write(AardvarkHandle, slaveAddress,
+                        AardvarkI2cFlags.AA_I2C_NO_FLAGS, numOfBytesToWrite, dataToWrite);
+                    if (error != numOfBytesToWrite) throw new ApplicationException("I2C: Write failed!");
+                }
+
+                Log.Debug("I2C Write >> 0x" + slaveAddress.ToString("X2") + ", 0x" +
+                          BitConverter.ToString(dataOut).Replace("-", " 0x"));
             }
         }
 
