@@ -5,10 +5,10 @@ namespace TapExtensions.Interfaces.Spi
     #region enums
 
     /// <summary>
-    ///     Mode0: Clock polarity 0 Clock phase 0. Data are captured on the clock's rising edge and data are output on falling edge <br />
-    ///     Mode1: Clock polarity 0 Clock phase 1. Data are captured on the clock's falling edge and data are output on rising edge <br />
-    ///     Mode2: Clock polarity 1 Clock phase 0. Data are captured on the clock's falling edge and data are output on rising edge <br />
-    ///     Mode3: Clock polarity 1 Clock phase 1. Data are captured on the clock's rising edge and data are output on falling edge <br />
+    ///     Mode0: Clock polarity 0 Clock phase 0. Data is captured on the clock's rising edge and data is output on falling edge <br />
+    ///     Mode1: Clock polarity 0 Clock phase 1. Data is captured on the clock's falling edge and data is output on rising edge <br />
+    ///     Mode2: Clock polarity 1 Clock phase 0. Data is captured on the clock's falling edge and data is output on rising edge <br />
+    ///     Mode3: Clock polarity 1 Clock phase 1. Data is captured on the clock's rising edge and data is output on falling edge <br />
     /// </summary>
     public enum ESpiMode
     {
@@ -97,79 +97,25 @@ namespace TapExtensions.Interfaces.Spi
 
     public interface ISpi : IInstrument
     {
-        /// <summary>
-        ///     Configures the SPI interface.
-        /// </summary>
-        /// <param name="mode">Mode0-3</param>
-        /// <param name="bitOrder">Msb or Lsb</param>
-        /// <param name="chipSelect">Device0 or Device1</param>
-        /// <param name="chipSelectPolarity">Chip select polarity</param>
-        /// <param name="bitRate">kHz</param>
+        void Delay(int value, ESpiSleepMode sleepMode);
+
         void Init(ESpiMode mode, ESpiBitOrder bitOrder, ESpiChipSelect chipSelect,
             ESpiChipSelectPolarity chipSelectPolarity, uint bitRate);
 
-        /// <summary>
-        ///     Configures the cheetah SPI interface
-        /// </summary>
-        /// <param name="mode">Mode0-3,select the polarity of the clock signal and the phase of the clock signal to sample on</param>
-        /// <param name="bitOrder">Msb or Lsb</param>
-        /// <param name="eSsPolarity">Mode0-7,a bit mask that indicates whether 3 SS line is active high or active low</param>
         void Init(ESpiMode mode, ESpiBitOrder bitOrder, ESpiSsPolarity eSsPolarity);
 
-        /// <summary>
-        ///     Query data from SPI device.
-        /// </summary>
-        /// <param name="data">Data to write</param>
-        /// <returns>Read data from spi device</returns>
         byte[] Query(byte[] data);
 
-        /// <summary>
-        ///     Query data from SPI device
-        /// </summary>
-        /// <param name="data">Data to write</param>
-        /// <param name="eSsSignal">Mode0-7</param>
-        /// <returns>Read data from spi device</returns>
         byte[] Query(byte[] data, ESpiSsSignal eSsSignal);
 
-        /// <summary>
-        ///     Queue a delay value on the bus
-        /// </summary>
-        /// <param name="value">
-        ///     cycles of delay to add to the outbound shift if eSleepMode is Cycle,
-        ///     or else amount of time for delay in nanoseconds if eSleepMode is Ns
-        /// </param>
-        /// <param name="sleepMode">Cycle/Ns</param>
-        void Delay(int value, ESpiSleepMode sleepMode);
-
-        /// <summary>
-        ///     Sets SPI bus bit rate
-        /// </summary>
-        /// <param name="bitrateKhz">The requested bitrate in kHz</param>
         void SetBitRate(uint bitrateKhz);
 
-        /// <summary>
-        ///     Set the SPI-device to slave-mode
-        /// </summary>
-        void SlaveEnable();
-
-        /// <summary>
-        ///     Set the SPI-device to master-mode
-        /// </summary>
         void SlaveDisable();
 
-        /// <summary>
-        ///     Read the bytes from an SPI slave reception
-        /// </summary>
-        /// <param name="numOfBytesMax">The maximum size of the data buffer</param>
-        /// <param name="numOfBytesRead">The number of bytes read asynchronously</param>
-        /// <returns>Received data</returns>
+        void SlaveEnable();
+
         byte[] SlaveRead(ushort numOfBytesMax, out int numOfBytesRead);
 
-        /// <summary>
-        ///     Set the slave response in the event the Aardvark adapter is put into slave mode and contacted by a master
-        /// </summary>
-        /// <param name="dataToResponse">The data to be set</param>
-        /// <returns>Received data</returns>
         int SlaveSetResponse(byte[] dataToResponse);
     }
 }

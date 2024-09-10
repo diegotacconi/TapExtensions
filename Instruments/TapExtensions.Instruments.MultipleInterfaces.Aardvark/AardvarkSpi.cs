@@ -17,6 +17,11 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
 
         #region SPI Interface Implementation
 
+        void ISpi.Delay(int value, ESpiSleepMode sleepMode)
+        {
+            throw new NotImplementedException();
+        }
+
         void ISpi.Init(ESpiMode mode, ESpiBitOrder bitOrder, ESpiChipSelect chipSelect,
             ESpiChipSelectPolarity chipSelectPolarity, uint bitRate)
         {
@@ -119,11 +124,6 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             throw new NotImplementedException();
         }
 
-        void ISpi.Delay(int value, ESpiSleepMode sleepMode)
-        {
-            throw new NotImplementedException();
-        }
-
         void ISpi.SetBitRate(uint bitrateKhz)
         {
             if (!CheckBitRateValueValid(bitrateKhz))
@@ -137,31 +137,6 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                     throw new ApplicationException("SPI set spi_bitrate(" + bitrateKhz + ") return: " + stat);
 
                 Log.Debug("SPI set bitrate Master " + bitrateKhz + "kHz done.");
-            }
-        }
-
-        void ISpi.SlaveEnable()
-        {
-            CheckIfInitialized();
-            lock (_instLock)
-            {
-                var status = -1;
-                int i;
-                for (i = 0; i < 2; i++)
-                {
-                    TapThread.Sleep(i * 100);
-
-                    status = AardvarkWrapper.aa_spi_slave_enable(AardvarkHandle);
-                    if (status == (int)AardvarkStatus.AA_OK)
-                    {
-                        Log.Debug("SPI SlaveEnable done with try " + (i + 1) + ".");
-                        return;
-                    }
-
-                    Log.Debug("SPI SlaveEnable try " + (i + 1) + " return[" + status + "].");
-                }
-
-                throw new ApplicationException("SPI slave_enable return[" + status + "] with try " + i + ".");
             }
         }
 
@@ -187,6 +162,31 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                 }
 
                 throw new ApplicationException("SPI slave_disable return[" + status + "] with try " + i + ".");
+            }
+        }
+
+        void ISpi.SlaveEnable()
+        {
+            CheckIfInitialized();
+            lock (_instLock)
+            {
+                var status = -1;
+                int i;
+                for (i = 0; i < 2; i++)
+                {
+                    TapThread.Sleep(i * 100);
+
+                    status = AardvarkWrapper.aa_spi_slave_enable(AardvarkHandle);
+                    if (status == (int)AardvarkStatus.AA_OK)
+                    {
+                        Log.Debug("SPI SlaveEnable done with try " + (i + 1) + ".");
+                        return;
+                    }
+
+                    Log.Debug("SPI SlaveEnable try " + (i + 1) + " return[" + status + "].");
+                }
+
+                throw new ApplicationException("SPI slave_enable return[" + status + "] with try " + i + ".");
             }
         }
 
