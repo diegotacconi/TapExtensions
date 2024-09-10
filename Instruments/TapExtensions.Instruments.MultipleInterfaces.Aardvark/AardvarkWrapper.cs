@@ -582,9 +582,9 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
          *
          * Returns the number of devices found, regardless of the
          * array size.
+         *
+         * AA_PORT_NOT_FREE = 0x8000
          */
-        public const ushort AA_PORT_NOT_FREE = 0x8000;
-
         [DllImport("aardvark")]
         private static extern int net_aa_find_devices(int num_devices, [Out] ushort[] devices);
 
@@ -592,7 +592,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
          * Get a list of ports to which Aardvark devices are attached.
          *
          * This function is the same as aa_find_devices() except that
-         * it returns the unique IDs of each Aardvark device.  The IDs
+         * it returns the unique IDs of each Aardvark device. The IDs
          * are guaranteed to be non-zero if valid.
          *
          * The IDs are the unsigned integer representation of the 10-digit
@@ -614,7 +614,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
          * greater than zero if it is valid.
          *
          * This function is recommended for use in simple applications
-         * where extended information is not required.  For more complex
+         * where extended information is not required. For more complex
          * applications, the use of aa_open_ext() is recommended.
          */
         [DllImport("aardvark")]
@@ -622,8 +622,8 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
 
         /*
          * Open the Aardvark port, returning extended information
-         * in the supplied structure.  Behavior is otherwise identical
-         * to aa_open() above.  If 0 is passed as the pointer to the
+         * in the supplied structure. Behavior is otherwise identical
+         * to aa_open() above. If 0 is passed as the pointer to the
          * structure, this function is exactly equivalent to aa_open().
          *
          * The structure is zeroed before the open is attempted.
@@ -633,7 +633,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
          * the device could not be queried for its version number.
          *
          * This function is recommended for use in complex applications
-         * where extended information is required.  For more simple
+         * where extended information is required. For more simple
          * applications, the use of aa_open() is recommended.
          */
         [StructLayout(LayoutKind.Sequential)]
@@ -695,16 +695,16 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
          * on a FILE* stream.  A FILE* stream can be obtained using "fopen"
          * or can correspond to the common "stdout" or "stderr" --
          * available when including stdlib.h
+         *
+         * AA_LOG_STDOUT = 1
+         * AA_LOG_STDERR = 2
          */
-        public const int AA_LOG_STDOUT = 1;
-        public const int AA_LOG_STDERR = 2;
-
         [DllImport("aardvark")]
         private static extern int net_aa_log(int aardvark, int level, int handle);
 
         /*
          * Return the version matrix for the device attached to the
-         * given handle.  If the handle is 0 or invalid, only the
+         * given handle. If the handle is 0 or invalid, only the
          * software and required api versions are set.
          */
         [DllImport("aardvark")]
@@ -747,15 +747,15 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         /*
          * Polling function to check if there are any asynchronous
          * messages pending for processing. The function takes a timeout
-         * value in units of milliseconds.  If the timeout is < 0, the
-         * function will block until data is received.  If the timeout is 0,
+         * value in units of milliseconds. If the timeout is < 0, the
+         * function will block until data is received. If the timeout is 0,
          * the function will perform a non-blocking check.
+         *
+         * AA_ASYNC_NO_DATA = 0x00
+         * AA_ASYNC_I2C_READ = 0x01
+         * AA_ASYNC_I2C_WRITE = 0x02
+         * AA_ASYNC_SPI = 0x04
          */
-        public const int AA_ASYNC_NO_DATA = 0x00000000;
-        public const int AA_ASYNC_I2C_READ = 0x00000001;
-        public const int AA_ASYNC_I2C_WRITE = 0x00000002;
-        public const int AA_ASYNC_SPI = 0x00000004;
-
         [DllImport("aardvark")]
         private static extern int net_aa_async_poll(int aardvark, int timeout);
 
@@ -768,7 +768,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         private static extern int net_aa_i2c_free_bus(int aardvark);
 
         /*
-         * Set the I2C bit rate in kilohertz.  If a zero is passed as the
+         * Set the I2C bit rate in kilohertz. If a zero is passed as the
          * bitrate, the bitrate is unchanged and the current bitrate is
          * returned.
          */
@@ -776,7 +776,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         private static extern int net_aa_i2c_bitrate(int aardvark, int bitrate_khz);
 
         /*
-         * Set the bus lock timeout.  If a zero is passed as the timeout,
+         * Set the bus lock timeout. If a zero is passed as the timeout,
          * the timeout is unchanged and the current timeout is returned.
          */
         [DllImport("aardvark")]
@@ -790,7 +790,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         /*
          * Read a stream of bytes from the I2C slave device.
          * This API function returns the number of bytes read into
-         * the num_read variable.  The return value of the function
+         * the num_read variable. The return value of the function
          * is a status code.
          */
         [DllImport("aardvark")]
@@ -805,7 +805,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         /*
          * Write a stream of bytes to the I2C slave device.
          * This API function returns the number of bytes written into
-         * the num_written variable.  The return value of the function
+         * the num_written variable. The return value of the function
          * is a status code.
          */
         [DllImport("aardvark")]
@@ -818,7 +818,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
          * reading a stream of bytes back from the same slave device.
          * This API function returns the number of bytes written into
          * the num_written variable and the number of bytes read into
-         * the num_read variable.  The return value of the function is
+         * the num_read variable. The return value of the function is
          * the status given as (read_status << 8) | (write_status).
          */
         [DllImport("aardvark")]
@@ -843,7 +843,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
 
         /*
          * Return number of bytes written from a previous
-         * Aardvark->I2C_master transmission.  Since the transmission is
+         * Aardvark->I2C_master transmission. Since the transmission is
          * happening asynchronously with respect to the PC host
          * software, there could be responses queued up from many
          * previous write transactions.
@@ -879,7 +879,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         #region SPI API
 
         /*
-         * Set the SPI bit rate in kilohertz.  If a zero is passed as the
+         * Set the SPI bit rate in kilohertz. If a zero is passed as the
          * bitrate, the bitrate is unchanged and the current bitrate is
          * returned.
          */
@@ -920,10 +920,11 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         private static extern int net_aa_spi_write(int aardvark, ushort out_num_bytes, [In] byte[] data_out,
             ushort in_num_bytes, [Out] byte[] data_in);
 
-        /* Enable/Disable the Aardvark as an SPI slave device */
+        /* Enable the Aardvark as an SPI slave device */
         [DllImport("aardvark")]
         private static extern int net_aa_spi_slave_enable(int aardvark);
 
+        /* Disable the Aardvark as an SPI slave device */
         [DllImport("aardvark")]
         private static extern int net_aa_spi_slave_disable(int aardvark);
 
@@ -942,7 +943,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
          * Change the output polarity on the SS line.
          *
          * Note: When configured as an SPI slave, the Aardvark will
-         * always be setup with SS as active low.  Hence this function
+         * always be setup with SS as active low. Hence this function
          * only affects the SPI master functions on the Aardvark.
          */
         [DllImport("aardvark")]
@@ -965,7 +966,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
          * Configure the GPIO, specifying the direction of each bit.
          *
          * A call to this function will not change the value of the pullup
-         * mask in the Aardvark.  This is illustrated by the following
+         * mask in the Aardvark. This is illustrated by the following
          * example:
          *   (1) Direction mask is first set to 0x00
          *   (2) Pullup is set to 0x01
@@ -976,10 +977,10 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
          *
          * On Aardvark power-up, the default value of the direction
          * mask is 0x00.
+         *
+         * AA_GPIO_DIR_INPUT = 0
+         * AA_GPIO_DIR_OUTPUT = 1
          */
-        public const byte AA_GPIO_DIR_INPUT = 0;
-        public const byte AA_GPIO_DIR_OUTPUT = 1;
-
         [DllImport("aardvark")]
         private static extern int net_aa_gpio_direction(int aardvark, byte direction_mask);
 
@@ -991,10 +992,10 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
          * be cached in case the line is later configured as an input.
          *
          * By default the pullup mask is 0x00.
+         *
+         * AA_GPIO_PULLUP_OFF = 0
+         * AA_GPIO_PULLUP_ON = 1
          */
-        public const byte AA_GPIO_PULLUP_OFF = 0;
-        public const byte AA_GPIO_PULLUP_ON = 1;
-
         [DllImport("aardvark")]
         private static extern int net_aa_gpio_pullup(int aardvark, byte pullup_mask);
 
@@ -1024,7 +1025,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
          * Pins configured as outputs will be ignored.
          *
          * The function will return either when a change has occurred or
-         * the timeout expires.  The timeout, specified in milliseconds, has
+         * the timeout expires. The timeout, specified in milliseconds, has
          * a precision of ~16 ms. The maximum allowable timeout is
          * approximately 4 seconds. If the timeout expires, this function
          * will return the current state of the GPIO lines.
