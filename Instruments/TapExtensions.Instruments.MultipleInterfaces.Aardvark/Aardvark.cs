@@ -11,6 +11,7 @@
  */
 
 using System;
+using System.Runtime.InteropServices;
 using OpenTap;
 using TapExtensions.Interfaces.I2c;
 
@@ -111,7 +112,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
 
                 if (AardvarkHandle < 0)
                 {
-                    var errorMsg = AardvarkWrapper.aa_status_string(AardvarkHandle);
+                    var errorMsg = Marshal.PtrToStringAnsi(AardvarkWrapper.net_aa_status_string(AardvarkHandle));
                     throw new ApplicationException($"{Name}: Error {AardvarkHandle}, {errorMsg}");
                 }
 
@@ -202,7 +203,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                 if (status == (int)powerMask)
                     return;
 
-                var errorMsg = AardvarkWrapper.aa_status_string(status);
+                var errorMsg = Marshal.PtrToStringAnsi(AardvarkWrapper.net_aa_status_string(status));
                 throw new InvalidOperationException($"{Name}: Error {status}, {errorMsg}");
             }
         }

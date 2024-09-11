@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using OpenTap;
 using TapExtensions.Interfaces.I2c;
 
@@ -227,7 +228,8 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                 var regAddressLength = (ushort)regAddress.Length;
                 var dataToWrite = new byte[regAddressLength + cmdLength];
                 for (var i = 0; i < regAddressLength; i++) dataToWrite[i] = regAddress[i];
-                for (int i = regAddressLength; i < regAddressLength + cmdLength; i++) dataToWrite[i] = command[i - regAddressLength];
+                for (int i = regAddressLength; i < regAddressLength + cmdLength; i++)
+                    dataToWrite[i] = command[i - regAddressLength];
                 var numOfBytesToWrite = (ushort)(regAddressLength + cmdLength);
 
                 var error = AardvarkWrapper.net_aa_i2c_write(AardvarkHandle, slaveAddress,
@@ -261,7 +263,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                 if (status == (int)pullupMask)
                     return;
 
-                var errorMsg = AardvarkWrapper.aa_status_string(status);
+                var errorMsg = Marshal.PtrToStringAnsi(AardvarkWrapper.net_aa_status_string(status));
                 throw new InvalidOperationException($"{Name}: Error {status}, {errorMsg}");
             }
         }

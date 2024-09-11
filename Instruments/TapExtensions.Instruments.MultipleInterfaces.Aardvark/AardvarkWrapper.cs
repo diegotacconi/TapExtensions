@@ -53,9 +53,6 @@ using OpenTap;
 
 // ReSharper disable InconsistentNaming
 
-// Suppress naming rule violation messages in Visual Studio
-#pragma warning disable IDE1006
-
 namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
 {
     #region ENUMS
@@ -164,7 +161,6 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         AA_SPI_SS_ACTIVE_HIGH = 1
     }
 
-    [Flags]
     public enum AardvarkGpioBits
     {
         AA_GPIO_SCL = 0x01,
@@ -209,15 +205,6 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
 
             /* Software requires that the API interface must be >= this version. */
             public ushort api_req_by_sw;
-        }
-
-        #endregion
-
-        #region TO BE REMOVED
-
-        public static string aa_status_string(int status)
-        {
-            return Marshal.PtrToStringAnsi(net_aa_status_string(status));
         }
 
         #endregion
