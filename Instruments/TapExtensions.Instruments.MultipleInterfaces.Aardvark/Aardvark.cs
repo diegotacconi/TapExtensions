@@ -93,9 +93,8 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                 var maxNumDevices = 16;
                 var devices = new ushort[maxNumDevices];
                 var numDevicesFound = AardvarkWrapper.net_aa_find_devices(maxNumDevices, devices);
-
                 if (numDevicesFound < 1)
-                    throw new ApplicationException("Number of Aardvark devices found should be more than 0.");
+                    throw new InvalidOperationException("Aardvark devices not found");
 
                 Log.Debug("Found " + numDevicesFound + " Aardvarks. Initializing device number " + DevNumber + ".");
 
