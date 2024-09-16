@@ -38,7 +38,7 @@
     <ProjectReference Include="..\..\Instruments\TapExtensions.Instruments.MultipleInterfaces.RasPi\TapExtensions.Instruments.MultipleInterfaces.RasPi.csproj" />
     <ProjectReference Include="..\..\Instruments\TapExtensions.Instruments.SigGen\TapExtensions.Instruments.SigGen.csproj" />
     <ProjectReference Include="..\..\Interfaces\TapExtensions.Interfaces\TapExtensions.Interfaces.csproj" />
-    <ProjectReference Include="..\..\Results\TapExtensions.Results\TapExtensions.Results.csproj" />
+    <ProjectReference Include="..\..\Results\TapExtensions.Results.ZipFile\TapExtensions.Results.ZipFile.csproj" />
     <ProjectReference Include="..\..\Settings\TapExtensions.Settings.Integrity\TapExtensions.Settings.Integrity.csproj" />
     <ProjectReference Include="..\..\Shared\TapExtensions.Shared\TapExtensions.Shared.csproj" />
     <ProjectReference Include="..\..\Shared\TapExtensions.Shared.Win32\TapExtensions.Shared.Win32.csproj" />

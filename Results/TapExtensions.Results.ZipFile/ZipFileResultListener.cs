@@ -6,7 +6,7 @@ using System.Text;
 using OpenTap;
 using TapExtensions.Interfaces.ResultListener;
 
-namespace TapExtensions.Results
+namespace TapExtensions.Results.ZipFile
 {
     [Display("Zip File",
         Groups: new[] { "TapExtensions", "Results" },
