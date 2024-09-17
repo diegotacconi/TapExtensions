@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Texas Instruments TMP102 Temperature Sensor
+// https://www.ti.com/product/TMP102
+
+using System;
 using TapExtensions.Interfaces.I2c;
 
 namespace TapExtensions.Steps.I2c
@@ -16,37 +19,12 @@ namespace TapExtensions.Steps.I2c
 
         public double ReadTemperature()
         {
-            // var configReg = ReadConfigurationRegister();
             var temperatureReg = ReadTemperatureRegister();
             var msb = temperatureReg[0];
             var lsb = temperatureReg[1];
             var extendedMode = (lsb & 0b00000001) == 0b00000001;
             var temperature = ConvertToTemperature(msb, lsb, extendedMode);
             return temperature;
-        }
-
-        private byte[] ReadConfigurationRegister()
-        {
-            /*
-             * Configuration Register (0x01)
-             * +-------------------------------------------------------+-------------------------------------------------------+
-             * |              Most Significant Byte (MSB)              |             Least Significant Byte (LSB)              |
-             * +------+------+------+------+------+------+------+------+------+------+------+------+------+------+------+------+
-             * | D15  | D14  | D13  | D12  | D11  | D10  | D9   | D8   | D7   | D6   | D5   | D4   | D3   | D2   | D1   | D0   |
-             * | OS   | R1   | R0   | F1   | F0   | POL  | TM   | SD   | CR1  | CR0  | AL   | EM   |  0   |  0   |  0   |  0   |
-             * +------+------+------+------+------+------+------+------+------+------+------+------+------+------+------+------+
-             * One-Shot (OS)
-             * Converter Resolution (R1/R0)
-             * Fault Queue (F1/F0)
-             * Polarity (POL)
-             * Thermostat Mode (TM)
-             * Shutdown Mode (SD)
-             * Conversion Rate (CR1/CR0)
-             * Alert (AL)
-             * Extended Temperature Mode (EM)
-             */
-            var configReg = _i2C.Read((ushort)_deviceAddress, 2, new byte[] { 0x01 });
-            return configReg;
         }
 
         private byte[] ReadTemperatureRegister()
@@ -69,21 +47,24 @@ namespace TapExtensions.Steps.I2c
 
         private static double ConvertToTemperature(int msb, int lsb, bool extendedMode)
         {
-            const double resolution = 0.0625;
             uint unsignedInt;
+            int signedInt;
             if (extendedMode)
             {
                 // Extended Temperature Range (13-bit)
                 unsignedInt = (uint)((msb << 8) + lsb);
                 unsignedInt >>= 3; //remove 3 lsb bits
+                signedInt = FromTwosComplement(unsignedInt, 13);
             }
             else
             {
                 // Normal Temperature Range (12-bit)
                 unsignedInt = (uint)((msb << 8) + lsb);
                 unsignedInt >>= 4; //remove 4 lsb bits
+                signedInt = FromTwosComplement(unsignedInt, 12);
             }
-            var signedInt = FromTwosComplement(unsignedInt, 12);
+
+            const double resolution = 0.0625;
             var temperature = resolution * signedInt;
             return temperature;
         }
@@ -99,7 +80,7 @@ namespace TapExtensions.Steps.I2c
                     "Parameter value exceeds max value of given bit-length!");
 
             int signedInt;
-            if ((unsignedInt & (1 << bits - 1)) != 0)
+            if ((unsignedInt & (1 << (bits - 1))) != 0)
             {
                 var complement = ~unsignedInt & ((1L << bits) - 1);
                 // ReSharper disable once RedundantCast
@@ -109,6 +90,7 @@ namespace TapExtensions.Steps.I2c
             {
                 signedInt = (int)unsignedInt;
             }
+
             return signedInt;
         }
     }
