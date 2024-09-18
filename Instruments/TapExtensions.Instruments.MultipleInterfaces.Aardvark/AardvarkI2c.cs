@@ -13,94 +13,16 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         {
             lock (_instLock)
             {
-                CheckIfInitialized();
-
-                if (slaveAddress <= 0)
-                    throw new InvalidOperationException(
-                        $"I2C: {nameof(slaveAddress)} must be greater than zero.");
-
-                if (numOfBytes <= 0)
-                    throw new InvalidOperationException(
-                        $"I2C: {nameof(numOfBytes)} must be greater than zero.");
-
-                var response = new byte[numOfBytes];
-                var status = AardvarkWrapper.net_aa_i2c_read(AardvarkHandle, slaveAddress,
-                    AardvarkI2cFlags.AA_I2C_NO_FLAGS, numOfBytes, response);
-
-                if (status != numOfBytes)
-                    throw new InvalidOperationException("I2C: Read failed!");
-
-                Log.Debug("I2C Read << 0x" + slaveAddress.ToString("X2") + ", 0x" +
-                          BitConverter.ToString(response).Replace("-", " 0x"));
-                return response;
+                return I2CRead(slaveAddress, numOfBytes);
             }
         }
 
         byte[] II2C.Read(ushort slaveAddress, ushort numOfBytes, byte[] regAddress)
         {
-            var response = new byte[numOfBytes];
-            var regAddressLength = (ushort)regAddress.Length;
-
             lock (_instLock)
             {
-                CheckIfInitialized();
-
-                if (slaveAddress <= 0)
-                    throw new InvalidOperationException(
-                        $"I2C: {nameof(slaveAddress)} must be greater than zero.");
-
-                if (numOfBytes <= 0)
-                    throw new InvalidOperationException(
-                        $"I2C: {nameof(numOfBytes)} must be greater than zero.");
-
-                Log.Debug(string.Format("I2C (0x{0:X2}) >> 0x{1}", slaveAddress,
-                    BitConverter.ToString(regAddress).Replace("-", " 0x")));
-
-                var status = AardvarkWrapper.net_aa_i2c_write(AardvarkHandle, slaveAddress,
-                    AardvarkI2cFlags.AA_I2C_NO_STOP, regAddressLength, regAddress);
-                if (status != regAddressLength)
-                {
-                    Log.Warning("I2C Write error, retry...");
-                    TapThread.Sleep(100);
-                    status = AardvarkWrapper.net_aa_i2c_write(AardvarkHandle, slaveAddress,
-                        AardvarkI2cFlags.AA_I2C_NO_STOP, regAddressLength, regAddress);
-                    if (status != regAddressLength)
-                        throw new InvalidOperationException("I2C Write error!");
-                }
-
-                var count = AardvarkWrapper.net_aa_i2c_read(AardvarkHandle, slaveAddress,
-                    AardvarkI2cFlags.AA_I2C_NO_FLAGS, numOfBytes, response);
-
-                if (count < 0)
-                    throw new InvalidOperationException(
-                        $"I2C Read error: {count}");
-
-                if (count == 0)
-                    throw new InvalidOperationException(
-                        "I2C Read error: no bytes read");
-
-                if (count != numOfBytes)
-                    throw new InvalidOperationException(
-                        $"I2C Read error: read {count} bytes (expected {numOfBytes})");
-
-                Log.Debug(string.Format("I2C (0x{0:X2}) << 0x{1}", slaveAddress,
-                    BitConverter.ToString(response).Replace("-", " 0x")));
-
-                /*
-                Log.Debug("Data read from device:");
-                for (var i = 0; i < count; ++i)
-                {
-                    if ((i & 0x0f) == 0)
-                        Log.Debug("{0:x4}:  ", slaveAddress + i);
-
-                    Log.Debug("{0:x2} ", response[i] & 0xff);
-
-                    if (((i + 1) & 0x07) == 0)
-                        Log.Debug(" ");
-                }
-                */
-
-                return response;
+                I2CWrite(slaveAddress, regAddress, AardvarkI2cFlags.AA_I2C_NO_STOP);
+                return I2CRead(slaveAddress, numOfBytes);
             }
         }
 
@@ -223,96 +145,112 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             }
         }
 
-        void II2C.Write(ushort slaveAddress, ushort cmdLength, byte[] command)
+        void II2C.Write(ushort slaveAddress, ushort numOfBytes, byte[] command)
         {
             lock (_instLock)
             {
-                CheckIfInitialized();
-
-                if (slaveAddress <= 0)
-                    throw new InvalidOperationException(
-                        $"I2C: {nameof(slaveAddress)} must be greater than zero.");
-
-                if (cmdLength <= 0)
-                    throw new InvalidOperationException(
-                        $"I2C: {nameof(cmdLength)} must be greater than zero.");
-
-                if (command == null)
-                    throw new InvalidOperationException(
-                        "I2C: command is null!");
-
-                if (cmdLength > command.Length)
-                    throw new InvalidOperationException(
-                        "I2C: cmdLength is bigger than the length of command!");
-
-                var status = AardvarkWrapper.net_aa_i2c_write(AardvarkHandle, slaveAddress,
-                    AardvarkI2cFlags.AA_I2C_NO_FLAGS, cmdLength, command);
-
-                if (status != cmdLength)
-                {
-                    Log.Warning("I2C Write error, retry...");
-                    TapThread.Sleep(100);
-                    status = AardvarkWrapper.net_aa_i2c_write(AardvarkHandle, slaveAddress,
-                        AardvarkI2cFlags.AA_I2C_NO_FLAGS, cmdLength, command);
-                    if (status != cmdLength)
-                        throw new InvalidOperationException("I2C: Write failed!");
-                }
-
-                Log.Debug("I2C Write >> 0x" + slaveAddress.ToString("X2") + ", 0x" +
-                          BitConverter.ToString(command).Replace("-", " 0x"));
+                I2CWrite(slaveAddress, command, AardvarkI2cFlags.AA_I2C_NO_FLAGS);
             }
         }
 
-        void II2C.Write(ushort slaveAddress, byte[] regAddress, ushort cmdLength, byte[] command)
+        void II2C.Write(ushort slaveAddress, byte[] regAddress, ushort numOfBytes, byte[] command)
         {
             lock (_instLock)
             {
-                CheckIfInitialized();
+                var regAddressLength = Convert.ToUInt16(regAddress.Length);
+                var commandLength = Convert.ToUInt16(command.Length);
+                var regAddressPlusCommand = new byte[regAddressLength + commandLength];
 
-                if (slaveAddress <= 0)
-                    throw new InvalidOperationException(
-                        $"I2C: {nameof(slaveAddress)} must be greater than zero.");
+                for (var i = 0; i < regAddressLength; i++)
+                    regAddressPlusCommand[i] = regAddress[i];
 
-                if (cmdLength <= 0)
-                    throw new InvalidOperationException(
-                        $"I2C: {nameof(cmdLength)} must be greater than zero.");
+                for (int i = regAddressLength; i < regAddressLength + commandLength; i++)
+                    regAddressPlusCommand[i] = command[i - regAddressLength];
 
-                if (command == null)
-                    throw new InvalidOperationException(
-                        "I2C: command is null!");
-
-                if (cmdLength > command.Length)
-                    throw new InvalidOperationException(
-                        "I2C: cmdLength is bigger than the length of command!");
-
-                var regAddressLength = (ushort)regAddress.Length;
-                var dataToWrite = new byte[regAddressLength + cmdLength];
-                for (var i = 0; i < regAddressLength; i++) dataToWrite[i] = regAddress[i];
-                for (int i = regAddressLength; i < regAddressLength + cmdLength; i++)
-                    dataToWrite[i] = command[i - regAddressLength];
-                var numOfBytesToWrite = (ushort)(regAddressLength + cmdLength);
-
-                var status = AardvarkWrapper.net_aa_i2c_write(AardvarkHandle, slaveAddress,
-                    AardvarkI2cFlags.AA_I2C_NO_FLAGS, numOfBytesToWrite, dataToWrite);
-
-                if (status != numOfBytesToWrite)
-                {
-                    Log.Warning("I2C Write error, retry...");
-                    TapThread.Sleep(100);
-                    status = AardvarkWrapper.net_aa_i2c_write(AardvarkHandle, slaveAddress,
-                        AardvarkI2cFlags.AA_I2C_NO_FLAGS, numOfBytesToWrite, dataToWrite);
-                    if (status != numOfBytesToWrite)
-                        throw new InvalidOperationException("I2C: Write failed!");
-                }
-
-                Log.Debug("I2C Write >> 0x" + slaveAddress.ToString("X2") + ", 0x" +
-                          BitConverter.ToString(command).Replace("-", " 0x"));
+                I2CWrite(slaveAddress, regAddressPlusCommand, AardvarkI2cFlags.AA_I2C_NO_FLAGS);
             }
         }
 
         #endregion
 
         #region Private Methods
+
+        private byte[] I2CRead(ushort slaveAddress, ushort numOfBytes)
+        {
+            CheckIfInitialized();
+
+            if (slaveAddress <= 0)
+                throw new InvalidOperationException(
+                    $"I2C: {nameof(slaveAddress)} must be greater than zero.");
+
+            if (numOfBytes <= 0)
+                throw new InvalidOperationException(
+                    $"I2C: {nameof(numOfBytes)} must be greater than zero.");
+
+            var response = new byte[numOfBytes];
+            var status = AardvarkWrapper.net_aa_i2c_read(AardvarkHandle, slaveAddress,
+                AardvarkI2cFlags.AA_I2C_NO_FLAGS, numOfBytes, response);
+
+            if (status < 0)
+                throw new InvalidOperationException(
+                    $"I2C Read error: {status}");
+
+            if (status == 0)
+                throw new InvalidOperationException(
+                    "I2C Read error: no bytes read");
+
+            if (status != numOfBytes)
+                throw new InvalidOperationException(
+                    $"I2C Read error: read {status} bytes (expected {numOfBytes})");
+
+            Log.Debug(string.Format("I2C (0x{0:X2}) << 0x{1}", slaveAddress,
+                BitConverter.ToString(response).Replace("-", " 0x")));
+
+            /*
+            Log.Debug("Data read from device:");
+            for (var i = 0; i < count; ++i)
+            {
+                if ((i & 0x0f) == 0)
+                    Log.Debug("{0:x4}:  ", slaveAddress + i);
+
+                Log.Debug("{0:x2} ", response[i] & 0xff);
+
+                if (((i + 1) & 0x07) == 0)
+                    Log.Debug(" ");
+            }
+            */
+
+            return response;
+        }
+
+        private void I2CWrite(ushort slaveAddress, byte[] command, AardvarkI2cFlags flags)
+        {
+            CheckIfInitialized();
+
+            if (slaveAddress <= 0)
+                throw new InvalidOperationException(
+                    $"I2C: {nameof(slaveAddress)} must be greater than zero.");
+
+            if (command == null)
+                throw new InvalidOperationException(
+                    $"I2C: {nameof(command)} cannot be null.");
+
+            var commandLength = Convert.ToUInt16(command.Length);
+
+            var status = AardvarkWrapper.net_aa_i2c_write(AardvarkHandle, slaveAddress, flags, commandLength, command);
+
+            if (status != commandLength)
+            {
+                Log.Warning("I2C Write error, retrying...");
+                TapThread.Sleep(100);
+                status = AardvarkWrapper.net_aa_i2c_write(AardvarkHandle, slaveAddress, flags, commandLength, command);
+                if (status != commandLength)
+                    throw new InvalidOperationException("I2C: Write failed!");
+            }
+
+            Log.Debug(string.Format("I2C (0x{0:X2}) >> 0x{1}", slaveAddress,
+                BitConverter.ToString(command).Replace("-", " 0x")));
+        }
 
         private void SetPullupResistors(EI2cPullup pullupMask)
         {
