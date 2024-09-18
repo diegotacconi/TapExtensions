@@ -23,8 +23,7 @@ namespace TapExtensions.Steps.I2c
             try
             {
                 var command = new[] { Command };
-                var commandLength = Convert.ToUInt16(command.Length);
-                I2CAdapter.Write(DeviceAddress, commandLength, command);
+                I2CAdapter.Write(DeviceAddress, command);
                 UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)

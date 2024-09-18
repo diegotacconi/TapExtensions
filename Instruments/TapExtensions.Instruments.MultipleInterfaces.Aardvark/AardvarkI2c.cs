@@ -145,7 +145,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             }
         }
 
-        void II2C.Write(ushort slaveAddress, ushort numOfBytes, byte[] command)
+        void II2C.Write(ushort slaveAddress, byte[] command)
         {
             lock (_instLock)
             {
@@ -153,21 +153,21 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             }
         }
 
-        void II2C.Write(ushort slaveAddress, byte[] regAddress, ushort numOfBytes, byte[] command)
+        void II2C.Write(ushort slaveAddress, byte[] regAddress, byte[] command)
         {
             lock (_instLock)
             {
-                var regAddressLength = Convert.ToUInt16(regAddress.Length);
+                var addressLength = Convert.ToUInt16(regAddress.Length);
                 var commandLength = Convert.ToUInt16(command.Length);
-                var regAddressPlusCommand = new byte[regAddressLength + commandLength];
+                var addressPlusCommand = new byte[addressLength + commandLength];
 
-                for (var i = 0; i < regAddressLength; i++)
-                    regAddressPlusCommand[i] = regAddress[i];
+                for (var i = 0; i < addressLength; i++)
+                    addressPlusCommand[i] = regAddress[i];
 
-                for (int i = regAddressLength; i < regAddressLength + commandLength; i++)
-                    regAddressPlusCommand[i] = command[i - regAddressLength];
+                for (int i = addressLength; i < addressLength + commandLength; i++)
+                    addressPlusCommand[i] = command[i - addressLength];
 
-                I2CWrite(slaveAddress, regAddressPlusCommand, AardvarkI2cFlags.AA_I2C_NO_FLAGS);
+                I2CWrite(slaveAddress, addressPlusCommand, AardvarkI2cFlags.AA_I2C_NO_FLAGS);
             }
         }
 

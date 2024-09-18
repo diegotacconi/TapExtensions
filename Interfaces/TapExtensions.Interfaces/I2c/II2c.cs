@@ -18,8 +18,8 @@ namespace TapExtensions.Interfaces.I2c
 
         byte[] SlaveRead(byte slaveAddress, ushort numOfBytesMax, out int numOfBytesRead);
 
-        void Write(ushort slaveAddress, ushort numOfBytes, byte[] dataOut);
+        void Write(ushort slaveAddress, byte[] command);
 
-        void Write(ushort slaveAddress, byte[] registerAddress, ushort numOfBytes, byte[] dataOut);
+        void Write(ushort slaveAddress, byte[] regAddress, byte[] command);
     }
 }
