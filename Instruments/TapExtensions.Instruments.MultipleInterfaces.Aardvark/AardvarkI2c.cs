@@ -48,7 +48,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                 var status = AardvarkWrapper.net_aa_i2c_bus_timeout(AardvarkHandle, timeOutMs);
                 if (status != timeOutMs)
                     throw new InvalidOperationException(
-                        $"Error trying to set the I2C bus timeout to {timeOutMs} ms.");
+                        $"Error trying to set the I2C bus timeout to {timeOutMs} ms. (Returned {status}).");
             }
         }
 
@@ -207,7 +207,6 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                 BitConverter.ToString(response).Replace("-", " 0x")));
 
             /*
-            Log.Debug("Data read from device:");
             for (var i = 0; i < count; ++i)
             {
                 if ((i & 0x0f) == 0)
@@ -264,7 +263,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                     return;
 
                 var errorMsg = Marshal.PtrToStringAnsi(AardvarkWrapper.net_aa_status_string(status));
-                throw new InvalidOperationException($"{Name}: Error {status}, {errorMsg}");
+                throw new InvalidOperationException($"I2C error: {status}, {errorMsg}");
             }
         }
 
