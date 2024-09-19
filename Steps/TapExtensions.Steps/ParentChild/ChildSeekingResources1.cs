@@ -6,10 +6,10 @@ using OpenTap;
 
 namespace TapExtensions.Steps.ParentChild
 {
-    [Display("ChildSeekingResources",
+    [Display("ChildSeekingResources1",
         Groups: new[] { "TapExtensions", "Steps", "ParentChild" })]
     [AllowAsChildIn(typeof(ParentWithResources))]
-    public class ChildSeekingResources : TestStep
+    public class ChildSeekingResources1 : TestStep
     {
         private Dut _parentsDut;
         private Instrument _parentsInstrument;
