@@ -4,9 +4,9 @@ using TapExtensions.Interfaces.I2c;
 
 namespace TapExtensions.Steps.I2c
 {
-    [Display("I2CWriteRead",
+    [Display("I2CReadRegister",
         Groups: new[] { "TapExtensions", "Steps", "I2c" })]
-    public class I2CWriteRead : TestStep
+    public class I2CReadRegister : TestStep
     {
         [Display("I2C Adapter", Order: 1)]
         public II2C I2CAdapter { get; set; }
