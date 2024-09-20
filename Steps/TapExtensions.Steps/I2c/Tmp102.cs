@@ -14,7 +14,7 @@ namespace TapExtensions.Steps.I2c
         public Tmp102(II2C i2C, int deviceAddress)
         {
             _i2C = i2C;
-            _deviceAddress = deviceAddress;
+            _deviceAddress = deviceAddress; // 0x48
         }
 
         public double ReadTemperature()
