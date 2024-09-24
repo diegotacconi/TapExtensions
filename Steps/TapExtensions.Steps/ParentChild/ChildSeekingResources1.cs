@@ -11,9 +11,13 @@ namespace TapExtensions.Steps.ParentChild
     [AllowAsChildIn(typeof(ParentWithResources))]
     public class ChildSeekingResources1 : TestStep
     {
+        #region Settings
+
         private Dut _parentsDut;
         private Instrument _parentsInstrument;
         private string _parentsString;
+
+        #endregion
 
         private void GetParentResources()
         {

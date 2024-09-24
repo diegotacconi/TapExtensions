@@ -13,6 +13,8 @@ namespace TapExtensions.Steps.ParentChild
     [AllowAsChildIn(typeof(ParentWithResources))]
     public class ChildSeekingResources2 : TestStep
     {
+        #region Settings
+
         [XmlIgnore]
         [Browsable(true)]
         [Display("SomeDut", Group: "From Parent", Collapsed: true)]
@@ -28,14 +30,16 @@ namespace TapExtensions.Steps.ParentChild
         [Display("SomeString", Group: "From Parent", Collapsed: true)]
         public string SomeString => GetParent<ParentWithResources>().SomeString;
 
+        #endregion
+
         public override void Run()
         {
             try
             {
                 Log.Debug($"Child={Name}, " +
-                          $"SomeDut={SomeDut.Name}, " +
-                          $"SomeInstrument={SomeInstrument.Name}, " +
-                          $"SomeString={SomeString}.");
+                          $"Dut={SomeDut.Name}, " +
+                          $"Instrument={SomeInstrument.Name}, " +
+                          $"String={SomeString}.");
 
                 UpgradeVerdict(Verdict.Pass);
             }
