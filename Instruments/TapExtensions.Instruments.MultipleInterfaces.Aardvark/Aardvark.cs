@@ -11,7 +11,10 @@
  */
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using OpenTap;
 using TapExtensions.Interfaces.I2c;
 
@@ -24,7 +27,10 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
     {
         #region Settings
 
-        [Display("Device Number", Order: 1)] public int DevNumber { get; set; }
+        [Display("Connection Address", Order: 1,
+            Description: "Port Number, or Serial Number, or List of serial numbers separated by semicolons.\n\n" +
+                         "Examples:\n 1\n 2\n 2237174516\n 2237174516; 2239556166; 2239578705")]
+        public string ConnectionAddress { get; set; }
 
         [Display("Connect on Open", Order: 2)] public bool ConnectOnOpen { get; set; }
 
@@ -56,6 +62,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         {
             // Default values
             Name = nameof(Aardvark);
+            ConnectionAddress = "0";
             ConnectOnOpen = true;
             TargetPower = ETargetPower.Off;
             I2CPullup = EI2cPullup.Off;
@@ -63,65 +70,181 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
             SpiBitRateKhz = 1000;
 
             // Validation rules
-            Rules.Add(() => DevNumber >= 0,
-                "Must be greater or equal to zero", nameof(DevNumber));
+            Rules.Add(ValidateConnectionAddress,
+                "Not valid", nameof(ConnectionAddress));
             Rules.Add(() => I2CBitRateKhz >= 1 && I2CBitRateKhz <= 800,
                 "I2C bit rate must be between 1 and 800 kHz", nameof(I2CBitRateKhz));
             Rules.Add(() => SpiBitRateKhz >= 125 && SpiBitRateKhz <= 8000,
                 "SPI bit rate must be between 125 kHz and 8 MHz", nameof(SpiBitRateKhz));
         }
 
+        private enum EAddressType
+        {
+            PortNumber,
+            SerialNumber,
+            ListOfSerialNumbers
+        }
+
+        private bool ValidateConnectionAddress()
+        {
+            try
+            {
+                GetAddressType();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        private EAddressType GetAddressType()
+        {
+            if (Regex.IsMatch(ConnectionAddress, @"^[0-9]{1}$"))
+                return EAddressType.PortNumber;
+
+            if (Regex.IsMatch(ConnectionAddress, @"^[0-9]{10}$"))
+                return EAddressType.SerialNumber;
+
+            if (Regex.IsMatch(ConnectionAddress, @"^[0-9]{10}\s*(;\s*[0-9]{10}\s*)*$"))
+                return EAddressType.ListOfSerialNumbers;
+
+            throw new InvalidOperationException(
+                $"{nameof(ConnectionAddress)} is not valid");
+        }
+
+
+        private class Device
+        {
+            public ushort PortNumber { get; set; }
+            public uint SerialNumber { get; set; }
+        }
+
+        private List<Device> FindDevices()
+        {
+            const int quantity = 10;
+            var portNumbers = new ushort[quantity];
+            var serialNumbers = new uint[quantity];
+
+            var numDevicesFound =
+                AardvarkWrapper.net_aa_find_devices_ext(quantity, portNumbers, quantity, serialNumbers);
+
+            if (numDevicesFound < 1)
+                throw new InvalidOperationException("Aardvark devices not found");
+
+            var devices = new List<Device>();
+            for (var i = 0; i < numDevicesFound; i++)
+                devices.Add(new Device { PortNumber = portNumbers[i], SerialNumber = serialNumbers[i] });
+
+            Log.Debug($"Found {numDevicesFound} Aardvark device(s), with serial number(s) of " +
+                      $"'{string.Join("', '", devices.Select(x => x.SerialNumber).ToList())}'.");
+
+            return devices;
+        }
+
+        private Device FindDevice()
+        {
+            var devices = FindDevices();
+
+            switch (GetAddressType())
+            {
+                case EAddressType.PortNumber:
+                {
+                    if (!ushort.TryParse(ConnectionAddress, out var portNumber))
+                        throw new InvalidOperationException(
+                            $"Cannot parse PortNumber from {nameof(ConnectionAddress)} of '{ConnectionAddress}'");
+
+                    var device = devices.FirstOrDefault(x => x.PortNumber == portNumber);
+                    if (device == null)
+                        throw new InvalidOperationException(
+                            $"Cannot find PortNumber of '{portNumber}' in list of devices");
+
+                    return device;
+                }
+                case EAddressType.SerialNumber:
+                {
+                    if (!uint.TryParse(ConnectionAddress, out var serialNumber))
+                        throw new InvalidOperationException(
+                            $"Cannot parse SerialNumber from {nameof(ConnectionAddress)} of '{ConnectionAddress}'");
+
+                    var device = devices.FirstOrDefault(x => x.SerialNumber == serialNumber);
+                    if (device == null)
+                        throw new InvalidOperationException(
+                            $"Cannot find SerialNumber of '{serialNumber}' in list of devices");
+
+                    return device;
+                }
+                case EAddressType.ListOfSerialNumbers:
+                {
+                    var requests = ConnectionAddress.Split(';')
+                        .Select(x => x.Trim())
+                        .Where(x => !string.IsNullOrWhiteSpace(x))
+                        .ToList();
+
+                    var device = new Device();
+                    foreach (var request in requests)
+                    {
+                        if (!uint.TryParse(request, out var serialNumber))
+                            throw new InvalidOperationException(
+                                $"Cannot parse SerialNumber from '{request}'");
+
+                        device = devices.FirstOrDefault(x => x.SerialNumber == serialNumber);
+                        if (device != null)
+                            break;
+                    }
+
+                    if (device == null)
+                        throw new InvalidOperationException(
+                            "Cannot find SerialNumber in list of devices");
+
+                    return device;
+                }
+                default:
+                    throw new InvalidOperationException(
+                        "Cannot find matching device");
+            }
+        }
+
         public override void Open()
         {
             base.Open();
 
-            // ToDo: net_aa_configure(aardvark, config);
-            // ToDo: net_aa_version(aardvark, ref version);
-            // ToDo: return Marshal.PtrToStringAnsi(net_aa_status_string(status));
-            // ToDo: return net_aa_unique_id(aardvark);
-            // ToDo: return net_aa_port(aardvark);
+            if (ConnectOnOpen)
+                Initialize();
+        }
 
+        public override void Close()
+        {
+            CheckIfInitialized();
+
+            // Restore powerMask power to off
+            if (TargetPower != ETargetPower.Off)
+                SetTargetPower(ETargetPower.Off);
+
+            AardvarkWrapper.net_aa_close(AardvarkHandle);
+            AardvarkHandle = 0;
+            _isInitialized = false;
+            base.Close();
+        }
+
+        private void Initialize()
+        {
             lock (_instLock)
             {
                 if (_isInitialized)
-                    throw new ApplicationException("Aardvark(s) already initialized!");
+                    throw new InvalidOperationException($"{Name} already initialized");
 
-                if (!ConnectOnOpen)
-                    return;
+                var device = FindDevice();
+                Log.Debug($"Opening Aardvark device with port number of '{device.PortNumber}' " +
+                          $"and serial number of '{device.SerialNumber}'");
 
-                // Find Devices
-                var maxNumDevices = 16;
-                var devices = new ushort[maxNumDevices];
-                var numDevicesFound = AardvarkWrapper.net_aa_find_devices(maxNumDevices, devices);
-                if (numDevicesFound < 1)
-                    throw new InvalidOperationException("Aardvark devices not found");
-
-                Log.Debug("Found " + numDevicesFound + " Aardvarks. Initializing device number " + DevNumber + ".");
-
-                // Open an Aardvark device
-                const int stepDelay = 333;
-                var tryDelay = 0;
-                var aExt = new AardvarkWrapper.AardvarkExt();
-                do
-                {
-                    TapThread.Sleep(tryDelay);
-                    tryDelay += stepDelay; // 0, 333, 666, 999...
-                    AardvarkHandle = AardvarkWrapper.net_aa_open_ext(DevNumber, ref aExt);
-                } while (AardvarkHandle < 0 && tryDelay < 1000);
+                AardvarkHandle = AardvarkWrapper.net_aa_open(device.PortNumber);
 
                 if (AardvarkHandle < 0)
                 {
                     var errorMsg = Marshal.PtrToStringAnsi(AardvarkWrapper.net_aa_status_string(AardvarkHandle));
-                    throw new ApplicationException($"{Name}: Error {AardvarkHandle}, {errorMsg}");
+                    throw new InvalidOperationException($"{Name}: Error {AardvarkHandle}, {errorMsg}");
                 }
-
-                // Get Unique ID
-                var uniqueId = AardvarkWrapper.net_aa_unique_id(AardvarkHandle);
-                if (uniqueId < 1)
-                    throw new ApplicationException("Aardvark's unique ID should be non-zero if valid.");
-
-                Log.Debug("Aardvark<" + DevNumber + "> has serial number of " + uniqueId + ".");
-
 
                 // Configure
                 _isInitialized = true;
@@ -132,8 +255,10 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                     Log.Debug($"Setting config mode to {configMode}");
                     var stat = AardvarkWrapper.net_aa_configure(AardvarkHandle, configMode);
                     if (stat != (int)configMode)
-                        throw new ApplicationException("ERRor[" + stat +
-                                                       "] when configuring aardvark to SPI+I2C mode.");
+                    {
+                        var errorMsg = Marshal.PtrToStringAnsi(AardvarkWrapper.net_aa_status_string(AardvarkHandle));
+                        throw new InvalidOperationException($"{Name}: Error {AardvarkHandle}, {errorMsg}");
+                    }
 
                     // Settings below must add, if some application stops working. SpiInit set these, but if application do not run it???
                     //stat = AardvarkWrapper.net_aa_spi_configure(AardvarkHandle, AardvarkSpiPolarity.AaSpiPolRisingFalling,
@@ -156,34 +281,8 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
 
 
                 // ToDo: SPI Configuration
-
-
-                // ToDo: net_aa_version(aardvark, ref version);
-
-                // Status
-                //var status = AardvarkStatus.AaUnableToOpen;
-                //var statusString = Marshal.PtrToStringAnsi(AardvarkWrapper.net_aa_status_string((int)status));
-                //Log.Debug("Aardvark<" + DevNumber + "> status is :" + statusString + ".");
-
-                Log.Debug("Aardvark<" + DevNumber + "> initialized with try " + tryDelay / stepDelay + ".");
             }
         }
-
-        public override void Close()
-        {
-            CheckIfInitialized();
-
-            // Restore powerMask power to off
-            if (TargetPower != ETargetPower.Off)
-                SetTargetPower(ETargetPower.Off);
-
-            AardvarkWrapper.net_aa_close(AardvarkHandle);
-            AardvarkHandle = 0;
-            _isInitialized = false;
-            base.Close();
-        }
-
-        #region Private Methods
 
         private void CheckIfInitialized()
         {
@@ -210,8 +309,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
         private void LogDebugData(string infoStart, byte[] data, int stat = 0)
         {
             if (string.IsNullOrEmpty(infoStart))
-                throw new ArgumentException("LogDebugData Value(infoStart) cannot be null or empty.",
-                    nameof(infoStart));
+                throw new InvalidOperationException("LogDebugData Value(infoStart) cannot be null or empty.");
 
             if (data == null)
             {
@@ -249,7 +347,5 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                     Log.Debug(infoStart + hexValues + " )");
             }
         }
-
-        #endregion
     }
 }
