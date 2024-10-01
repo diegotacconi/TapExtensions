@@ -2,11 +2,11 @@
 using OpenTap;
 using TapExtensions.Interfaces.Gpio;
 
-namespace TapExtensions.Instruments.MultipleInterfaces.RasPi
+namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
 {
-    [Display("RasPiGpio",
+    [Display("RaspiGpio",
         Groups: new[] { "TapExtensions", "Instruments", "MultipleInterfaces" })]
-    public class RasPiGpio : Resource, IGpio
+    public class RaspiGpio : Resource, IGpio
     {
         public void SetPinMode(int pin, EPinMode mode)
         {
@@ -31,7 +31,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.RasPi
     }
 
     // ReSharper disable InconsistentNaming
-    public enum ERasPiPin
+    public enum ERaspiPin
     {
         GPIO_02_PINHDR_03 = 3,
         GPIO_03_PINHDR_05 = 5,

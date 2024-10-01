@@ -5,11 +5,11 @@ using OpenTap;
 using Renci.SshNet;
 using TapExtensions.Interfaces.Ssh;
 
-namespace TapExtensions.Instruments.MultipleInterfaces.RasPi
+namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
 {
-    [Display("RasPiSsh",
+    [Display("RaspiSsh",
         Groups: new[] { "TapExtensions", "Instruments", "MultipleInterfaces" })]
-    public class RasPiSsh : Resource, ISecureShell
+    public class RaspiSsh : Resource, ISecureShell
     {
         #region Settings
 
@@ -61,10 +61,10 @@ namespace TapExtensions.Instruments.MultipleInterfaces.RasPi
         private SshClient _sshClient;
         private ForwardedPortLocal _forwardedPortLocal;
 
-        public RasPiSsh()
+        public RaspiSsh()
         {
             // Default SSH Setting values
-            Name = nameof(RasPiSsh);
+            Name = nameof(RaspiSsh);
             IpAddress = "192.168.100.1";
             TcpPort = 22;
             Username = "pi";

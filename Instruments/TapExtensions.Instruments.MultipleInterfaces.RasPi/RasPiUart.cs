@@ -2,11 +2,11 @@
 using System.IO.Ports;
 using OpenTap;
 
-namespace TapExtensions.Instruments.MultipleInterfaces.RasPi
+namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
 {
-    [Display("RasPiUart",
+    [Display("RaspiUart",
         Groups: new[] { "TapExtensions", "Instruments", "MultipleInterfaces" })]
-    public class RasPiUart : Resource
+    public class RaspiUart : Resource
     {
         #region Settings
 
@@ -20,10 +20,10 @@ namespace TapExtensions.Instruments.MultipleInterfaces.RasPi
 
         private SerialPort _sp;
 
-        public RasPiUart()
+        public RaspiUart()
         {
             // Default values
-            Name = nameof(RasPiUart);
+            Name = nameof(RaspiUart);
             SerialPortName = "COM5";
         }
 
