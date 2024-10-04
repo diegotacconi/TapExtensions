@@ -46,6 +46,9 @@
     <File Path="Packages/TapExtensions/TapExtensions.Shared.dll" SourcePath="TapExtensions.Shared.dll">
       <SetAssemblyInfo Attributes="Version" />
     </File>
+    <File Path="Packages/TapExtensions/TapExtensions.Shared.Telnet.dll" SourcePath="TapExtensions.Shared.Telnet.dll">
+      <SetAssemblyInfo Attributes="Version" />
+    </File>
     <File Path="Packages/TapExtensions/TapExtensions.Shared.Win32.dll" SourcePath="TapExtensions.Shared.Win32.dll">
       <SetAssemblyInfo Attributes="Version" />
     </File>
@@ -67,6 +70,7 @@
     <File Path="Packages/TapExtensions/TapExtensions.Results.ZipFile.pdb" SourcePath="TapExtensions.Results.ZipFile.pdb" />
     <File Path="Packages/TapExtensions/TapExtensions.Settings.Integrity.pdb" SourcePath="TapExtensions.Settings.Integrity.pdb" />
     <File Path="Packages/TapExtensions/TapExtensions.Shared.pdb" SourcePath="TapExtensions.Shared.pdb" />
+    <File Path="Packages/TapExtensions/TapExtensions.Shared.Telnet.pdb" SourcePath="TapExtensions.Shared.Telnet.pdb" />
     <File Path="Packages/TapExtensions/TapExtensions.Shared.Win32.pdb" SourcePath="TapExtensions.Shared.Win32.pdb" />
     <File Path="Packages/TapExtensions/TapExtensions.Steps.pdb" SourcePath="TapExtensions.Steps.pdb" />
     -->
