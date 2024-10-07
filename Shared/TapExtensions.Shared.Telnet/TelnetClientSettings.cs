@@ -9,8 +9,9 @@ namespace TapExtensions.Shared.Telnet
         public IPEndPoint LocalEndpoint { get; set; }
 
         /// <summary>
+        ///     Disable Nagle's algorithm
         ///     Gets or sets a value that disables a delay when send or receive buffers are not full.
-        ///     true if the delay is disabled; otherwise, false. The default value is false.
+        ///     True if the delay is disabled, otherwise false.
         /// </summary>
         public bool NoDelay { get; set; } = true;
 
