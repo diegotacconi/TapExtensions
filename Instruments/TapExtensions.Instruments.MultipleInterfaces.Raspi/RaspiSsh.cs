@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using OpenTap;
@@ -65,7 +65,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
         {
             // Default SSH Setting values
             Name = nameof(RaspiSsh);
-            IpAddress = "192.168.100.1";
+            IpAddress = "192.168.4.100";
             TcpPort = 22;
             Username = "pi";
             Password = "";

@@ -13,7 +13,7 @@
     <Name>Uart</Name>
   </UartDut>
   <SshCommandDut type="TapExtensions.Duts.Ssh.SshCommandDut" Source="">
-    <IpAddress>192.168.101.1</IpAddress>
+    <IpAddress>192.168.4.100</IpAddress>
     <TcpPort>22</TcpPort>
     <Username>pi</Username>
     <Password>raspberry</Password>
@@ -24,7 +24,7 @@
     <Name>SshCommand</Name>
   </SshCommandDut>
   <SshShellDut type="TapExtensions.Duts.Ssh.SshShellDut" Source="">
-    <IpAddress>192.168.101.1</IpAddress>
+    <IpAddress>192.168.4.100</IpAddress>
     <TcpPort>22</TcpPort>
     <Username>pi</Username>
     <Password>raspberry</Password>

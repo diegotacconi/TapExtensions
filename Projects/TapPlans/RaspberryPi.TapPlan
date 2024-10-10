@@ -28,7 +28,7 @@
       <OpenTap.Description />
     </TestStep>
     <TestStep type="TapExtensions.Steps.Network.Ping" Version="1.0.0" Id="7ab8c006-dee6-40b7-8a85-3c7ac4f0f702">
-      <IpAddress>192.168.101.1</IpAddress>
+      <IpAddress>192.168.4.100</IpAddress>
       <MinSuccessfulReplies>4</MinSuccessfulReplies>
       <Timeout>60</Timeout>
       <Enabled>true</Enabled>
