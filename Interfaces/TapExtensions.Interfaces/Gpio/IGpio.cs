@@ -1,8 +1,6 @@
-﻿using OpenTap;
-
-namespace TapExtensions.Interfaces.Gpio
+﻿namespace TapExtensions.Interfaces.Gpio
 {
-    public interface IGpio : IInstrument
+    public interface IGpio
     {
         void SetPinMode(int pin, EPinMode mode);
 

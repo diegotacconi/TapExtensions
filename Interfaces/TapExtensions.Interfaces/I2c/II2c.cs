@@ -1,8 +1,6 @@
-﻿using OpenTap;
-
-namespace TapExtensions.Interfaces.I2c
+﻿namespace TapExtensions.Interfaces.I2c
 {
-    public interface II2C : IInstrument
+    public interface II2C
     {
         byte[] Read(ushort slaveAddress, ushort numOfBytes);
 

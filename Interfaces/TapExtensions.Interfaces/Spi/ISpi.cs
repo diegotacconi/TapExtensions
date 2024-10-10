@@ -1,6 +1,4 @@
-﻿using OpenTap;
-
-namespace TapExtensions.Interfaces.Spi
+﻿namespace TapExtensions.Interfaces.Spi
 {
     #region enums
 
@@ -95,7 +93,7 @@ namespace TapExtensions.Interfaces.Spi
 
     #endregion
 
-    public interface ISpi : IInstrument
+    public interface ISpi
     {
         void Delay(int value, ESpiSleepMode sleepMode);
 
