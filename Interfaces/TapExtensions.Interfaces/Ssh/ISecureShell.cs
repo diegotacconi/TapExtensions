@@ -3,7 +3,7 @@ using OpenTap;
 
 namespace TapExtensions.Interfaces.Ssh
 {
-    public interface ISecureShell : IInstrument, IDut
+    public interface ISecureShell : IDut
     {
         string IpAddress { get; }
 
