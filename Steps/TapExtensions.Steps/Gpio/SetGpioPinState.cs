@@ -9,7 +9,7 @@ namespace TapExtensions.Steps.Gpio
     {
         [Display("Gpio", Order: 1)] public IGpio Gpio { get; set; }
 
-        [Display("Pin Number", Order: 2)] public int PinNumber { get; set; }
+        [Display("Pin Number", Order: 2)] public int PinNumber { get; set; } = 5;
 
         [Display("Pin State", Order: 3)] public EPinState PinState { get; set; }
 

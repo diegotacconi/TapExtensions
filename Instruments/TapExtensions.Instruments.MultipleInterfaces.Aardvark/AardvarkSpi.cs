@@ -50,21 +50,25 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Aardvark
                         spiPolar = AardvarkSpiPolarity.AA_SPI_POL_RISING_FALLING;
                         spiPhase = AardvarkSpiPhase.AA_SPI_PHASE_SAMPLE_SETUP;
                         break;
+
                     case ESpiMode.Mode1:
                         spiPolar = AardvarkSpiPolarity.AA_SPI_POL_RISING_FALLING;
                         spiPhase = AardvarkSpiPhase.AA_SPI_PHASE_SETUP_SAMPLE;
                         break;
+
                     case ESpiMode.Mode2:
                         spiPolar = AardvarkSpiPolarity.AA_SPI_POL_FALLING_RISING;
                         spiPhase = AardvarkSpiPhase.AA_SPI_PHASE_SAMPLE_SETUP;
                         break;
+
                     case ESpiMode.Mode3:
                         spiPolar = AardvarkSpiPolarity.AA_SPI_POL_FALLING_RISING;
                         spiPhase = AardvarkSpiPhase.AA_SPI_PHASE_SETUP_SAMPLE;
                         break;
+
                     default:
-                        throw new ArgumentException("SPI Init \"mode\"-parameter: " + mode + " is not allowed.",
-                            nameof(mode));
+                        throw new ArgumentException(
+                            $"Case not found for {nameof(mode)}={mode}");
                 }
 
                 var spiBitOrder = AardvarkSpiBitorder.AA_SPI_BITORDER_LSB;

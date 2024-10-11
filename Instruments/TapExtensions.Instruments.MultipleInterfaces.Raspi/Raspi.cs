@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Net;
 using OpenTap;
 using Renci.SshNet;
-// using TapExtensions.Interfaces.Ssh;
 
 namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
 {
     [Display("Raspberry Pi",
         Groups: new[] { "TapExtensions", "Instruments", "MultipleInterfaces" })]
-    public partial class Raspi : Instrument // , ISecureShell
+    public partial class Raspi : Instrument
     {
         #region Settings
 
@@ -131,7 +130,8 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
             Log.Debug($"SSH >> {cmd.CommandText}");
 
             response = cmd.Execute();
-            Log.Debug($"SSH << {response}");
+            if (!string.IsNullOrWhiteSpace(response))
+                Log.Debug($"SSH << {response}");
 
             return cmd.ExitStatus == 0;
         }
