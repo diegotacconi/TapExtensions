@@ -1,6 +1,8 @@
-﻿namespace TapExtensions.Interfaces.Uart
+﻿using OpenTap;
+
+namespace TapExtensions.Interfaces.Uart
 {
-    public interface IUart
+    public interface IUart : IDut
     {
         bool Expect(string expectedResponse, int timeout);
 
