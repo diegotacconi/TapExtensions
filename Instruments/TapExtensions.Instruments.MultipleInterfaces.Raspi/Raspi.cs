@@ -1,15 +1,15 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using OpenTap;
 using Renci.SshNet;
-using TapExtensions.Interfaces.Ssh;
+// using TapExtensions.Interfaces.Ssh;
 
 namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
 {
-    [Display("RaspiSsh",
+    [Display("Raspberry Pi",
         Groups: new[] { "TapExtensions", "Instruments", "MultipleInterfaces" })]
-    public class RaspiSsh : Resource, ISecureShell
+    public partial class Raspi : Instrument // , ISecureShell
     {
         #region Settings
 
@@ -61,10 +61,10 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
         private SshClient _sshClient;
         private ForwardedPortLocal _forwardedPortLocal;
 
-        public RaspiSsh()
+        public Raspi()
         {
             // Default SSH Setting values
-            Name = nameof(RaspiSsh);
+            Name = nameof(Raspi);
             IpAddress = "192.168.4.100";
             TcpPort = 22;
             Username = "pi";
@@ -152,6 +152,11 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
 
             _sshClient.Connect();
             IsConnected = true;
+        }
+
+        private void CheckIfConnected()
+        {
+            SshConnect();
         }
 
         private void SshDisconnect()
