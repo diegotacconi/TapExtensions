@@ -4,7 +4,7 @@ namespace TapExtensions.Interfaces.Gpio
 {
     public interface IGpio : IInstrument
     {
-        void SetPinMode(int pin, EPinMode mode);
+        void SetPinMode(int pin, EPinInputMode mode);
 
         void SetPinState(int pin, EPinState state);
 
@@ -13,15 +13,15 @@ namespace TapExtensions.Interfaces.Gpio
 
     public enum EPinState
     {
-        High = 1,
-        Low = 0
+        OutputHigh,
+        OutputLow,
+        Input
     }
 
-    public enum EPinMode
+    public enum EPinInputMode
     {
-        Input,
-        InputPullDown,
-        InputPullUp,
-        Output
+        PullUp,
+        PullDown,
+        PullNone
     }
 }
