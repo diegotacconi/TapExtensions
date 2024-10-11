@@ -7,11 +7,11 @@ using OpenTap;
 using TapExtensions.Interfaces.Uart;
 using TapExtensions.Shared.Telnet;
 
-namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
+namespace TapExtensions.Duts.Uart
 {
-    [Display("RaspiSer2Net",
-        Groups: new[] { "TapExtensions", "Instruments", "MultipleInterfaces" })]
-    public class RaspiSer2Net : Resource, IUart
+    [Display("Ser2Net",
+        Groups: new[] { "TapExtensions", "Duts", "Uart" })]
+    public class Ser2Net : Dut, IUart
     {
         #region Settings
 
@@ -23,10 +23,10 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
 
         private static TelnetClient _client;
 
-        public RaspiSer2Net()
+        public Ser2Net()
         {
             // Default values
-            Name = nameof(RaspiSer2Net);
+            Name = nameof(Ser2Net);
             IpAddress = "192.168.4.100";
             TcpPort = 3000;
 

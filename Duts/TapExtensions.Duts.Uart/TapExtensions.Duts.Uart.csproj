@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Interfaces\TapExtensions.Interfaces\TapExtensions.Interfaces.csproj" />
+    <ProjectReference Include="..\..\Shared\TapExtensions.Shared.Telnet\TapExtensions.Shared.Telnet.csproj" />
   </ItemGroup>
 
 </Project>
