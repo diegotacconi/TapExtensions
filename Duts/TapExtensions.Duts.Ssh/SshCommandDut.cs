@@ -187,6 +187,9 @@ namespace TapExtensions.Duts.Ssh
         public bool SendSshQuery(string command, int timeout, out string response)
         {
             if (_sshClient == null || !_sshClient.IsConnected)
+                Connect();
+
+            if (_sshClient == null || !_sshClient.IsConnected)
                 throw new InvalidOperationException($"{Name} is not connected");
 
             var stopwatch = new Stopwatch();
