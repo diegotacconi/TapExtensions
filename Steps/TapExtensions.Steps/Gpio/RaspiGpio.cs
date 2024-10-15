@@ -1,15 +1,11 @@
 ﻿using System;
-using System.IO;
-using System.Text.RegularExpressions;
+using System.Collections.Generic;
 using OpenTap;
-using TapExtensions.Interfaces.Gpio;
 using TapExtensions.Interfaces.Ssh;
 
 namespace TapExtensions.Steps.Gpio
 {
-    [Display("RaspiSetGpioPin", Groups: new[] { "TapExtensions", "Steps", "Gpio" },
-        Description: "Control Raspberry Pi GPIO's using SSH")]
-    public class RaspiSetGpioPin : TestStep
+    public abstract class RaspiGpio : TestStep
     {
         [Display("Raspi", Order: 1)] public ISecureShell Raspi { get; set; }
 
@@ -44,26 +40,67 @@ namespace TapExtensions.Steps.Gpio
             GPIO_27_PINHDR_13 = 27
         }
 
-        [Display("Pin Number", Order: 2)] public ERaspiGpio PinNumber { get; set; } = ERaspiGpio.GPIO_05_PINHDR_29;
-
-        [Display("Pin State", Order: 3)] public EPinState PinState { get; set; }
-
-        public override void Run()
+        public enum EDirection
         {
-            try
-            {
-                SetPinState((int)PinNumber, PinState);
-                UpgradeVerdict(Verdict.Pass);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message);
-                UpgradeVerdict(Verdict.Fail);
-            }
+            Input,
+            Output
+        }
+
+        public enum EPull
+        {
+            PullUp,
+            PullDown,
+            PullNone
+        }
+
+        public enum EOutputDrive
+        {
+            DriveHigh,
+            DriveLow
+        }
+
+        public enum ELevel
+        {
+            High,
+            Low
         }
 
         #region GPIO Interface Implementation
 
+        public string GetShortCommand(string longCommand)
+        {
+            var dictionary =
+                new Dictionary<string, string>
+                {
+                    { "Input", "ip" },
+                    { "Output", "op" },
+                    { "AltFunction0", "a0" },
+                    { "AltFunction1", "a1" },
+                    { "AltFunction2", "a2" },
+                    { "AltFunction3", "a3" },
+                    { "AltFunction4", "a4" },
+                    { "AltFunction5", "a5" },
+                    { "AltFunction6", "a6" },
+                    { "AltFunction7", "a7" },
+                    { "AltFunction8", "a8" },
+                    { "NoFunction", "no" },
+                    { "PullUp", "pu" },
+                    { "PullDown", "pd" },
+                    { "PullNone", "pn" },
+                    { "DriveHigh", "dh" },
+                    { "DriveLow", "dl" },
+                    { "High", "hi" },
+                    { "Low", "lo" }
+                };
+
+            if (!dictionary.TryGetValue(longCommand, out var shortCommand))
+                throw new InvalidOperationException(
+                    $"The GPIO Command Dictionary does not contain '{longCommand}'");
+
+            return shortCommand;
+        }
+
+        /*
         private void SetPinMode(int pin, EPinInputMode mode)
         {
             throw new NotImplementedException();
@@ -166,67 +203,65 @@ namespace TapExtensions.Steps.Gpio
 
         private string[] GetGpioStatus(int pin)
         {
-            /*
-                pi@lmi:~ $ sudo raspi-gpio get
-                BANK0 (GPIO 0 to 27):
-                GPIO 0: level=1 func=INPUT pull=UP
-                GPIO 1: level=1 func=INPUT pull=UP
-                GPIO 2: level=1 alt=0 func=SDA1 pull=UP
-                GPIO 3: level=1 alt=0 func=SCL1 pull=UP
-                GPIO 4: level=1 func=INPUT pull=NONE
-                GPIO 5: level=1 func=INPUT pull=UP
-                GPIO 6: level=1 func=INPUT pull=UP
-                GPIO 7: level=1 func=OUTPUT pull=UP
-                GPIO 8: level=1 func=OUTPUT pull=UP
-                GPIO 9: level=0 alt=0 func=SPI0_MISO pull=DOWN
-                GPIO 10: level=0 alt=0 func=SPI0_MOSI pull=DOWN
-                GPIO 11: level=0 alt=0 func=SPI0_SCLK pull=DOWN
-                GPIO 12: level=0 func=INPUT pull=DOWN
-                GPIO 13: level=0 func=INPUT pull=DOWN
-                GPIO 14: level=1 alt=5 func=TXD1 pull=NONE
-                GPIO 15: level=1 alt=5 func=RXD1 pull=UP
-                GPIO 16: level=0 func=INPUT pull=DOWN
-                GPIO 17: level=0 func=INPUT pull=DOWN
-                GPIO 18: level=0 func=INPUT pull=DOWN
-                GPIO 19: level=0 func=INPUT pull=DOWN
-                GPIO 20: level=0 func=INPUT pull=DOWN
-                GPIO 21: level=0 func=INPUT pull=DOWN
-                GPIO 22: level=0 func=INPUT pull=DOWN
-                GPIO 23: level=0 func=INPUT pull=DOWN
-                GPIO 24: level=0 func=INPUT pull=DOWN
-                GPIO 25: level=0 func=INPUT pull=DOWN
-                GPIO 26: level=0 func=INPUT pull=DOWN
-                GPIO 27: level=0 func=INPUT pull=DOWN
-                BANK1 (GPIO 28 to 45):
-                GPIO 28: level=1 alt=5 func=RGMII_MDIO pull=UP
-                GPIO 29: level=0 alt=5 func=RGMII_MDC pull=DOWN
-                GPIO 30: level=0 alt=3 func=CTS0 pull=UP
-                GPIO 31: level=0 alt=3 func=RTS0 pull=NONE
-                GPIO 32: level=1 alt=3 func=TXD0 pull=NONE
-                GPIO 33: level=1 alt=3 func=RXD0 pull=UP
-                GPIO 34: level=1 alt=3 func=SD1_CLK pull=NONE
-                GPIO 35: level=1 alt=3 func=SD1_CMD pull=UP
-                GPIO 36: level=1 alt=3 func=SD1_DAT0 pull=UP
-                GPIO 37: level=1 alt=3 func=SD1_DAT1 pull=UP
-                GPIO 38: level=1 alt=3 func=SD1_DAT2 pull=UP
-                GPIO 39: level=1 alt=3 func=SD1_DAT3 pull=UP
-                GPIO 40: level=0 alt=0 func=PWM1_0 pull=NONE
-                GPIO 41: level=0 alt=0 func=PWM1_1 pull=NONE
-                GPIO 42: level=0 func=OUTPUT pull=UP
-                GPIO 43: level=1 func=INPUT pull=UP
-                GPIO 44: level=1 func=INPUT pull=UP
-                GPIO 45: level=1 func=INPUT pull=UP
-                BANK2 (GPIO 46 to 53):
-                GPIO 46: level=0 func=INPUT pull=UP
-                GPIO 47: level=0 func=INPUT pull=UP
-                GPIO 48: level=0 func=INPUT pull=DOWN
-                GPIO 49: level=0 func=INPUT pull=DOWN
-                GPIO 50: level=0 func=INPUT pull=DOWN
-                GPIO 51: level=0 func=INPUT pull=DOWN
-                GPIO 52: level=0 func=INPUT pull=DOWN
-                GPIO 53: level=0 func=INPUT pull=DOWN
-                pi@lmi:~ $
-             */
+                //pi@lmi:~ $ sudo raspi-gpio get
+                //BANK0 (GPIO 0 to 27):
+                //GPIO 0: level=1 func=INPUT pull=UP
+                //GPIO 1: level=1 func=INPUT pull=UP
+                //GPIO 2: level=1 alt=0 func=SDA1 pull=UP
+                //GPIO 3: level=1 alt=0 func=SCL1 pull=UP
+                //GPIO 4: level=1 func=INPUT pull=NONE
+                //GPIO 5: level=1 func=INPUT pull=UP
+                //GPIO 6: level=1 func=INPUT pull=UP
+                //GPIO 7: level=1 func=OUTPUT pull=UP
+                //GPIO 8: level=1 func=OUTPUT pull=UP
+                //GPIO 9: level=0 alt=0 func=SPI0_MISO pull=DOWN
+                //GPIO 10: level=0 alt=0 func=SPI0_MOSI pull=DOWN
+                //GPIO 11: level=0 alt=0 func=SPI0_SCLK pull=DOWN
+                //GPIO 12: level=0 func=INPUT pull=DOWN
+                //GPIO 13: level=0 func=INPUT pull=DOWN
+                //GPIO 14: level=1 alt=5 func=TXD1 pull=NONE
+                //GPIO 15: level=1 alt=5 func=RXD1 pull=UP
+                //GPIO 16: level=0 func=INPUT pull=DOWN
+                //GPIO 17: level=0 func=INPUT pull=DOWN
+                //GPIO 18: level=0 func=INPUT pull=DOWN
+                //GPIO 19: level=0 func=INPUT pull=DOWN
+                //GPIO 20: level=0 func=INPUT pull=DOWN
+                //GPIO 21: level=0 func=INPUT pull=DOWN
+                //GPIO 22: level=0 func=INPUT pull=DOWN
+                //GPIO 23: level=0 func=INPUT pull=DOWN
+                //GPIO 24: level=0 func=INPUT pull=DOWN
+                //GPIO 25: level=0 func=INPUT pull=DOWN
+                //GPIO 26: level=0 func=INPUT pull=DOWN
+                //GPIO 27: level=0 func=INPUT pull=DOWN
+                //BANK1 (GPIO 28 to 45):
+                //GPIO 28: level=1 alt=5 func=RGMII_MDIO pull=UP
+                //GPIO 29: level=0 alt=5 func=RGMII_MDC pull=DOWN
+                //GPIO 30: level=0 alt=3 func=CTS0 pull=UP
+                //GPIO 31: level=0 alt=3 func=RTS0 pull=NONE
+                //GPIO 32: level=1 alt=3 func=TXD0 pull=NONE
+                //GPIO 33: level=1 alt=3 func=RXD0 pull=UP
+                //GPIO 34: level=1 alt=3 func=SD1_CLK pull=NONE
+                //GPIO 35: level=1 alt=3 func=SD1_CMD pull=UP
+                //GPIO 36: level=1 alt=3 func=SD1_DAT0 pull=UP
+                //GPIO 37: level=1 alt=3 func=SD1_DAT1 pull=UP
+                //GPIO 38: level=1 alt=3 func=SD1_DAT2 pull=UP
+                //GPIO 39: level=1 alt=3 func=SD1_DAT3 pull=UP
+                //GPIO 40: level=0 alt=0 func=PWM1_0 pull=NONE
+                //GPIO 41: level=0 alt=0 func=PWM1_1 pull=NONE
+                //GPIO 42: level=0 func=OUTPUT pull=UP
+                //GPIO 43: level=1 func=INPUT pull=UP
+                //GPIO 44: level=1 func=INPUT pull=UP
+                //GPIO 45: level=1 func=INPUT pull=UP
+                //BANK2 (GPIO 46 to 53):
+                //GPIO 46: level=0 func=INPUT pull=UP
+                //GPIO 47: level=0 func=INPUT pull=UP
+                //GPIO 48: level=0 func=INPUT pull=DOWN
+                //GPIO 49: level=0 func=INPUT pull=DOWN
+                //GPIO 50: level=0 func=INPUT pull=DOWN
+                //GPIO 51: level=0 func=INPUT pull=DOWN
+                //GPIO 52: level=0 func=INPUT pull=DOWN
+                //GPIO 53: level=0 func=INPUT pull=DOWN
+                //pi@lmi:~ $
 
             var command = $"sudo raspi-gpio get {pin}";
             if (!Raspi.SendSshQuery(command, 5, out var response))
@@ -288,6 +323,7 @@ namespace TapExtensions.Steps.Gpio
 
             return inputMode;
         }
+        */
 
         #endregion
     }
