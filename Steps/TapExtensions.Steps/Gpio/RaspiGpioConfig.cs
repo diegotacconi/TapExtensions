@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using OpenTap;
+using TapExtensions.Interfaces.Gpio;
 
 namespace TapExtensions.Steps.Gpio
 {
@@ -29,9 +30,11 @@ namespace TapExtensions.Steps.Gpio
             {
                 foreach (var config in Configs)
                 {
+                    // SetPinDirection((int)config.Pin, config.Direction);
+                    // SetPinPull((int)config.Pin, config.Pull);
                     var pin = (int)config.Pin;
-                    var direction = GetShortCommand(config.Direction.ToString());
-                    var pull = GetShortCommand(config.Pull.ToString());
+                    var direction = EnumToString(config.Direction);
+                    var pull = EnumToString(config.Pull);
                     var cmd = $"sudo pinctrl set {pin} {direction} {pull}";
                     Log.Debug(cmd);
                 }

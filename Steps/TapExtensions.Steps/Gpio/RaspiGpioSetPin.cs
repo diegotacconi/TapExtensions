@@ -1,5 +1,6 @@
 ﻿using System;
 using OpenTap;
+using TapExtensions.Interfaces.Gpio;
 
 namespace TapExtensions.Steps.Gpio
 {
@@ -8,16 +9,18 @@ namespace TapExtensions.Steps.Gpio
     {
         [Display("Pin", Order: 2)] public ERaspiGpio Pin { get; set; } = ERaspiGpio.GPIO_05_PINHDR_29;
 
-        [Display("OutputDrive", Order: 5)] public EOutputDrive OutputDrive { get; set; } = EOutputDrive.DriveHigh;
+        [Display("OutputDrive", Order: 5)] public EDrive Drive { get; set; } = EDrive.DriveHigh;
 
         public override void Run()
         {
             try
             {
+                // SetPinDrive((int)Pin, Drive);
                 var pin = (int)Pin;
-                var drive = GetShortCommand(OutputDrive.ToString());
+                var drive = EnumToString(Drive);
                 var cmd = $"sudo pinctrl set {pin} {drive}";
                 Log.Debug(cmd);
+
                 UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)

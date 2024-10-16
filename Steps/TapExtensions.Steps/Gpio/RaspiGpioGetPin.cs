@@ -1,5 +1,6 @@
 ﻿using System;
 using OpenTap;
+using TapExtensions.Interfaces.Gpio;
 
 namespace TapExtensions.Steps.Gpio
 {
@@ -15,11 +16,19 @@ namespace TapExtensions.Steps.Gpio
             try
             {
                 var pin = (int)Pin;
-                var expectedLevel = GetShortCommand(ExpectedLevel.ToString());
-                var measuredLevel = GetShortCommand(ExpectedLevel.ToString());
-                var cmd = $"sudo pinctrl get {pin} ==> (measured = '{measuredLevel}', expected = '{expectedLevel}')";
+
+                // var measuredLevel = GetPinLevel(Pin);
+                var cmd = $"sudo pinctrl get {pin}";
                 Log.Debug(cmd);
-                UpgradeVerdict(measuredLevel == expectedLevel ? Verdict.Pass : Verdict.Fail);
+                var response = " 6: ip    pu | hi // GPIO6 = input";
+                Log.Debug(response);
+                var measuredLevel = (ELevel)ParseLevel(response);
+
+                if (measuredLevel != ExpectedLevel)
+                    throw new InvalidOperationException(
+                        $"Measured level of '{measuredLevel}' is not equal to the expected level of '{ExpectedLevel}'");
+
+                UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)
             {

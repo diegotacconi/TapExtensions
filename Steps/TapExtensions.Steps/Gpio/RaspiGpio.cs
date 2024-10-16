@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using OpenTap;
+using TapExtensions.Interfaces.Gpio;
 using TapExtensions.Interfaces.Ssh;
 
 namespace TapExtensions.Steps.Gpio
@@ -40,73 +42,81 @@ namespace TapExtensions.Steps.Gpio
             GPIO_27_PINHDR_13 = 27
         }
 
-        public enum EDirection
-        {
-            Input,
-            Output
-        }
-
-        public enum EPull
-        {
-            PullUp,
-            PullDown,
-            PullNone
-        }
-
-        public enum EOutputDrive
-        {
-            DriveHigh,
-            DriveLow
-        }
-
-        public enum ELevel
-        {
-            High,
-            Low
-        }
-
         #region GPIO Interface Implementation
 
-        public string GetShortCommand(string longCommand)
+        private readonly Dictionary<Enum, string> dictionary =
+            new Dictionary<Enum, string>
+            {
+                { EDirection.Input, "ip" },
+                { EDirection.Output, "op" },
+                { EPull.PullNone, "pn" },
+                { EPull.PullDown, "pd" },
+                { EPull.PullUp, "pu" },
+                { EDrive.DriveLow, "dl" },
+                { EDrive.DriveHigh, "dh" },
+                { ELevel.Low, "lo" },
+                { ELevel.High, "hi" }
+            };
+
+        private protected string EnumToString(Enum key)
         {
-            var dictionary =
-                new Dictionary<string, string>
-                {
-                    { "Input", "ip" },
-                    { "Output", "op" },
-                    { "AltFunction0", "a0" },
-                    { "AltFunction1", "a1" },
-                    { "AltFunction2", "a2" },
-                    { "AltFunction3", "a3" },
-                    { "AltFunction4", "a4" },
-                    { "AltFunction5", "a5" },
-                    { "AltFunction6", "a6" },
-                    { "AltFunction7", "a7" },
-                    { "AltFunction8", "a8" },
-                    { "NoFunction", "no" },
-                    { "PullUp", "pu" },
-                    { "PullDown", "pd" },
-                    { "PullNone", "pn" },
-                    { "DriveHigh", "dh" },
-                    { "DriveLow", "dl" },
-                    { "High", "hi" },
-                    { "Low", "lo" }
-                };
-
-            if (!dictionary.TryGetValue(longCommand, out var shortCommand))
+            if (!dictionary.TryGetValue(key, out var value))
                 throw new InvalidOperationException(
-                    $"The GPIO Command Dictionary does not contain '{longCommand}'");
+                    $"Cannot find key of '{key}' in GPIO dictionary");
 
-            return shortCommand;
+            return value;
+        }
+
+        private protected Enum StringToEnum(string value)
+        {
+            if (!dictionary.ContainsValue(value))
+                throw new InvalidOperationException(
+                    $"Cannot find value of '{value}' in GPIO dictionary");
+
+            var key = dictionary.FirstOrDefault(x => x.Value == value).Key;
+            return key;
+        }
+
+        private protected Enum ParseLevel(string response)
+        {
+            // "%2d: %2s %s %s | %s // %s%s%s\n"
+            // "%2d: %2s    %s | %s // %s%s%s\n"
+            //    6: ip    pu | hi // GPIO6 = input
+            var levelString = GetStringBetween(response, " | ", " // ");
+            var levelEnum = StringToEnum(levelString);
+            return levelEnum;
+        }
+
+        private protected static string GetStringBetween(string text, string before, string after)
+        {
+            var x = 0; // If the 'before' string is empty, then use the whole 'text' string
+            if (before != string.Empty)
+            {
+                x = text.IndexOf(before, StringComparison.Ordinal);
+                if (x < 0)
+                    throw new InvalidOperationException(
+                        $"Cannot find the string '{before}' in '{text}'");
+                x += before.Length;
+            }
+
+            if (after == string.Empty)
+                return text.Substring(x);
+
+            var y = text.IndexOf(after, x, StringComparison.Ordinal);
+            if (y < 0)
+                throw new InvalidOperationException(
+                    $"Cannot find the string '{after}' in '{text}'");
+
+            return text.Substring(x, y - x);
         }
 
         /*
-        private void SetPinMode(int pin, EPinInputMode mode)
+        private protected void SetPinMode(int pin, EPinInputMode mode)
         {
             throw new NotImplementedException();
         }
 
-        private void SetPinState(int pin, EPinState state)
+        private protected void SetPinState(int pin, EPinState state)
         {
             // ToDo:
             //    /sys/class/gpio/gpio11/direction
@@ -128,12 +138,12 @@ namespace TapExtensions.Steps.Gpio
             }
         }
 
-        private EPinState GetPinState(int pin)
+        private protected EPinState GetPinState(int pin)
         {
             throw new NotImplementedException();
         }
 
-        private void SendGpioInputCommand(int pin, EPinState state, EPinInputMode mode)
+        private protected void SendGpioInputCommand(int pin, EPinState state, EPinInputMode mode)
         {
             var command = "sudo raspi-gpio set " + pin + " " + GetPinType(state) + " " + GetInputMode(mode);
             if (!Raspi.SendSshQuery(command, 5, out _))
@@ -169,7 +179,7 @@ namespace TapExtensions.Steps.Gpio
             }
         }
 
-        private void SendGpioOutputCommand(int pin, EPinState state)
+        private protected void SendGpioOutputCommand(int pin, EPinState state)
         {
             var command = $"sudo raspi-gpio set {pin} op {GetPinType(state)}";
             if (!Raspi.SendSshQuery(command, 5, out _))
@@ -201,7 +211,7 @@ namespace TapExtensions.Steps.Gpio
             }
         }
 
-        private string[] GetGpioStatus(int pin)
+        private protected string[] GetGpioStatus(int pin)
         {
                 //pi@lmi:~ $ sudo raspi-gpio get
                 //BANK0 (GPIO 0 to 27):
@@ -272,7 +282,7 @@ namespace TapExtensions.Steps.Gpio
             return regex.Split(response);
         }
 
-        private static string GetPinType(EPinState state)
+        private protected static string GetPinType(EPinState state)
         {
             string pinType;
 
@@ -298,7 +308,7 @@ namespace TapExtensions.Steps.Gpio
             return pinType;
         }
 
-        private static string GetInputMode(EPinInputMode mode)
+        private protected static string GetInputMode(EPinInputMode mode)
         {
             string inputMode;
 
