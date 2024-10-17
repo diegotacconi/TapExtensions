@@ -5,8 +5,8 @@ using TapExtensions.Interfaces.Gpio;
 
 namespace TapExtensions.Steps.Gpio
 {
-    [Display("RaspiGpioConfig", Groups: new[] { "TapExtensions", "Steps", "Gpio" })]
-    public class RaspiGpioConfig : RaspiGpio
+    [Display("RaspiGpioConfigAll", Groups: new[] { "TapExtensions", "Steps", "Gpio" })]
+    public class RaspiGpioConfigAll : RaspiGpio
     {
         public class Config : ValidatingObject
         {
@@ -30,13 +30,8 @@ namespace TapExtensions.Steps.Gpio
             {
                 foreach (var config in Configs)
                 {
-                    // SetPinDirection((int)config.Pin, config.Direction);
-                    // SetPinPull((int)config.Pin, config.Pull);
-                    var pin = (int)config.Pin;
-                    var direction = EnumToString(config.Direction);
-                    var pull = EnumToString(config.Pull);
-                    var cmd = $"sudo pinctrl set {pin} {direction} {pull}";
-                    Log.Debug(cmd);
+                    SetPinDirection((int)config.Pin, config.Direction);
+                    SetPinPull((int)config.Pin, config.Pull);
                 }
 
                 UpgradeVerdict(Verdict.Pass);

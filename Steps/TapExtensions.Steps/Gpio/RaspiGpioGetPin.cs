@@ -15,15 +15,7 @@ namespace TapExtensions.Steps.Gpio
         {
             try
             {
-                var pin = (int)Pin;
-
-                // var measuredLevel = GetPinLevel(Pin);
-                var cmd = $"sudo pinctrl get {pin}";
-                Log.Debug(cmd);
-                var response = " 6: ip    pu | hi // GPIO6 = input";
-                Log.Debug(response);
-                var measuredLevel = (ELevel)ParseLevel(response);
-
+                var measuredLevel = GetPinLevel((int)Pin);
                 if (measuredLevel != ExpectedLevel)
                     throw new InvalidOperationException(
                         $"Measured level of '{measuredLevel}' is not equal to the expected level of '{ExpectedLevel}'");

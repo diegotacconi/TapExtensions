@@ -7,8 +7,10 @@ using TapExtensions.Interfaces.Ssh;
 
 namespace TapExtensions.Steps.Gpio
 {
-    public abstract class RaspiGpio : TestStep
+    public abstract class RaspiGpio : TestStep, IRaspiGpio
     {
+        #region Settings
+
         [Display("Raspi", Order: 1)] public ISecureShell Raspi { get; set; }
 
         // ReSharper disable InconsistentNaming
@@ -42,7 +44,41 @@ namespace TapExtensions.Steps.Gpio
             GPIO_27_PINHDR_13 = 27
         }
 
+        #endregion
+
         #region GPIO Interface Implementation
+
+        public void SetPinDirection(int pin, EDirection direction)
+        {
+            var cmd = $"sudo pinctrl set {pin} {EnumToString(direction)}";
+            Log.Debug(cmd);
+        }
+
+        public void SetPinPull(int pin, EPull pull)
+        {
+            var cmd = $"sudo pinctrl set {pin} {EnumToString(pull)}";
+            Log.Debug(cmd);
+        }
+
+        public void SetPinDrive(int pin, EDrive drive)
+        {
+            var cmd = $"sudo pinctrl set {pin} {EnumToString(drive)}";
+            Log.Debug(cmd);
+        }
+
+        public ELevel GetPinLevel(int pin)
+        {
+            var cmd = $"sudo pinctrl get {pin}";
+            Log.Debug(cmd);
+            var response = " 6: ip    pu | hi // GPIO6 = input";
+            Log.Debug(response);
+            var measuredLevel = (ELevel)ParseLevel(response);
+            return measuredLevel;
+        }
+
+        #endregion
+
+        #region Private Methods
 
         private readonly Dictionary<Enum, string> dictionary =
             new Dictionary<Enum, string>

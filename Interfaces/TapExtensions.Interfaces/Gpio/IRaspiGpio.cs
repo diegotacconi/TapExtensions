@@ -2,7 +2,7 @@
 
 namespace TapExtensions.Interfaces.Gpio
 {
-    public interface IRaspiGpio : IInstrument
+    public interface IRaspiGpio //: IInstrument
     {
         void SetPinDirection(int pin, EDirection direction);
 

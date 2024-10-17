@@ -15,12 +15,7 @@ namespace TapExtensions.Steps.Gpio
         {
             try
             {
-                // SetPinDrive((int)Pin, Drive);
-                var pin = (int)Pin;
-                var drive = EnumToString(Drive);
-                var cmd = $"sudo pinctrl set {pin} {drive}";
-                Log.Debug(cmd);
-
+                SetPinDrive((int)Pin, Drive);
                 UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)
