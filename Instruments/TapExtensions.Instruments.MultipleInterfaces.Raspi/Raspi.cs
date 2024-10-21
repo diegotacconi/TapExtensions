@@ -123,6 +123,9 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
         public bool SendSshQuery(string command, int timeout, out string response)
         {
             if (_sshClient == null || !_sshClient.IsConnected)
+                SshConnect();
+
+            if (_sshClient == null || !_sshClient.IsConnected)
                 throw new InvalidOperationException($"{Name} is not connected");
 
             var cmd = _sshClient.CreateCommand(command);
@@ -152,11 +155,6 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
 
             _sshClient.Connect();
             IsConnected = true;
-        }
-
-        private void CheckIfConnected()
-        {
-            SshConnect();
         }
 
         private void SshDisconnect()

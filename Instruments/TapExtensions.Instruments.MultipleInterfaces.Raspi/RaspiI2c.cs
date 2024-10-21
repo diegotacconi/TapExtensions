@@ -30,8 +30,6 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
                 throw new InvalidOperationException(
                     $"{nameof(regAddress)} cannot be null.");
 
-            CheckIfConnected();
-
             var chipAddress = $"0x{slaveAddress:X2}";
             var dataAddress = $"0x{regAddress.First():X2}";
             var command = $"sudo i2cget -y {I2CBus} {chipAddress} {dataAddress} i {numOfBytes}";
