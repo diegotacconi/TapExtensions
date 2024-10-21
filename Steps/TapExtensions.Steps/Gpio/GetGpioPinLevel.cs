@@ -19,7 +19,11 @@ namespace TapExtensions.Steps.Gpio
             try
             {
                 var measuredLevel = Gpio.GetPinLevel(PinNumber);
-                UpgradeVerdict(measuredLevel == ExpectedLevel ? Verdict.Pass : Verdict.Fail);
+                if (measuredLevel != ExpectedLevel)
+                    throw new InvalidOperationException(
+                        $"Measured level of '{measuredLevel}' is not equal to the expected level of '{ExpectedLevel}'");
+
+                UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)
             {
