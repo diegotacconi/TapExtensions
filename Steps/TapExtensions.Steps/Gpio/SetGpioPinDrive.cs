@@ -11,7 +11,7 @@ namespace TapExtensions.Steps.Gpio
 
         [Display("Pin Number", Order: 2)] public int PinNumber { get; set; }
 
-        [Display("Pin Drive", Order: 3)] public EDrive Drive { get; set; }
+        [Display("Pin Output Drive", Order: 3)] public EDrive Drive { get; set; }
 
         public override void Run()
         {

@@ -78,14 +78,14 @@ namespace TapExtensions.Duts.Ssh
                 _sshClient = new SshClient(IpAddress, TcpPort, Username, Password)
                     { KeepAliveInterval = TimeSpan.FromSeconds(KeepAliveInterval) };
 
-            if (!_sshClient.IsConnected)
-            {
-                if (VerboseLoggingEnabled)
-                    Log.Debug($"Connecting to {IpAddress} on port {TcpPort}");
+            if (_sshClient.IsConnected)
+                return;
 
-                _sshClient.Connect();
-                IsConnected = true;
-            }
+            if (VerboseLoggingEnabled)
+                Log.Debug($"Connecting to {_sshClient.ConnectionInfo.Host}:{_sshClient.ConnectionInfo.Port}");
+
+            _sshClient.Connect();
+            IsConnected = true;
         }
 
         public void Disconnect()
@@ -93,8 +93,11 @@ namespace TapExtensions.Duts.Ssh
             if (_sshClient == null)
                 return;
 
+            if (!_sshClient.IsConnected)
+                return;
+
             if (VerboseLoggingEnabled)
-                Log.Debug($"Disconnecting from {IpAddress}");
+                Log.Debug($"Disconnecting from {_sshClient.ConnectionInfo.Host}:{_sshClient.ConnectionInfo.Port}");
 
             _sshClient.Disconnect();
             _sshClient.Dispose();
@@ -108,13 +111,13 @@ namespace TapExtensions.Duts.Ssh
                 _scpClient = new ScpClient(IpAddress, TcpPort, Username, Password)
                     { KeepAliveInterval = TimeSpan.FromSeconds(KeepAliveInterval) };
 
-            if (!_scpClient.IsConnected)
-            {
-                if (VerboseLoggingEnabled)
-                    Log.Debug($"SCP: Connecting to {IpAddress} on port {TcpPort}");
+            if (_scpClient.IsConnected)
+                return;
 
-                _scpClient.Connect();
-            }
+            if (VerboseLoggingEnabled)
+                Log.Debug($"SCP: Connecting to {_scpClient.ConnectionInfo.Host}:{_scpClient.ConnectionInfo.Port}");
+
+            _scpClient.Connect();
         }
 
         private void ScpDisconnect()
@@ -123,7 +126,7 @@ namespace TapExtensions.Duts.Ssh
                 return;
 
             if (VerboseLoggingEnabled)
-                Log.Debug($"SCP: Disconnecting from {IpAddress}");
+                Log.Debug($"SCP: Disconnecting from {_scpClient.ConnectionInfo.Host}:{_scpClient.ConnectionInfo.Port}");
 
             _scpClient.Disconnect();
             _scpClient.Dispose();
