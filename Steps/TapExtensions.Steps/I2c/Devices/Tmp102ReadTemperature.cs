@@ -2,14 +2,13 @@
 using OpenTap;
 using TapExtensions.Interfaces.I2c;
 
-namespace TapExtensions.Steps.I2c
+namespace TapExtensions.Steps.I2c.Devices
 {
     [Display("Tmp102ReadTemperature",
-        Groups: new[] { "TapExtensions", "Steps", "I2c" })]
+        Groups: new[] { "TapExtensions", "Steps", "I2c", "Devices" })]
     public class Tmp102ReadTemperature : TestStep
     {
-        [Display("I2C Adapter", Order: 1)]
-        public II2C I2CAdapter { get; set; }
+        [Display("I2C Adapter", Order: 1)] public II2C I2CAdapter { get; set; }
 
         [Display("Device Address", Order: 2)]
         [Unit("Hex", StringFormat: "X2")]

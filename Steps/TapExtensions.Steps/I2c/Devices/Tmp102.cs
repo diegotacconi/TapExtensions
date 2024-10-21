@@ -4,14 +4,14 @@
 using System;
 using TapExtensions.Interfaces.I2c;
 
-namespace TapExtensions.Steps.I2c
+namespace TapExtensions.Steps.I2c.Devices
 {
     public class Tmp102
     {
         private readonly II2C _i2C;
         private readonly int _deviceAddress;
 
-        public Tmp102(II2C i2C, int deviceAddress)
+        public Tmp102(II2C i2C, int deviceAddress = 0x48)
         {
             _i2C = i2C;
             _deviceAddress = deviceAddress; // 0x48

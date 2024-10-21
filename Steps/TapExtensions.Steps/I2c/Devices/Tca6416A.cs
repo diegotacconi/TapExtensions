@@ -13,17 +13,17 @@
 
 using TapExtensions.Interfaces.I2c;
 
-namespace TapExtensions.Steps.I2c
+namespace TapExtensions.Steps.I2c.Devices
 {
     public class Tca6416A
     {
         private readonly II2C _i2C;
         private readonly int _deviceAddress;
 
-        public Tca6416A(II2C i2C, int deviceAddress)
+        public Tca6416A(II2C i2C, int deviceAddress = 0x20)
         {
             _i2C = i2C;
-            _deviceAddress = deviceAddress; // 0x20, 0x21
+            _deviceAddress = deviceAddress;
         }
 
         public byte[] ReadRegisters(out ushort input, out ushort output, out ushort polarity, out ushort config)

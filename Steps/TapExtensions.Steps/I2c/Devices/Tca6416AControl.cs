@@ -3,14 +3,13 @@ using System.Linq;
 using OpenTap;
 using TapExtensions.Interfaces.I2c;
 
-namespace TapExtensions.Steps.I2c
+namespace TapExtensions.Steps.I2c.Devices
 {
     [Display("Tca6416AControl",
-        Groups: new[] { "TapExtensions", "Steps", "I2c" })]
+        Groups: new[] { "TapExtensions", "Steps", "I2c", "Devices" })]
     public class Tca6416AControl : TestStep
     {
-        [Display("I2C Adapter", Order: 1)]
-        public II2C I2CAdapter { get; set; }
+        [Display("I2C Adapter", Order: 1)] public II2C I2CAdapter { get; set; }
 
         [Display("Device Address", Order: 2)]
         [Unit("Hex", StringFormat: "X2")]
