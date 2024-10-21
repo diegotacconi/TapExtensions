@@ -4,20 +4,20 @@ using TapExtensions.Interfaces.Gpio;
 
 namespace TapExtensions.Steps.Gpio
 {
-    [Display("SetGpioPinState", Groups: new[] { "TapExtensions", "Steps", "Gpio" })]
-    public class SetGpioPinState : TestStep
+    [Display("SetGpioPinDirection", Groups: new[] { "TapExtensions", "Steps", "Gpio" })]
+    public class SetGpioPinDirection : TestStep
     {
         [Display("Gpio", Order: 1)] public IGpio Gpio { get; set; }
 
-        [Display("Pin Number", Order: 2)] public int PinNumber { get; set; } = 5;
+        [Display("Pin Number", Order: 2)] public int PinNumber { get; set; }
 
-        [Display("Pin State", Order: 3)] public EPinState PinState { get; set; }
+        [Display("Pin Direction", Order: 3)] public EDirection Direction { get; set; }
 
         public override void Run()
         {
             try
             {
-                Gpio.SetPinState(PinNumber, PinState);
+                Gpio.SetPinDirection(PinNumber, Direction);
                 UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)

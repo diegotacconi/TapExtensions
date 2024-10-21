@@ -7,7 +7,7 @@ using TapExtensions.Interfaces.Ssh;
 
 namespace TapExtensions.Steps.Gpio
 {
-    public abstract class RaspiGpio : TestStep, IRaspiGpio
+    public abstract class RaspiGpio : TestStep //, IGpio
     {
         #region Settings
 

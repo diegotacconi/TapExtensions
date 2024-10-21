@@ -4,24 +4,37 @@ namespace TapExtensions.Interfaces.Gpio
 {
     public interface IGpio : IInstrument
     {
-        void SetPinMode(int pin, EPinInputMode mode);
+        void SetPinDirection(int pin, EDirection direction);
 
-        void SetPinState(int pin, EPinState state);
+        void SetPinPull(int pin, EPull pull);
 
-        EPinState GetPinState(int pin);
+        void SetPinDrive(int pin, EDrive drive);
+
+        ELevel GetPinLevel(int pin);
     }
 
-    public enum EPinState
+    public enum EDirection
     {
-        OutputHigh,
-        OutputLow,
-        Input
+        Input,
+        Output
     }
 
-    public enum EPinInputMode
+    public enum EPull
     {
-        PullUp,
+        PullNone,
         PullDown,
-        PullNone
+        PullUp
+    }
+
+    public enum EDrive
+    {
+        DriveLow,
+        DriveHigh
+    }
+
+    public enum ELevel
+    {
+        Low,
+        High
     }
 }
