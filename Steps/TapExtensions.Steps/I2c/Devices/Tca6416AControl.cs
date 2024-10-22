@@ -20,9 +20,17 @@ namespace TapExtensions.Steps.I2c.Devices
             try
             {
                 var tca6416A = new Tca6416A(I2CAdapter, DeviceAddress);
-                var registers = tca6416A.ReadRegisters(out _, out _, out _, out _);
+                var registers =
+                    tca6416A.ReadRegisters(out var level, out var drive, out var polarity, out var direction);
+
+                // Display register values
                 var binaryString = string.Join(" ", registers.Select(x => Convert.ToString(x, 2).PadLeft(8, '0')));
                 Log.Debug($"TCA6416A Registers = {binaryString}");
+                Log.Debug($"Level     = {Convert.ToString(level, 2).PadLeft(16, '0')}");
+                Log.Debug($"Drive     = {Convert.ToString(drive, 2).PadLeft(16, '0')}");
+                Log.Debug($"Polarity  = {Convert.ToString(polarity, 2).PadLeft(16, '0')}");
+                Log.Debug($"Direction = {Convert.ToString(direction, 2).PadLeft(16, '0')}");
+
                 UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)

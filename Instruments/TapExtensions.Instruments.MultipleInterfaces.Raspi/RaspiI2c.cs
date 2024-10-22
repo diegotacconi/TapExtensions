@@ -30,24 +30,26 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
                 throw new InvalidOperationException(
                     $"{nameof(regAddress)} cannot be null.");
 
-            var chipAddress = $"0x{slaveAddress:X2}";
-            var dataAddress = $"0x{regAddress.First():X2}";
-            var command = $"sudo i2cget -y {I2CBus} {chipAddress} {dataAddress} i {numOfBytes}";
-            SendSshQuery(command, 5, out var response);
+            var responseBytes = new List<byte>();
+            for (var i = 0; i < numOfBytes; i++)
+            {
+                var dataAddress = (byte)(regAddress.First() + i);
+                var command = $"sudo i2cget -y {I2CBus} 0x{slaveAddress:X2} 0x{dataAddress:X2}";
+                SendSshQuery(command, 5, out var responseByte);
 
-            if (string.IsNullOrWhiteSpace(response))
-                throw new InvalidOperationException("No response");
+                if (string.IsNullOrWhiteSpace(responseByte))
+                    throw new InvalidOperationException("No response");
 
-            var responseBytes = HexStringToBytes(response);
-            var responseLength = responseBytes.Length;
-            if (responseLength != numOfBytes)
-                throw new InvalidOperationException(
-                    $"Response's length of {responseLength} does not match requested {nameof(numOfBytes)} of {numOfBytes}");
+                responseByte = responseByte.TrimEnd('\r', '\n');
 
-            // Log.Debug(string.Format("I2C (0x{0:X2}) << 0x{1}", slaveAddress,
-            //     BitConverter.ToString(responseBytes).Replace("-", " 0x")));
+                if (responseByte.ToUpper().StartsWith("0X"))
+                    responseByte = responseByte.Substring(2, responseByte.Length - 2);
 
-            return responseBytes;
+                if (!string.IsNullOrWhiteSpace(responseByte))
+                    responseBytes.Add(Convert.ToByte(responseByte, 16));
+            }
+
+            return responseBytes.ToArray();
         }
 
         public void SetBitRate(uint bitRateKhz)
@@ -83,34 +85,6 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
         public void Write(ushort slaveAddress, byte[] regAddress, byte[] command)
         {
             throw new NotImplementedException();
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        private static byte[] HexStringToBytes(string hexValues)
-        {
-            var hexBytes = hexValues.Split(new[] { " ", "\r\n", "\n\r", "\r", "\n" },
-                StringSplitOptions.RemoveEmptyEntries);
-
-            var bytes = new List<byte>();
-            foreach (var hexByte in hexBytes)
-            {
-                var hex = hexByte;
-
-                if (hex.ToUpper().StartsWith("0X"))
-                    hex = hex.Substring(2, hex.Length - 2);
-
-                if (!string.IsNullOrWhiteSpace(hex))
-                    bytes.Add(Convert.ToByte(hex, 16));
-            }
-
-            if (!bytes.Any())
-                throw new InvalidOperationException(
-                    $"{nameof(HexStringToBytes)}: Cannot find any hexadecimal values to convert to bytes");
-
-            return bytes.ToArray();
         }
 
         #endregion

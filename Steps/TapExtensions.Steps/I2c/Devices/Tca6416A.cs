@@ -26,7 +26,7 @@ namespace TapExtensions.Steps.I2c.Devices
             _deviceAddress = deviceAddress;
         }
 
-        public byte[] ReadRegisters(out ushort input, out ushort output, out ushort polarity, out ushort config)
+        public byte[] ReadRegisters(out ushort level, out ushort drive, out ushort polarity, out ushort direction)
         {
             /*
              * The Input Port registers (registers 0 and 1) reflect the incoming logic levels of the pins,
@@ -72,10 +72,10 @@ namespace TapExtensions.Steps.I2c.Devices
              *
              */
             var register = _i2C.Read((ushort)_deviceAddress, 8, new byte[] { 0x00 });
-            input = (ushort)((register[1] << 8) | register[0]);
-            output = (ushort)((register[3] << 8) | register[2]);
+            level = (ushort)((register[1] << 8) | register[0]);
+            drive = (ushort)((register[3] << 8) | register[2]);
             polarity = (ushort)((register[5] << 8) | register[4]);
-            config = (ushort)((register[7] << 8) | register[6]);
+            direction = (ushort)((register[7] << 8) | register[6]);
             return register;
         }
     }
