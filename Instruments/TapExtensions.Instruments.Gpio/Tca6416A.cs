@@ -11,20 +11,33 @@
 // - Two Polarity Inversion registers.
 // At power on or after a reset, the I/Os are configured as inputs.
 
+using System;
+using System.Linq;
+using OpenTap;
+using TapExtensions.Interfaces.Gpio;
 using TapExtensions.Interfaces.I2c;
 
-namespace TapExtensions.Steps.I2c.Devices
+namespace TapExtensions.Instruments.Gpio
 {
-    public class Tca6416A
+    [Display("Texas Instruments TCA6416A",
+        Groups: new[] { "TapExtensions", "Instruments", "Gpio" },
+        Description: "16-bits of General Purpose Input/Output (I/O) expansion")]
+    public class Tca6416A : Instrument, IGpio
     {
-        private readonly II2C _i2C;
-        private readonly int _deviceAddress;
+        #region Settings
 
-        public Tca6416A(II2C i2C, int deviceAddress = 0x20)
+        [Display("I2C Adapter", Order: 1)] public II2C I2CAdapter { get; set; }
+
+        [Display("Device Address", Order: 2)]
+        [Unit("Hex", StringFormat: "X2")]
+        public ushort DeviceAddress { get; set; } = 0x20;
+
+        public Tca6416A()
         {
-            _i2C = i2C;
-            _deviceAddress = deviceAddress;
+            Name = nameof(Tca6416A);
         }
+
+        #endregion
 
         public byte[] ReadRegisters(out ushort level, out ushort drive, out ushort polarity, out ushort direction)
         {
@@ -71,15 +84,58 @@ namespace TapExtensions.Steps.I2c.Devices
              * +------+------+------+------+------+------+------+------+------+------+------+------+------+------+------+------+
              *
              */
-            var register = _i2C.Read((ushort)_deviceAddress, 8, new byte[] { 0x00 });
+            // var register = _i2C.Read((ushort)_deviceAddress, 8, new byte[] { 0x00 });
+            var register = I2CAdapter.Read(DeviceAddress, 8, new byte[] { 0x00 });
             level = (ushort)((register[1] << 8) | register[0]);
             drive = (ushort)((register[3] << 8) | register[2]);
             polarity = (ushort)((register[5] << 8) | register[4]);
             direction = (ushort)((register[7] << 8) | register[6]);
             return register;
         }
+
+        #region GPIO Interface Implementation
+
+        public void SetPinDirection(int pin, EDirection direction)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetPinPull(int pin, EPull pull)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetPinDrive(int pin, EDrive drive)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ELevel GetPinLevel(int pin)
+        {
+            // Debug start
+            var registers = ReadRegisters(out var lvl, out var drive, out var polarity, out var dir);
+            var binaryString = string.Join(" ", registers.Select(x => Convert.ToString(x, 2).PadLeft(8, '0')));
+            Log.Debug($"Registers = {binaryString}");
+            Log.Debug($"Lvl       = {Convert.ToString(lvl, 2).PadLeft(16, '0')}");
+            Log.Debug($"Drive     = {Convert.ToString(drive, 2).PadLeft(16, '0')}");
+            Log.Debug($"Polarity  = {Convert.ToString(polarity, 2).PadLeft(16, '0')}");
+            Log.Debug($"Dir       = {Convert.ToString(dir, 2).PadLeft(16, '0')}");
+            // Debug end
+
+
+            var register = I2CAdapter.Read(DeviceAddress, 2, new byte[] { 0x00 });
+            var level = (ushort)((register[1] << 8) | register[0]);
+
+            Log.Debug($"Level = {Convert.ToString(level, 2).PadLeft(16, '0')}");
+
+            // ToDo: Determine ELevel
+            return ELevel.Low;
+        }
+
+        #endregion
     }
 
+    /*
     // ReSharper disable InconsistentNaming
     public enum ETca6416Pin
     {
@@ -100,4 +156,5 @@ namespace TapExtensions.Steps.I2c.Devices
         P16_PIN_19 = 0b0100_0000_0000_0000,
         P17_PIN_20 = 0b1000_0000_0000_0000
     }
+    */
 }

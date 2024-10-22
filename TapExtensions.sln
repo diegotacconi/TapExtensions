@@ -51,7 +51,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Settings.Inte
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Results.ZipFile", "Results\TapExtensions.Results.ZipFile\TapExtensions.Results.ZipFile.csproj", "{5FF88E2D-5A71-41C1-AB80-77A0045635A7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TapExtensions.Shared.Telnet", "Shared\TapExtensions.Shared.Telnet\TapExtensions.Shared.Telnet.csproj", "{39D9CFA4-8896-4B95-9222-54F7602880D6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Shared.Telnet", "Shared\TapExtensions.Shared.Telnet\TapExtensions.Shared.Telnet.csproj", "{39D9CFA4-8896-4B95-9222-54F7602880D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TapExtensions.Instruments.Gpio", "Instruments\TapExtensions.Instruments.Gpio\TapExtensions.Instruments.Gpio.csproj", "{1EE2DB7D-936D-413B-B5D9-B838EF45C3C5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -123,6 +125,10 @@ Global
 		{39D9CFA4-8896-4B95-9222-54F7602880D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{39D9CFA4-8896-4B95-9222-54F7602880D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39D9CFA4-8896-4B95-9222-54F7602880D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EE2DB7D-936D-413B-B5D9-B838EF45C3C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EE2DB7D-936D-413B-B5D9-B838EF45C3C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EE2DB7D-936D-413B-B5D9-B838EF45C3C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EE2DB7D-936D-413B-B5D9-B838EF45C3C5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -144,6 +150,7 @@ Global
 		{C46BFCFD-7ABC-42CA-B9D8-26D925F07516} = {0F0C09F9-0089-4A96-A926-0EA875454D99}
 		{5FF88E2D-5A71-41C1-AB80-77A0045635A7} = {798B7510-669C-4A94-B74E-ADE8EC0F2319}
 		{39D9CFA4-8896-4B95-9222-54F7602880D6} = {34D8FC14-432B-43CC-BD77-697BD2B86294}
+		{1EE2DB7D-936D-413B-B5D9-B838EF45C3C5} = {6536E8DB-FFA1-4E97-91E7-DBA37839B386}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4A1F67F2-6AC5-4761-9B2F-17DE13AAFB3B}
