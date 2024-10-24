@@ -9,8 +9,7 @@ namespace TapExtensions.Steps.ParentChild
 {
     [Display("ParentWithResources",
         Groups: new[] { "TapExtensions", "Steps", "ParentChild" })]
-    [AllowChildrenOfType(typeof(ChildSeekingResources1))]
-    [AllowChildrenOfType(typeof(ChildSeekingResources2))]
+    [AllowChildrenOfType(typeof(ChildSeekingResources))]
     public class ParentWithResources : TestStep
     {
         #region Settings

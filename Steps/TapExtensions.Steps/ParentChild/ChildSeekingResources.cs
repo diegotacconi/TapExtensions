@@ -11,7 +11,7 @@ namespace TapExtensions.Steps.ParentChild
     [Display("ChildSeekingResources2",
         Groups: new[] { "TapExtensions", "Steps", "ParentChild" })]
     [AllowAsChildIn(typeof(ParentWithResources))]
-    public class ChildSeekingResources2 : TestStep
+    public class ChildSeekingResources : TestStep
     {
         #region Settings
 
