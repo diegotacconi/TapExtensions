@@ -154,6 +154,7 @@ namespace TapExtensions.Duts.Ssh
                 if (VerboseLoggingEnabled)
                     Log.Debug($"SCP: Transferring file from {localFile} to {remoteFile}");
 
+                OnActivity();
                 _scpClient.Upload(new FileInfo(localFile), remoteFile);
             }
 
@@ -180,6 +181,7 @@ namespace TapExtensions.Duts.Ssh
                 if (VerboseLoggingEnabled)
                     Log.Debug($"SCP: Transferring file from {remoteFile} to {localFile}");
 
+                OnActivity();
                 _scpClient.Download(remoteFile, new FileInfo(localFile));
             }
 
@@ -204,6 +206,7 @@ namespace TapExtensions.Duts.Ssh
             if (VerboseLoggingEnabled)
                 Log.Debug($"SSH >> {cmd.CommandText}");
 
+            OnActivity();
             var async = cmd.BeginExecute(ar => stopwatch.Stop());
 
             var readBuffer = new StringBuilder();

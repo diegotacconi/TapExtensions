@@ -132,6 +132,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
             cmd.CommandTimeout = TimeSpan.FromSeconds(timeout);
             Log.Debug($"SSH >> {cmd.CommandText}");
 
+            OnActivity();
             response = cmd.Execute();
             if (!string.IsNullOrWhiteSpace(response))
                 Log.Debug($"SSH << {response}");

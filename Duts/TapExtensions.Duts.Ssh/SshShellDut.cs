@@ -120,6 +120,7 @@ namespace TapExtensions.Duts.Ssh
 
             lock (_sshLock)
             {
+                OnActivity();
                 using (var shell = _sshClient.CreateShellStream("SshShell", 0, 0, 0, 0, 1024))
                 {
                     var stopwatch = new Stopwatch();
