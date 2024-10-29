@@ -35,16 +35,9 @@ namespace TapExtensions.Instruments.BarcodeScanner
                          " USB\\VID_05E0&PID_1701\\USB_CDC_SYMBOL_SCANNER")]
         public string ConnectionAddress { get; set; }
 
-        public enum ELoggingLevel
-        {
-            None = 0,
-            Normal = 1,
-            Verbose = 2
-        }
-
-        [Display("Logging Level", Order: 20,
-            Description: "Level of verbose logging for serial port (UART) communication.")]
-        public ELoggingLevel LoggingLevel { get; set; }
+        [Display("Verbose Logging", Order: 20,
+            Description: "Enables verbose logging of serial port (UART) communication.")]
+        public bool VerboseLoggingEnabled { get; set; } = true;
 
         #endregion
 
@@ -56,7 +49,6 @@ namespace TapExtensions.Instruments.BarcodeScanner
             // Default values
             Name = nameof(ZebraMS4717);
             ConnectionAddress = @"USB\VID_05E0&PID_1701";
-            LoggingLevel = ELoggingLevel.Normal;
 
             // Validation rules
             Rules.Add(ValidateConnectionAddress, "Not valid", nameof(ConnectionAddress));
@@ -133,16 +125,15 @@ namespace TapExtensions.Instruments.BarcodeScanner
                 throw new InvalidOperationException(
                     "List of USB Device Address cannot be empty");
 
-            if (LoggingLevel >= ELoggingLevel.Verbose)
+            if (VerboseLoggingEnabled)
                 Log.Debug("Searching for USB Address(es) of " +
                           $"'{string.Join("', '", usbDeviceAddresses)}'");
 
             var found = UsbSerialDevices.FindUsbAddress(usbDeviceAddresses);
 
-            if (LoggingLevel >= ELoggingLevel.Normal)
-                Log.Debug($"Found serial port '{found.ComPort}' " +
-                          $"with USB Address of '{found.UsbAddress}' " +
-                          $"and Description of '{found.Description}'");
+            Log.Debug($"Found serial port '{found.ComPort}' " +
+                      $"with USB Address of '{found.UsbAddress}' " +
+                      $"and Description of '{found.Description}'");
 
             return found.ComPort;
         }
@@ -168,7 +159,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
             // Close serial port if already opened
             CloseSerialPort();
 
-            if (LoggingLevel >= ELoggingLevel.Normal)
+            if (VerboseLoggingEnabled)
                 Log.Debug($"Opening serial port ({_sp.PortName})");
 
             // Open serial port
@@ -180,25 +171,18 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
         private void CloseSerialPort()
         {
-            try
-            {
-                if (!_sp.IsOpen)
-                    return;
+            if (!_sp.IsOpen)
+                return;
 
-                if (LoggingLevel >= ELoggingLevel.Normal)
-                    Log.Debug($"Closing serial port ({_sp.PortName})");
+            if (VerboseLoggingEnabled)
+                Log.Debug($"Closing serial port ({_sp.PortName})");
 
-                // Close serial port
-                _sp.DiscardInBuffer();
-                _sp.DiscardOutBuffer();
-                _sp.Close();
-                _sp.Dispose();
-                IsConnected = false;
-            }
-            catch (Exception ex)
-            {
-                Log.Warning(ex.Message);
-            }
+            // Close serial port
+            _sp.DiscardInBuffer();
+            _sp.DiscardOutBuffer();
+            _sp.Close();
+            _sp.Dispose();
+            IsConnected = false;
         }
 
         private void CheckIfBarcodeScannerIsAvailable()
@@ -268,6 +252,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
             var response = new List<byte>();
             var timer = new Stopwatch();
             timer.Start();
+
             do
             {
                 TapThread.Sleep(10);
@@ -329,17 +314,8 @@ namespace TapExtensions.Instruments.BarcodeScanner
                 }
             }
 
-            switch (LoggingLevel)
-            {
-                case ELoggingLevel.Normal:
-                    Log.Debug($"{serialPortName} {direction} {msg}");
-                    break;
-
-                case ELoggingLevel.Verbose:
-                    Log.Debug($"{serialPortName} {direction} Hex:   {hex}");
-                    Log.Debug($"{serialPortName} {direction} Ascii: {ascii}");
-                    break;
-            }
+            if (VerboseLoggingEnabled)
+                Log.Debug($"{serialPortName} {direction} {msg}");
         }
 
         private void Query(byte opCode, byte expectedByte)
@@ -375,7 +351,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
             WriteRead(message.ToArray(), new[] { expectedByte }, timeout);
         }
 
-        private byte[] CalculateChecksum(byte[] bytes)
+        private static byte[] CalculateChecksum(byte[] bytes)
         {
             // Twos complement of the sum of the message
             int sum = 0;

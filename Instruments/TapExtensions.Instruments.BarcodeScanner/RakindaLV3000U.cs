@@ -35,16 +35,9 @@ namespace TapExtensions.Instruments.BarcodeScanner
             Description: "List of USB device addresses to search for a match.")]
         public List<string> UsbDeviceAddresses { get; set; }
 
-        public enum ELoggingLevel
-        {
-            None = 0,
-            Normal = 1,
-            Verbose = 2
-        }
-
-        [Display("Logging Level", Order: 20, Group: "Debug", Collapsed: true,
-            Description: "Level of verbose logging for serial port (UART) communication.")]
-        public ELoggingLevel LoggingLevel { get; set; }
+        [Display("Verbose Logging", Order: 20,
+            Description: "Enables verbose logging of serial port (UART) communication.")]
+        public bool VerboseLoggingEnabled { get; set; } = true;
 
         #endregion
 
@@ -58,67 +51,39 @@ namespace TapExtensions.Instruments.BarcodeScanner
             SerialPortName = "COM6";
             UseAutoDetection = true;
             UsbDeviceAddresses = new List<string> { @"USB\VID_1EAB&PID_1D06" };
-            LoggingLevel = ELoggingLevel.Normal;
         }
 
         public override void Open()
         {
             base.Open();
+            IsConnected = false;
 
-            _portName = UseAutoDetection ? FindSerialPort() : SerialPortName;
-
-            // Check if barcode scanner is available
-            OpenSerialPort();
-            try
-            {
-                const int timeout = 5;
-
-                // Send "?" and expect the response to be "!"
-                WriteRead(new byte[] { 0x3F }, new byte[] { 0x21 }, timeout);
-
-                // Default all commands
-                SetCommand("NLS0001000;", timeout);
-
-                // Reading mode = Trigger
-                SetCommand("NLS0302000;", timeout);
-
-                // Enable command programming
-                SetCommand("NLS0006010;", timeout);
-
-                // Enable all bar codes
-                SetCommand("NLS0001020;", timeout);
-            }
-            finally
-            {
-                CloseSerialPort();
-            }
+            _portName = UseAutoDetection ? FindUsbSerialDevice() : SerialPortName;
+            CheckIfBarcodeScannerIsAvailable();
         }
 
-        private void SetCommand(string command, int timeout)
+        public override void Close()
         {
-            // When received a set command, the scanner would process it and returned a byte of response data.
-            // The scanner returns '0x06' if successfully set, or '0x15' if failure.
-            var cmdBytes = Encoding.ASCII.GetBytes(command);
-            var expectedSuccessfulReply = new byte[] { 0x06 };
-            WriteRead(cmdBytes, expectedSuccessfulReply, timeout);
+            CloseSerialPort();
+            base.Close();
+            IsConnected = false;
         }
 
-        private string FindSerialPort()
+        private string FindUsbSerialDevice()
         {
             if (UsbDeviceAddresses.Count == 0)
                 throw new InvalidOperationException(
                     "List of USB Device Address cannot be empty");
 
-            if (LoggingLevel >= ELoggingLevel.Verbose)
+            if (VerboseLoggingEnabled)
                 Log.Debug("Searching for USB Address(es) of " +
                           $"'{string.Join("', '", UsbDeviceAddresses)}'");
 
             var found = UsbSerialDevices.FindUsbAddress(UsbDeviceAddresses);
 
-            if (LoggingLevel >= ELoggingLevel.Normal)
-                Log.Debug($"Found serial port '{found.ComPort}' " +
-                          $"with USB Address of '{found.UsbAddress}' " +
-                          $"and Description of '{found.Description}'");
+            Log.Debug($"Found serial port '{found.ComPort}' " +
+                      $"with USB Address of '{found.UsbAddress}' " +
+                      $"and Description of '{found.Description}'");
 
             return found.ComPort;
         }
@@ -144,40 +109,57 @@ namespace TapExtensions.Instruments.BarcodeScanner
             // Close serial port if already opened
             CloseSerialPort();
 
-            if (LoggingLevel >= ELoggingLevel.Normal)
+            if (VerboseLoggingEnabled)
                 Log.Debug($"Opening serial port ({_sp.PortName})");
 
             // Open serial port
             _sp.Open();
             _sp.DiscardInBuffer();
             _sp.DiscardOutBuffer();
-        }
-
-        public override void Close()
-        {
-            CloseSerialPort();
-            base.Close();
+            IsConnected = true;
         }
 
         private void CloseSerialPort()
         {
+            if (!_sp.IsOpen)
+                return;
+
+            if (VerboseLoggingEnabled)
+                Log.Debug($"Closing serial port ({_sp.PortName})");
+
+            // Close serial port
+            _sp.DiscardInBuffer();
+            _sp.DiscardOutBuffer();
+            _sp.Close();
+            _sp.Dispose();
+            IsConnected = false;
+        }
+
+        private void CheckIfBarcodeScannerIsAvailable()
+        {
+            OpenSerialPort();
             try
             {
-                if (_sp.IsOpen)
-                {
-                    if (LoggingLevel >= ELoggingLevel.Normal)
-                        Log.Debug($"Closing serial port ({_sp.PortName})");
+                const int timeout = 5;
 
-                    // Close serial port
-                    _sp.DiscardInBuffer();
-                    _sp.DiscardOutBuffer();
-                    _sp.Close();
-                    _sp.Dispose();
-                }
+                // Send "?" and expect the response to be "!"
+                WriteRead(new byte[] { 0x3F }, new byte[] { 0x21 }, timeout);
+
+                // Default all commands
+                SetCommand("NLS0001000;", timeout);
+
+                // Reading mode = Trigger
+                SetCommand("NLS0302000;", timeout);
+
+                // Enable command programming
+                SetCommand("NLS0006010;", timeout);
+
+                // Enable all bar codes
+                SetCommand("NLS0001020;", timeout);
             }
-            catch (Exception ex)
+            finally
             {
-                Log.Warning(ex.Message);
+                CloseSerialPort();
             }
         }
 
@@ -215,6 +197,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
         private void Write(byte[] command)
         {
+            OnActivity();
             LogBytes(_sp.PortName, ">>", command);
             _sp.DiscardInBuffer();
             _sp.DiscardOutBuffer();
@@ -223,6 +206,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
         private byte[] Read(byte[] expectedResponse, int timeout)
         {
+            OnActivity();
             bool responseReceived;
             var response = new List<byte>();
             var timer = new Stopwatch();
@@ -289,17 +273,17 @@ namespace TapExtensions.Instruments.BarcodeScanner
                 }
             }
 
-            switch (LoggingLevel)
-            {
-                case ELoggingLevel.Normal:
-                    Log.Debug($"{serialPortName} {direction} {msg}");
-                    break;
+            if (VerboseLoggingEnabled)
+                Log.Debug($"{serialPortName} {direction} {msg}");
+        }
 
-                case ELoggingLevel.Verbose:
-                    Log.Debug($"{serialPortName} {direction} Hex:   {hex}");
-                    Log.Debug($"{serialPortName} {direction} Ascii: {ascii}");
-                    break;
-            }
+        private void SetCommand(string command, int timeout)
+        {
+            // When received a set command, the scanner would process it and returned a byte of response data.
+            // The scanner returns '0x06' if successfully set, or '0x15' if failure.
+            var cmdBytes = Encoding.ASCII.GetBytes(command);
+            var expectedSuccessfulReply = new byte[] { 0x06 };
+            WriteRead(cmdBytes, expectedSuccessfulReply, timeout);
         }
     }
 }

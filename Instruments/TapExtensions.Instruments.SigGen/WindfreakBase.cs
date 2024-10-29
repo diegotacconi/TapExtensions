@@ -96,16 +96,16 @@ namespace TapExtensions.Instruments.SigGen
 
         private void CloseSerialPort()
         {
-            if (_sp.IsOpen)
-            {
-                Log.Debug($"Closing serial port ({_sp.PortName})");
+            if (!_sp.IsOpen)
+                return;
 
-                // Close serial port
-                _sp.DiscardInBuffer();
-                _sp.DiscardOutBuffer();
-                _sp.Close();
-                _sp.Dispose();
-            }
+            Log.Debug($"Closing serial port ({_sp.PortName})");
+
+            // Close serial port
+            _sp.DiscardInBuffer();
+            _sp.DiscardOutBuffer();
+            _sp.Close();
+            _sp.Dispose();
         }
 
         public virtual string SerialQuery(string command)
