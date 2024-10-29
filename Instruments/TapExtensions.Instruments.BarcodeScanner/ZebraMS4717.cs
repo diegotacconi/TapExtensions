@@ -17,6 +17,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using OpenTap;
+using TapExtensions.Interfaces.BarcodeScanner;
 using TapExtensions.Shared.Win32;
 
 namespace TapExtensions.Instruments.BarcodeScanner
@@ -24,7 +25,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
     [Display("Zebra MS4717",
         Groups: new[] { "TapExtensions", "Instruments", "BarcodeScanner" },
         Description: "Zebra MS4717 Fixed Mount Imager")]
-    public class ZebraMS4717 : BarcodeScannerBase
+    public class ZebraMS4717 : Instrument, IBarcodeScanner
     {
         #region Settings
 
@@ -199,7 +200,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
             }
         }
 
-        public override byte[] GetRawBytes()
+        public byte[] GetRawBytes()
         {
             const int timeout = 5;
             byte[] rawBarcodeLabel;
@@ -228,6 +229,18 @@ namespace TapExtensions.Instruments.BarcodeScanner
             }
 
             return rawBarcodeLabel;
+        }
+
+        public (string serialNumber, string productCode) GetSerialNumberAndProductCode()
+        {
+            // Scan barcode label
+            var rawBytes = GetRawBytes();
+
+            // Parse barcode label
+            var productCode = BarcodeLabelUtility.GetProductCode(rawBytes);
+            var serialNumber = BarcodeLabelUtility.GetSerialNumber(rawBytes);
+
+            return (serialNumber, productCode);
         }
 
         private void WriteRead(byte[] command, byte[] expectedEndOfMessage, int timeout)

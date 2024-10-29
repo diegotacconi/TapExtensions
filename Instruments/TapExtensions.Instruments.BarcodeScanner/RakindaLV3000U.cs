@@ -10,6 +10,7 @@ using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using OpenTap;
+using TapExtensions.Interfaces.BarcodeScanner;
 using TapExtensions.Shared.Win32;
 
 namespace TapExtensions.Instruments.BarcodeScanner
@@ -17,7 +18,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
     [Display("Rakinda LV3000U",
         Groups: new[] { "TapExtensions", "Instruments", "BarcodeScanner" },
         Description: "Rakinda LV3000U or LV3000H Fixed Mount Scanner")]
-    public class RakindaLV3000U : BarcodeScannerBase
+    public class RakindaLV3000U : Instrument, IBarcodeScanner
     {
         #region Settings
 
@@ -35,6 +36,10 @@ namespace TapExtensions.Instruments.BarcodeScanner
             Description: "List of USB device addresses to search for a match.")]
         public List<string> UsbDeviceAddresses { get; set; }
 
+        [Display("Retry", Order: 30,
+            Description: "Maximum number of iteration attempts to retry scanning the barcode label.")]
+        public Enabled<int> MaxIterationCount { get; set; }
+
         [Display("Verbose Logging", Order: 20,
             Description: "Enables verbose logging of serial port (UART) communication.")]
         public bool VerboseLoggingEnabled { get; set; } = true;
@@ -51,6 +56,11 @@ namespace TapExtensions.Instruments.BarcodeScanner
             SerialPortName = "COM6";
             UseAutoDetection = true;
             UsbDeviceAddresses = new List<string> { @"USB\VID_1EAB&PID_1D06" };
+            MaxIterationCount = new Enabled<int> { IsEnabled = true, Value = 3 };
+
+            // Validation rules
+            Rules.Add(() => MaxIterationCount.Value > 0,
+                "Must be greater than zero", nameof(MaxIterationCount));
         }
 
         public override void Open()
@@ -163,7 +173,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
             }
         }
 
-        public override byte[] GetRawBytes()
+        public byte[] GetRawBytes()
         {
             const int timeout = 5;
             byte[] rawBarcodeLabel;
@@ -187,6 +197,42 @@ namespace TapExtensions.Instruments.BarcodeScanner
             }
 
             return rawBarcodeLabel;
+        }
+
+        public (string serialNumber, string productCode) GetSerialNumberAndProductCode()
+        {
+            var serialNumber = "";
+            var productCode = "";
+            var maxCount = MaxIterationCount.IsEnabled ? MaxIterationCount.Value : 1;
+
+            // Retry loop
+            for (var iteration = 1; iteration <= maxCount; iteration++)
+            {
+                try
+                {
+                    if (iteration > 1)
+                        Log.Warning($"Retrying attempt {iteration} of {maxCount} ...");
+
+                    // Try to scan the barcode label
+                    var rawBytes = GetRawBytes();
+
+                    // Parse the barcode label
+                    productCode = BarcodeLabelUtility.GetProductCode(rawBytes);
+                    serialNumber = BarcodeLabelUtility.GetSerialNumber(rawBytes);
+
+                    // Exit loop if no exceptions
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    if (iteration < maxCount)
+                        Log.Debug($"IgnoreException: {ex.Message}");
+                    else
+                        throw;
+                }
+            }
+
+            return (serialNumber, productCode);
         }
 
         private void WriteRead(byte[] command, byte[] expectedEndOfMessage, int timeout)
