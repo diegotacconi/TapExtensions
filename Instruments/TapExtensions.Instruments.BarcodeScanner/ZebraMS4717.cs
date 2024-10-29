@@ -62,6 +62,22 @@ namespace TapExtensions.Instruments.BarcodeScanner
             Rules.Add(ValidateConnectionAddress, "Not valid", nameof(ConnectionAddress));
         }
 
+        public override void Open()
+        {
+            base.Open();
+            IsConnected = false;
+
+            _portName = GetSerialPortName();
+            CheckIfBarcodeScannerIsAvailable();
+        }
+
+        public override void Close()
+        {
+            CloseSerialPort();
+            base.Close();
+            IsConnected = false;
+        }
+
         private enum EAddressType
         {
             ComPort,
@@ -131,25 +147,6 @@ namespace TapExtensions.Instruments.BarcodeScanner
             return found.ComPort;
         }
 
-        public override void Open()
-        {
-            base.Open();
-
-            _portName = GetSerialPortName();
-
-            // Check if barcode scanner is available
-            OpenSerialPort();
-            try
-            {
-                Wakeup();
-                ParamDefaults();
-            }
-            finally
-            {
-                CloseSerialPort();
-            }
-        }
-
         private void OpenSerialPort()
         {
             if (string.IsNullOrWhiteSpace(_portName))
@@ -178,33 +175,43 @@ namespace TapExtensions.Instruments.BarcodeScanner
             _sp.Open();
             _sp.DiscardInBuffer();
             _sp.DiscardOutBuffer();
-        }
-
-        public override void Close()
-        {
-            CloseSerialPort();
-            base.Close();
+            IsConnected = true;
         }
 
         private void CloseSerialPort()
         {
             try
             {
-                if (_sp.IsOpen)
-                {
-                    if (LoggingLevel >= ELoggingLevel.Normal)
-                        Log.Debug($"Closing serial port ({_sp.PortName})");
+                if (!_sp.IsOpen)
+                    return;
 
-                    // Close serial port
-                    _sp.DiscardInBuffer();
-                    _sp.DiscardOutBuffer();
-                    _sp.Close();
-                    _sp.Dispose();
-                }
+                if (LoggingLevel >= ELoggingLevel.Normal)
+                    Log.Debug($"Closing serial port ({_sp.PortName})");
+
+                // Close serial port
+                _sp.DiscardInBuffer();
+                _sp.DiscardOutBuffer();
+                _sp.Close();
+                _sp.Dispose();
+                IsConnected = false;
             }
             catch (Exception ex)
             {
                 Log.Warning(ex.Message);
+            }
+        }
+
+        private void CheckIfBarcodeScannerIsAvailable()
+        {
+            OpenSerialPort();
+            try
+            {
+                Wakeup();
+                ParamDefaults();
+            }
+            finally
+            {
+                CloseSerialPort();
             }
         }
 
@@ -247,6 +254,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
         private void Write(byte[] command)
         {
+            OnActivity();
             LogBytes(_sp.PortName, ">>", command);
             _sp.DiscardInBuffer();
             _sp.DiscardOutBuffer();
@@ -255,11 +263,11 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
         private byte[] Read(byte[] expectedResponse, int timeout)
         {
+            OnActivity();
             bool responseReceived;
             var response = new List<byte>();
             var timer = new Stopwatch();
             timer.Start();
-
             do
             {
                 TapThread.Sleep(10);
