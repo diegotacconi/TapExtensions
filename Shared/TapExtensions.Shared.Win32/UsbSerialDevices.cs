@@ -16,6 +16,23 @@ namespace TapExtensions.Shared.Win32
             public string Description { get; set; }
         }
 
+        public static UsbSerialDevice FindUsbSerialDevice(string connectionAddresses)
+        {
+            if (string.IsNullOrWhiteSpace(connectionAddresses))
+                throw new InvalidOperationException("List of addresses cannot be empty");
+
+            // Split addresses string into multiple address strings
+            var separators = new List<char> { ',', ';', '\t', '\n', '\r' };
+            var parts = connectionAddresses.Split(separators.ToArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            // Remove all white-spaces from the beginning and end of the route strings
+            var usbDeviceAddresses = parts.Select(part => part.Trim()).ToList();
+
+            var found = FindUsbAddress(usbDeviceAddresses);
+
+            return found;
+        }
+
         public static List<UsbSerialDevice> GetAllSerialDevices()
         {
             var devices = new List<UsbSerialDevice>();
@@ -69,7 +86,8 @@ namespace TapExtensions.Shared.Win32
             var found = new List<UsbSerialDevice>();
 
             foreach (var device in devices)
-                if (device.UsbAddress.Contains(searchItem, StringComparison.OrdinalIgnoreCase))
+                if (device.UsbAddress.Contains(searchItem, StringComparison.OrdinalIgnoreCase) ||
+                    device.ComPort.Equals(searchItem, StringComparison.OrdinalIgnoreCase))
                     found.Add(device);
 
             if (found.Count > 1)

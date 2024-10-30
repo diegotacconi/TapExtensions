@@ -2,6 +2,9 @@
 // https://www.rakinda.com/en/productdetail/83/118/154.html
 // https://www.rakinda.com/en/productdetail/83/135/95.html
 // https://rakindaiot.com/product/mini-barcode-scanner-lv3000u-2d-with-external-insulation-board/
+//
+// Remember to configure the scanner as a USB Serial Device, not as a USB Keyboard
+// https://github.com/diegotacconi/TapExtensions/tree/main/Instruments/TapExtensions.Instruments.BarcodeScanner/ConfigDocs
 
 using System;
 using System.Collections.Generic;
@@ -22,21 +25,13 @@ namespace TapExtensions.Instruments.BarcodeScanner
     {
         #region Settings
 
-        // https://github.com/diegotacconi/TapExtensions/tree/main/Instruments/TapExtensions.Instruments.BarcodeScanner/ConfigDocs
-        [EnabledIf(nameof(UseAutoDetection), false)]
-        [Display("Serial Port Name", Order: 1,
-            Description: "Remember to configure the scanner as a serial port (UART) device, over USB.")]
-        public string SerialPortName { get; set; }
+        [Display("Connection Address", Order: 1,
+            Description: "Examples:\n" +
+                         " COM4\n" +
+                         " USB\\VID_1EAB&PID_1D06")]
+        public string ConnectionAddress { get; set; }
 
-        [Display("Use AutoDetection", Order: 2, Group: "Serial Port AutoDetection", Collapsed: true)]
-        public bool UseAutoDetection { get; set; }
-
-        [EnabledIf(nameof(UseAutoDetection))]
-        [Display("USB Device Address", Order: 3, Group: "Serial Port AutoDetection", Collapsed: true,
-            Description: "List of USB device addresses to search for a match.")]
-        public List<string> UsbDeviceAddresses { get; set; }
-
-        [Display("Retry", Order: 30,
+        [Display("Retry", Order: 10,
             Description: "Maximum number of iteration attempts to retry scanning the barcode label.")]
         public Enabled<int> MaxIterationCount { get; set; }
 
@@ -53,9 +48,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
         {
             // Default values
             Name = nameof(RakindaLV3000U);
-            SerialPortName = "COM6";
-            UseAutoDetection = true;
-            UsbDeviceAddresses = new List<string> { @"USB\VID_1EAB&PID_1D06" };
+            ConnectionAddress = @"USB\VID_1EAB&PID_1D06";
             MaxIterationCount = new Enabled<int> { IsEnabled = true, Value = 3 };
 
             // Validation rules
@@ -68,7 +61,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
             base.Open();
             IsConnected = false;
 
-            _portName = UseAutoDetection ? FindUsbSerialDevice() : SerialPortName;
+            FindSerialPort();
             CheckIfBarcodeScannerIsAvailable();
         }
 
@@ -79,23 +72,17 @@ namespace TapExtensions.Instruments.BarcodeScanner
             IsConnected = false;
         }
 
-        private string FindUsbSerialDevice()
+        private void FindSerialPort()
         {
-            if (UsbDeviceAddresses.Count == 0)
-                throw new InvalidOperationException(
-                    "List of USB Device Address cannot be empty");
-
             if (VerboseLoggingEnabled)
-                Log.Debug("Searching for USB Address(es) of " +
-                          $"'{string.Join("', '", UsbDeviceAddresses)}'");
+                Log.Debug($"Searching for USB Address(es) of '{ConnectionAddress}'");
 
-            var found = UsbSerialDevices.FindUsbAddress(UsbDeviceAddresses);
+            var found = UsbSerialDevices.FindUsbSerialDevice(ConnectionAddress);
+            _portName = found.ComPort;
 
             Log.Debug($"Found serial port '{found.ComPort}' " +
                       $"with USB Address of '{found.UsbAddress}' " +
                       $"and Description of '{found.Description}'");
-
-            return found.ComPort;
         }
 
         private void OpenSerialPort()

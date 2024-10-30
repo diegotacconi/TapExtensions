@@ -15,7 +15,6 @@ using System.Diagnostics;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using OpenTap;
 using TapExtensions.Interfaces.BarcodeScanner;
 using TapExtensions.Shared.Win32;
@@ -52,15 +51,54 @@ namespace TapExtensions.Instruments.BarcodeScanner
             ConnectionAddress = @"USB\VID_05E0&PID_1701";
 
             // Validation rules
-            Rules.Add(ValidateConnectionAddress, "Not valid", nameof(ConnectionAddress));
+            // Rules.Add(ValidateConnectionAddress, "Not valid", nameof(ConnectionAddress));
         }
+
+        /*
+        public bool ValidateConnectionAddress()
+        {
+            try
+            {
+                UsbSerialDevices.GetAddressType(ConnectionAddress);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+        */
+
+        /*
+        private enum EAddressType
+        {
+            ComPort,
+            UsbDevice
+        }
+
+        private static EAddressType GetAddressType(string address)
+        {
+            // const string comPortPattern = "^COM[1-9][0-9]*$";
+            const string comPortPattern = "^[Cc][Oo][Mm][1-9][0-9]*$";
+            if (Regex.IsMatch(address, comPortPattern))
+                return EAddressType.ComPort;
+
+            // const string usbDevicePattern = "^USB\\VID_[0-9A-Z]{4}&PID_[0-9A-Z]{4}[0-9A-Z&_\\]+";
+            const string usbDevicePattern = "^USB.*";
+            if (Regex.IsMatch(address, usbDevicePattern))
+                return EAddressType.UsbDevice;
+
+            throw new InvalidOperationException(
+                "Connection Address is not valid");
+        }
+        */
 
         public override void Open()
         {
             base.Open();
             IsConnected = false;
 
-            _portName = GetSerialPortName();
+            FindSerialPort();
             CheckIfBarcodeScannerIsAvailable();
         }
 
@@ -71,72 +109,25 @@ namespace TapExtensions.Instruments.BarcodeScanner
             IsConnected = false;
         }
 
-        private enum EAddressType
+        private void FindSerialPort()
         {
-            ComPort,
-            UsbDevice
-        }
-
-        private bool ValidateConnectionAddress()
-        {
-            try
+            // List USB devices
+            if (VerboseLoggingEnabled)
             {
-                GetAddressType();
-                return true;
+                var devices = UsbSerialDevices.GetAllSerialDevices();
+                foreach (var device in devices)
+                    Log.Debug($"'{device.ComPort}', '{device.UsbAddress}', '{device.Description}'.");
             }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
-        private EAddressType GetAddressType()
-        {
-            // const string comPortPattern = "^COM[1-9][0-9]*$";
-            const string comPortPattern = "^[Cc][Oo][Mm][1-9][0-9]*$";
-            if (Regex.IsMatch(ConnectionAddress, comPortPattern))
-                return EAddressType.ComPort;
-
-            // const string usbDevicePattern = "^USB\\VID_[0-9A-Z]{4}&PID_[0-9A-Z]{4}[0-9A-Z&_\\]+";
-            const string usbDevicePattern = "^USB.*";
-            if (Regex.IsMatch(ConnectionAddress, usbDevicePattern))
-                return EAddressType.UsbDevice;
-
-            throw new InvalidOperationException(
-                "Connection Address is not valid");
-        }
-
-        private string GetSerialPortName()
-        {
-            if (GetAddressType() == EAddressType.ComPort)
-                return ConnectionAddress;
-
-            if (GetAddressType() == EAddressType.UsbDevice)
-                return FindUsbSerialDevice();
-
-            throw new InvalidOperationException(
-                "Connection Address is not valid");
-        }
-
-        private string FindUsbSerialDevice()
-        {
-            var usbDeviceAddresses = new List<string> { ConnectionAddress };
-
-            if (usbDeviceAddresses.Count == 0)
-                throw new InvalidOperationException(
-                    "List of USB Device Address cannot be empty");
 
             if (VerboseLoggingEnabled)
-                Log.Debug("Searching for USB Address(es) of " +
-                          $"'{string.Join("', '", usbDeviceAddresses)}'");
+                Log.Debug($"Searching for USB Address(es) of '{ConnectionAddress}'");
 
-            var found = UsbSerialDevices.FindUsbAddress(usbDeviceAddresses);
+            var found = UsbSerialDevices.FindUsbSerialDevice(ConnectionAddress);
+            _portName = found.ComPort;
 
             Log.Debug($"Found serial port '{found.ComPort}' " +
                       $"with USB Address of '{found.UsbAddress}' " +
                       $"and Description of '{found.Description}'");
-
-            return found.ComPort;
         }
 
         private void OpenSerialPort()
