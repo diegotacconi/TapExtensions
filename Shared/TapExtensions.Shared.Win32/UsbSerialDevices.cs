@@ -25,7 +25,7 @@ namespace TapExtensions.Shared.Win32
             var separators = new List<char> { ',', ';', '\t', '\n', '\r' };
             var parts = connectionAddresses.Split(separators.ToArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
 
-            // Remove all white-spaces from the beginning and end of the route strings
+            // Remove all white-spaces from the beginning and end of the address string
             var usbDeviceAddresses = parts.Select(part => part.Trim()).ToList();
 
             var found = FindUsbAddress(usbDeviceAddresses);

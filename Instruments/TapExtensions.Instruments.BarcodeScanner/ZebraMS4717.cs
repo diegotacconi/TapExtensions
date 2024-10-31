@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using OpenTap;
 using TapExtensions.Interfaces.BarcodeScanner;
 using TapExtensions.Shared.Win32;
@@ -51,47 +52,29 @@ namespace TapExtensions.Instruments.BarcodeScanner
             ConnectionAddress = @"USB\VID_05E0&PID_1701";
 
             // Validation rules
-            // Rules.Add(ValidateConnectionAddress, "Not valid", nameof(ConnectionAddress));
+            Rules.Add(ValidateConnectionAddress, "Not valid", nameof(ConnectionAddress));
         }
 
-        /*
         public bool ValidateConnectionAddress()
         {
-            try
+            // Split addresses string into multiple address strings
+            var separators = new List<char> { ',', ';', '\t', '\n', '\r' };
+            var parts = ConnectionAddress.Split(separators.ToArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            // Remove all white-spaces from the beginning and end of the address string
+            var addresses = parts.Select(part => part.Trim()).ToList();
+
+            var validAddresses = new List<bool>();
+            foreach (var address in addresses)
             {
-                UsbSerialDevices.GetAddressType(ConnectionAddress);
-                return true;
+                const string comPortPattern = "^[Cc][Oo][Mm][1-9][0-9]*$";
+                const string usbDevicePattern = "^USB.*";
+                var validAddress = Regex.IsMatch(address, comPortPattern) || Regex.IsMatch(address, usbDevicePattern);
+                validAddresses.Add(validAddress);
             }
-            catch (Exception)
-            {
-                return false;
-            }
+
+            return validAddresses.Any() && validAddresses.All(x => x);
         }
-        */
-
-        /*
-        private enum EAddressType
-        {
-            ComPort,
-            UsbDevice
-        }
-
-        private static EAddressType GetAddressType(string address)
-        {
-            // const string comPortPattern = "^COM[1-9][0-9]*$";
-            const string comPortPattern = "^[Cc][Oo][Mm][1-9][0-9]*$";
-            if (Regex.IsMatch(address, comPortPattern))
-                return EAddressType.ComPort;
-
-            // const string usbDevicePattern = "^USB\\VID_[0-9A-Z]{4}&PID_[0-9A-Z]{4}[0-9A-Z&_\\]+";
-            const string usbDevicePattern = "^USB.*";
-            if (Regex.IsMatch(address, usbDevicePattern))
-                return EAddressType.UsbDevice;
-
-            throw new InvalidOperationException(
-                "Connection Address is not valid");
-        }
-        */
 
         public override void Open()
         {
@@ -111,6 +94,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
         private void FindSerialPort()
         {
+            /*
             // List USB devices
             if (VerboseLoggingEnabled)
             {
@@ -118,6 +102,10 @@ namespace TapExtensions.Instruments.BarcodeScanner
                 foreach (var device in devices)
                     Log.Debug($"'{device.ComPort}', '{device.UsbAddress}', '{device.Description}'.");
             }
+            */
+
+            if (string.IsNullOrWhiteSpace(ConnectionAddress))
+                throw new InvalidOperationException($"{nameof(ConnectionAddress)} cannot be empty");
 
             if (VerboseLoggingEnabled)
                 Log.Debug($"Searching for USB Address(es) of '{ConnectionAddress}'");
@@ -144,8 +132,8 @@ namespace TapExtensions.Instruments.BarcodeScanner
                 DataBits = 8,
                 StopBits = StopBits.One,
                 Handshake = Handshake.RequestToSend,
-                ReadTimeout = 1000, // 1 second
-                WriteTimeout = 1000 // 1 second
+                ReadTimeout = 1000,
+                WriteTimeout = 1000
             };
 
             // Close serial port if already opened

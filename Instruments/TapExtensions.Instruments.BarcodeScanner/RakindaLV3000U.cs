@@ -12,6 +12,7 @@ using System.Diagnostics;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using OpenTap;
 using TapExtensions.Interfaces.BarcodeScanner;
 using TapExtensions.Shared.Win32;
@@ -52,8 +53,30 @@ namespace TapExtensions.Instruments.BarcodeScanner
             MaxIterationCount = new Enabled<int> { IsEnabled = true, Value = 3 };
 
             // Validation rules
+            Rules.Add(ValidateConnectionAddress, "Not valid", nameof(ConnectionAddress));
             Rules.Add(() => MaxIterationCount.Value > 0,
                 "Must be greater than zero", nameof(MaxIterationCount));
+        }
+
+        public bool ValidateConnectionAddress()
+        {
+            // Split addresses string into multiple address strings
+            var separators = new List<char> { ',', ';', '\t', '\n', '\r' };
+            var parts = ConnectionAddress.Split(separators.ToArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            // Remove all white-spaces from the beginning and end of the address string
+            var addresses = parts.Select(part => part.Trim()).ToList();
+
+            var validAddresses = new List<bool>();
+            foreach (var address in addresses)
+            {
+                const string comPortPattern = "^[Cc][Oo][Mm][1-9][0-9]*$";
+                const string usbDevicePattern = "^USB.*";
+                var validAddress = Regex.IsMatch(address, comPortPattern) || Regex.IsMatch(address, usbDevicePattern);
+                validAddresses.Add(validAddress);
+            }
+
+            return validAddresses.Any() && validAddresses.All(x => x);
         }
 
         public override void Open()
@@ -74,6 +97,9 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
         private void FindSerialPort()
         {
+            if (string.IsNullOrWhiteSpace(ConnectionAddress))
+                throw new InvalidOperationException($"{nameof(ConnectionAddress)} cannot be empty");
+
             if (VerboseLoggingEnabled)
                 Log.Debug($"Searching for USB Address(es) of '{ConnectionAddress}'");
 
@@ -99,8 +125,8 @@ namespace TapExtensions.Instruments.BarcodeScanner
                 DataBits = 8,
                 StopBits = StopBits.One,
                 Handshake = Handshake.None,
-                ReadTimeout = 1000, // 1 second
-                WriteTimeout = 1000 // 1 second
+                ReadTimeout = 1000,
+                WriteTimeout = 1000
             };
 
             // Close serial port if already opened
