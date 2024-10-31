@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO.Ports;
 using OpenTap;
 using TapExtensions.Shared.Win32;
@@ -10,20 +9,14 @@ namespace TapExtensions.Instruments.SigGen
     {
         #region Settings
 
-        [EnabledIf(nameof(UseAutoDetection), false)]
-        [Display("Serial Port Name", Order: 1, Description: "Example: 'COM3'")]
-        public string SerialPortName { get; set; }
+        [Display("Connection Address", Order: 1,
+            Description: "Examples:\n" +
+                         " USB\\VID_16D0&PID_0557\\004571\n" +
+                         " USB\\VID_16D0&PID_0557\n" +
+                         " COM5")]
+        public string ConnectionAddress { get; set; }
 
-        [Display("Use AutoDetection", Order: 2, Group: "Serial Port AutoDetection", Collapsed: true)]
-        public bool UseAutoDetection { get; set; } = false;
-
-        [EnabledIf(nameof(UseAutoDetection))]
-        [Display("USB Device Address", Order: 3, Group: "Serial Port AutoDetection", Collapsed: true,
-            Description: "List of USB device addresses to search for a match.\n" +
-                         @"Example: 'USB\VID_1234&PID_5678\SERIALNUMBER'")]
-        public List<string> UsbDeviceAddresses { get; set; }
-
-        [Display("Verbose Logging", Order: 20, Group: "Debug", Collapsed: true,
+        [Display("Verbose Logging", Order: 20,
             Description: "Enables verbose logging of serial port (UART) communication.")]
         public bool VerboseLoggingEnabled { get; set; } = true;
 
@@ -34,21 +27,22 @@ namespace TapExtensions.Instruments.SigGen
         public override void Open()
         {
             base.Open();
-            var portName = UseAutoDetection ? FindSerialPort() : SerialPortName;
+            IsConnected = false;
+
+            var portName = FindSerialPort();
             OpenSerialPort(portName);
         }
 
         private string FindSerialPort()
         {
-            if (UsbDeviceAddresses.Count == 0)
+            if (string.IsNullOrWhiteSpace(ConnectionAddress))
                 throw new InvalidOperationException(
-                    "List of USB Device Address cannot be empty");
+                    $"{nameof(ConnectionAddress)} cannot be empty");
 
             if (VerboseLoggingEnabled)
-                Log.Debug("Searching for USB Address(es) of " +
-                          $"'{string.Join("', '", UsbDeviceAddresses)}'");
+                Log.Debug($"Searching for USB Address(es) of '{ConnectionAddress}'");
 
-            var found = UsbSerialDevices.FindUsbAddress(UsbDeviceAddresses);
+            var found = UsbSerialDevices.FindUsbSerialDevice(ConnectionAddress);
 
             Log.Debug($"Found serial port '{found.ComPort}' " +
                       $"with USB Address of '{found.UsbAddress}' " +
@@ -71,8 +65,8 @@ namespace TapExtensions.Instruments.SigGen
                 DataBits = 8,
                 StopBits = StopBits.One,
                 Handshake = Handshake.RequestToSend,
-                ReadTimeout = 2000, // 2 second
-                WriteTimeout = 2000, // 2 second
+                ReadTimeout = 2000,
+                WriteTimeout = 2000,
                 DtrEnable = true,
                 RtsEnable = true
             };
@@ -86,12 +80,14 @@ namespace TapExtensions.Instruments.SigGen
             _sp.Open();
             _sp.DiscardInBuffer();
             _sp.DiscardOutBuffer();
+            IsConnected = true;
         }
 
         public override void Close()
         {
             CloseSerialPort();
             base.Close();
+            IsConnected = false;
         }
 
         private void CloseSerialPort()
@@ -106,12 +102,14 @@ namespace TapExtensions.Instruments.SigGen
             _sp.DiscardOutBuffer();
             _sp.Close();
             _sp.Dispose();
+            IsConnected = false;
         }
 
         public virtual string SerialQuery(string command)
         {
             SerialCommand(command);
 
+            OnActivity();
             var response = string.Empty;
             const int timeoutMs = 3000;
             const int intervalMs = 10;
@@ -132,6 +130,8 @@ namespace TapExtensions.Instruments.SigGen
 
         public virtual void SerialCommand(string command)
         {
+            OnActivity();
+
             if (VerboseLoggingEnabled)
                 Log.Debug("{0} >> {1}", _sp.PortName, command);
 
