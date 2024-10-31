@@ -28,8 +28,9 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
         [Display("Connection Address", Order: 1,
             Description: "Examples:\n" +
-                         " COM4\n" +
-                         " USB\\VID_1EAB&PID_1D06")]
+                         " USB\\VID_1EAB&PID_1D06\\CF078472\n" +
+                         " USB\\VID_1EAB&PID_1D06\n" +
+                         " COM3")]
         public string ConnectionAddress { get; set; }
 
         [Display("Retry", Order: 10,
@@ -220,7 +221,6 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
             // Retry loop
             for (var iteration = 1; iteration <= maxCount; iteration++)
-            {
                 try
                 {
                     if (iteration > 1)
@@ -243,7 +243,6 @@ namespace TapExtensions.Instruments.BarcodeScanner
                     else
                         throw;
                 }
-            }
 
             return (serialNumber, productCode);
         }

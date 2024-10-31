@@ -31,9 +31,9 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
         [Display("Connection Address", Order: 1,
             Description: "Examples:\n" +
-                         " COM3\n" +
+                         " USB\\VID_05E0&PID_1701\\USB_CDC_SYMBOL_SCANNER\n" +
                          " USB\\VID_05E0&PID_1701\n" +
-                         " USB\\VID_05E0&PID_1701\\USB_CDC_SYMBOL_SCANNER")]
+                         " COM4")]
         public string ConnectionAddress { get; set; }
 
         [Display("Verbose Logging", Order: 20,
@@ -105,17 +105,19 @@ namespace TapExtensions.Instruments.BarcodeScanner
             */
 
             if (string.IsNullOrWhiteSpace(ConnectionAddress))
-                throw new InvalidOperationException($"{nameof(ConnectionAddress)} cannot be empty");
+                throw new InvalidOperationException(
+                    $"{nameof(ConnectionAddress)} cannot be empty");
 
             if (VerboseLoggingEnabled)
                 Log.Debug($"Searching for USB Address(es) of '{ConnectionAddress}'");
 
             var found = UsbSerialDevices.FindUsbSerialDevice(ConnectionAddress);
-            _portName = found.ComPort;
 
             Log.Debug($"Found serial port '{found.ComPort}' " +
                       $"with USB Address of '{found.UsbAddress}' " +
                       $"and Description of '{found.Description}'");
+
+            _portName = found.ComPort;
         }
 
         private void OpenSerialPort()
@@ -231,7 +233,9 @@ namespace TapExtensions.Instruments.BarcodeScanner
         private void Write(byte[] command)
         {
             OnActivity();
+
             LogBytes(_sp.PortName, ">>", command);
+
             _sp.DiscardInBuffer();
             _sp.DiscardOutBuffer();
             _sp.Write(command, 0, command.Length);
@@ -346,9 +350,9 @@ namespace TapExtensions.Instruments.BarcodeScanner
         private static byte[] CalculateChecksum(byte[] bytes)
         {
             // Twos complement of the sum of the message
-            int sum = 0;
+            var sum = 0;
             foreach (var item in bytes)
-                sum += (int)item;
+                sum += item;
 
             var sum16 = (ushort)(sum % 255);
             var twosComplement = (ushort)(~sum16 + 1);

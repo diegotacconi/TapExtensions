@@ -21,13 +21,13 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
         private enum EHeader
         {
-            ProductCode,     // 1P
-            SerialNumber,    // S
-            Company,         // 18V
-            Date,            // 10D
-            Traceability,    // 1T
+            ProductCode, // 1P
+            SerialNumber, // S
+            Company, // 18V
+            Date, // 10D
+            Traceability, // 1T
             CountryOfOrigin, // 4L
-            Quantity         // Q
+            Quantity // Q
         }
 
         private static byte[] GetHeaderIdentifier(EHeader header)
@@ -51,7 +51,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
                     identifier = new byte[] { 0x31, 0x54 }; // 1T = Traceability Number (Lot/Batch Number)
                     break;
                 case EHeader.CountryOfOrigin:
-                    identifier = new byte[] { 0x34, 0x4c }; // 4L = Country of Origin, two-character ISO 3166 country code
+                    identifier = new byte[] { 0x34, 0x4c }; // 4L = Country of Origin, two-character ISO 3166
                     break;
                 case EHeader.Quantity:
                     identifier = new byte[] { 0x51 }; // Q = Quantity, Number of Pieces, or Amount (numeric only)
@@ -79,15 +79,12 @@ namespace TapExtensions.Instruments.BarcodeScanner
         {
             var msg = new StringBuilder();
             if (bytes != null && bytes.Length != 0)
-            {
                 foreach (var b in bytes)
-                {
                     if (b >= 0x20 && b <= 0x7E)
                         msg.Append((char)b);
                     else
                         msg.Append("{" + b.ToString("X2") + "}");
-                }
-            }
+
             return msg.ToString();
         }
 
@@ -121,7 +118,6 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
             // Find delimiters
             for (var i = 0; i < source.Length; i++)
-            {
                 if (Equals(source[i], delimiters))
                 {
                     part = new byte[i - startIndex];
@@ -129,7 +125,6 @@ namespace TapExtensions.Instruments.BarcodeScanner
                     parts.Add(part);
                     startIndex = i + 1;
                 }
-            }
 
             // Remaining part
             part = new byte[source.Length - startIndex];

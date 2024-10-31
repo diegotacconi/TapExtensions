@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using OpenTap;
 using TapExtensions.Interfaces.Common;
@@ -30,9 +29,14 @@ namespace TapExtensions.Instruments.SigGen
         {
             // Default values
             Name = "SynthUsb3";
-            SerialPortName = "COM6";
-            UseAutoDetection = true;
-            UsbDeviceAddresses = new List<string> { @"USB\VID_16D0&PID_0000" }; // ToDo: PID
+            ConnectionAddress = @"USB\VID_16D0&PID_0000"; // ToDo: PID
+            // Validation rules
+            Rules.Add(ValidateConnectionAddress, "Not valid", nameof(ConnectionAddress));
+        }
+
+        public bool ValidateConnectionAddress()
+        {
+            return true;
         }
 
         public override void Open()
