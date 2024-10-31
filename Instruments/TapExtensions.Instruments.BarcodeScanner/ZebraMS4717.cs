@@ -85,13 +85,6 @@ namespace TapExtensions.Instruments.BarcodeScanner
             CheckIfBarcodeScannerIsAvailable();
         }
 
-        public override void Close()
-        {
-            CloseSerialPort();
-            base.Close();
-            IsConnected = false;
-        }
-
         private void FindSerialPort()
         {
             /*
@@ -149,6 +142,13 @@ namespace TapExtensions.Instruments.BarcodeScanner
             _sp.DiscardInBuffer();
             _sp.DiscardOutBuffer();
             IsConnected = true;
+        }
+
+        public override void Close()
+        {
+            CloseSerialPort();
+            base.Close();
+            IsConnected = false;
         }
 
         private void CloseSerialPort()
@@ -233,9 +233,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
         private void Write(byte[] command)
         {
             OnActivity();
-
             LogBytes(_sp.PortName, ">>", command);
-
             _sp.DiscardInBuffer();
             _sp.DiscardOutBuffer();
             _sp.Write(command, 0, command.Length);

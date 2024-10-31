@@ -89,27 +89,22 @@ namespace TapExtensions.Instruments.BarcodeScanner
             CheckIfBarcodeScannerIsAvailable();
         }
 
-        public override void Close()
-        {
-            CloseSerialPort();
-            base.Close();
-            IsConnected = false;
-        }
-
         private void FindSerialPort()
         {
             if (string.IsNullOrWhiteSpace(ConnectionAddress))
-                throw new InvalidOperationException($"{nameof(ConnectionAddress)} cannot be empty");
+                throw new InvalidOperationException(
+                    $"{nameof(ConnectionAddress)} cannot be empty");
 
             if (VerboseLoggingEnabled)
                 Log.Debug($"Searching for USB Address(es) of '{ConnectionAddress}'");
 
             var found = UsbSerialDevices.FindUsbSerialDevice(ConnectionAddress);
-            _portName = found.ComPort;
 
             Log.Debug($"Found serial port '{found.ComPort}' " +
                       $"with USB Address of '{found.UsbAddress}' " +
                       $"and Description of '{found.Description}'");
+
+            _portName = found.ComPort;
         }
 
         private void OpenSerialPort()
@@ -141,6 +136,13 @@ namespace TapExtensions.Instruments.BarcodeScanner
             _sp.DiscardInBuffer();
             _sp.DiscardOutBuffer();
             IsConnected = true;
+        }
+
+        public override void Close()
+        {
+            CloseSerialPort();
+            base.Close();
+            IsConnected = false;
         }
 
         private void CloseSerialPort()
