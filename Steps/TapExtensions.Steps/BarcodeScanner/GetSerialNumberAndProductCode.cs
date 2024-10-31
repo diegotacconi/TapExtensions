@@ -8,8 +8,7 @@ namespace TapExtensions.Steps.BarcodeScanner
         Groups: new[] { "TapExtensions", "Steps", "BarcodeScanner" })]
     public class GetSerialNumberAndProductCode : TestStep
     {
-        [Display("BarcodeScanner")]
-        public IBarcodeScanner BarcodeScanner { get; set; }
+        [Display("BarcodeScanner")] public IBarcodeScanner BarcodeScanner { get; set; }
 
         public override void Run()
         {
@@ -18,11 +17,12 @@ namespace TapExtensions.Steps.BarcodeScanner
                 var (serialNumber, productCode) = BarcodeScanner.GetSerialNumberAndProductCode();
                 Log.Debug($"productCode  = '{productCode}'");
                 Log.Debug($"serialNumber = '{serialNumber}'");
+                UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)
             {
                 Log.Error(ex.Message);
-                // Publish(Name, false, true, true, "bool");
+                UpgradeVerdict(Verdict.Fail);
             }
         }
     }

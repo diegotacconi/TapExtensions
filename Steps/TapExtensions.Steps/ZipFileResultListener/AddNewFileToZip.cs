@@ -41,10 +41,12 @@ namespace TapExtensions.Steps.ZipFileResultListener
             try
             {
                 ZipFileResultListener.AddNewFile(FileName, FileContents);
+                UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)
             {
                 Log.Error(ex.Message);
+                UpgradeVerdict(Verdict.Fail);
             }
         }
     }

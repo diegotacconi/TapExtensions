@@ -38,12 +38,12 @@ namespace TapExtensions.Steps.Uart
             try
             {
                 var success = Uart.Expect(ExpectedResponse, Timeout);
-                // Publish(Name, success, true, true, "bool");
+                UpgradeVerdict(success ? Verdict.Pass : Verdict.Fail);
             }
             catch (Exception ex)
             {
                 Log.Error(ex.Message);
-                // Publish(Name, false, true, true, "bool");
+                UpgradeVerdict(Verdict.Fail);
             }
         }
     }

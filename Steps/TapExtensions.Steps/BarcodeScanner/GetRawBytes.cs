@@ -9,8 +9,7 @@ namespace TapExtensions.Steps.BarcodeScanner
         Groups: new[] { "TapExtensions", "Steps", "BarcodeScanner" })]
     public class GetRawBytes : TestStep
     {
-        [Display("BarcodeScanner")]
-        public IBarcodeScanner BarcodeScanner { get; set; }
+        [Display("BarcodeScanner")] public IBarcodeScanner BarcodeScanner { get; set; }
 
         public override void Run()
         {
@@ -18,10 +17,12 @@ namespace TapExtensions.Steps.BarcodeScanner
             {
                 var rawBytes = BarcodeScanner.GetRawBytes();
                 Log.Debug(AsciiBytesToString(rawBytes));
+                UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)
             {
                 Log.Error(ex.Message);
+                UpgradeVerdict(Verdict.Fail);
             }
         }
 
@@ -29,20 +30,15 @@ namespace TapExtensions.Steps.BarcodeScanner
         {
             var msg = new StringBuilder();
             if (bytes != null && bytes.Length != 0)
-            {
                 foreach (var c in bytes)
                 {
                     var j = c;
                     if (j >= 0x20 && j <= 0x7E)
-                    {
                         msg.Append((char)j);
-                    }
                     else
-                    {
                         msg.Append("{" + c.ToString("X2") + "}");
-                    }
                 }
-            }
+
             return msg.ToString();
         }
     }
