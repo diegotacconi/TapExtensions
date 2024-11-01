@@ -1,4 +1,4 @@
-﻿// Information on the Zebra MS4717 barcode scanner:
+﻿// Zebra MS4717 Barcode Scanner
 // https://www.zebra.com/us/en/products/oem/fixed-mount/ms4700-series.html
 // https://www.zebra.com/content/dam/zebra_new_ia/en-us/manuals/oem/ms4717-ig-en.pdf
 //

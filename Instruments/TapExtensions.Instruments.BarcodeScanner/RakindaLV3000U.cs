@@ -1,4 +1,4 @@
-﻿// Information on the Rakinda LV3000U and LV3000H barcode scanners:
+﻿// Rakinda LV3000U and LV3000H Barcode Scanners
 // https://www.rakinda.com/en/productdetail/83/118/154.html
 // https://www.rakinda.com/en/productdetail/83/135/95.html
 // https://rakindaiot.com/product/mini-barcode-scanner-lv3000u-2d-with-external-insulation-board/

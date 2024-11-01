@@ -1,4 +1,10 @@
-﻿using System;
+﻿// Windfreak SynthUSBII RF Signal Generator
+// https://windfreaktech.com/product/usb-rf-signal-generator/
+//
+// Serial Communication Specification
+// https://windfreaktech.com/wp-content/uploads/docs/synthusbii/synthusbiicom.pdf
+
+using System;
 using System.Globalization;
 using OpenTap;
 using TapExtensions.Interfaces.Common;

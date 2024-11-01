@@ -1,4 +1,10 @@
-﻿using System;
+﻿// Windfreak SynthUSB3 RF Signal Generator
+// https://windfreaktech.com/product/synthusb3-6ghz-rf-signal-generator/
+//
+// Serial Communication Specification
+// https://windfreaktech.com/wp-content/uploads/2020/11/WFT_SynthUSB3_API_10a.pdf
+
+using System;
 using System.Globalization;
 using OpenTap;
 using TapExtensions.Interfaces.Common;
