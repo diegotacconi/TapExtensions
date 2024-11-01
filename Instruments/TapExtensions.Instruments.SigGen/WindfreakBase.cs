@@ -118,6 +118,9 @@ namespace TapExtensions.Instruments.SigGen
 
         private protected virtual void SerialWrite(string command)
         {
+            if (string.IsNullOrEmpty(command))
+                return;
+
             OnActivity();
 
             if (VerboseLoggingEnabled)
@@ -143,7 +146,7 @@ namespace TapExtensions.Instruments.SigGen
                 TapThread.Sleep(intervalMs);
             } while (!response.Contains("\n") && loopCount < maxCount);
 
-            if (VerboseLoggingEnabled)
+            if (VerboseLoggingEnabled && !string.IsNullOrEmpty(response))
                 Log.Debug("{0} << {1}", _sp.PortName, response.Trim('\n'));
 
             return response;
