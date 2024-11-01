@@ -110,10 +110,26 @@ namespace TapExtensions.Instruments.SigGen
             IsConnected = false;
         }
 
-        private protected virtual string Query(string command)
+        private protected virtual string SerialQuery(string command)
         {
-            Write(command);
+            SerialWrite(command);
+            return SerialRead();
+        }
 
+        private protected virtual void SerialWrite(string command)
+        {
+            OnActivity();
+
+            if (VerboseLoggingEnabled)
+                Log.Debug("{0} >> {1}", _sp.PortName, command);
+
+            _sp.DiscardInBuffer();
+            _sp.DiscardOutBuffer();
+            _sp.Write(command);
+        }
+
+        private protected virtual string SerialRead()
+        {
             OnActivity();
             var response = string.Empty;
             const int timeoutMs = 3000;
@@ -131,18 +147,6 @@ namespace TapExtensions.Instruments.SigGen
                 Log.Debug("{0} << {1}", _sp.PortName, response.Trim('\n'));
 
             return response;
-        }
-
-        private protected virtual void Write(string command)
-        {
-            OnActivity();
-
-            if (VerboseLoggingEnabled)
-                Log.Debug("{0} >> {1}", _sp.PortName, command);
-
-            _sp.DiscardInBuffer();
-            _sp.DiscardOutBuffer();
-            _sp.Write(command);
         }
     }
 }

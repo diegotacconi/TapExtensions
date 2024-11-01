@@ -178,7 +178,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
                 try
                 {
                     // Attempt to read the barcode label
-                    rawBarcodeLabel = Read(new byte[0], timeout);
+                    rawBarcodeLabel = SerialRead(new byte[0], timeout);
                 }
                 finally
                 {
@@ -207,22 +207,25 @@ namespace TapExtensions.Instruments.BarcodeScanner
             return (serialNumber, productCode);
         }
 
-        private void Query(byte[] command, byte[] expectedEndOfMessage, int timeout)
+        private void SerialQuery(byte[] command, byte[] expectedEndOfMessage, int timeout)
         {
-            Write(command);
-            Read(expectedEndOfMessage, timeout);
+            SerialWrite(command);
+            SerialRead(expectedEndOfMessage, timeout);
         }
 
-        private void Write(byte[] command)
+        private void SerialWrite(byte[] command)
         {
             OnActivity();
-            LogBytes(">>", command);
+
+            if (VerboseLoggingEnabled)
+                LogBytes(">>", command);
+
             _sp.DiscardInBuffer();
             _sp.DiscardOutBuffer();
             _sp.Write(command, 0, command.Length);
         }
 
-        private byte[] Read(byte[] expectedResponse, int timeout)
+        private byte[] SerialRead(byte[] expectedResponse, int timeout)
         {
             OnActivity();
             bool responseReceived;
@@ -247,7 +250,9 @@ namespace TapExtensions.Instruments.BarcodeScanner
             } while (!responseReceived);
 
             timer.Stop();
-            LogBytes("<<", response.ToArray());
+
+            if (VerboseLoggingEnabled)
+                LogBytes("<<", response.ToArray());
 
             if (!responseReceived)
                 throw new InvalidOperationException("Did not receive the expected end of message");
@@ -272,16 +277,12 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
             var msg = new StringBuilder();
             foreach (var c in bytes)
-            {
-                var j = c;
-                if (j >= 0x20 && j <= 0x7E)
-                    msg.Append((char)j);
+                if (c >= 0x20 && c <= 0x7E)
+                    msg.Append((char)c);
                 else
                     msg.Append("{" + c.ToString("X2") + "}");
-            }
 
-            if (VerboseLoggingEnabled)
-                Log.Debug($"{_sp.PortName} {direction} {msg}");
+            Log.Debug($"{_sp.PortName} {direction} {msg}");
         }
 
         private void Query(byte opCode, byte expectedByte)
@@ -314,7 +315,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
             message.Add(checksum[0]); // Low byte
 
             // Send message
-            Query(message.ToArray(), new[] { expectedByte }, timeout);
+            SerialQuery(message.ToArray(), new[] { expectedByte }, timeout);
         }
 
         private static byte[] CalculateChecksum(byte[] bytes)
@@ -409,7 +410,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
         private void Wakeup()
         {
-            Write(new byte[] { 0x00 });
+            SerialWrite(new byte[] { 0x00 });
             TapThread.Sleep(100);
         }
 

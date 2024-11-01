@@ -152,7 +152,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
                 const int timeout = 5;
 
                 // Send "?" and expect the response to be "!"
-                Query(new byte[] { 0x3F }, new byte[] { 0x21 }, timeout);
+                SerialQuery(new byte[] { 0x3F }, new byte[] { 0x21 }, timeout);
 
                 // Default all commands
                 SetCommand("NLS0001000;", timeout);
@@ -181,14 +181,14 @@ namespace TapExtensions.Instruments.BarcodeScanner
             try
             {
                 // Start Scanning
-                Query(new byte[] { 0x1B, 0x31 }, new byte[] { 0x06 }, timeout);
+                SerialQuery(new byte[] { 0x1B, 0x31 }, new byte[] { 0x06 }, timeout);
 
                 // Attempt to read the barcode label
                 var expectedEndOfBarcodeLabel = new byte[] { 0x0D, 0x0A };
-                rawBarcodeLabel = Read(expectedEndOfBarcodeLabel, timeout);
+                rawBarcodeLabel = SerialRead(expectedEndOfBarcodeLabel, timeout);
 
                 // Stop Scanning
-                Query(new byte[] { 0x1B, 0x30 }, new byte[] { 0x06 }, timeout);
+                SerialQuery(new byte[] { 0x1B, 0x30 }, new byte[] { 0x06 }, timeout);
             }
             finally
             {
@@ -232,22 +232,25 @@ namespace TapExtensions.Instruments.BarcodeScanner
             return (serialNumber, productCode);
         }
 
-        private void Query(byte[] command, byte[] expectedEndOfMessage, int timeout)
+        private void SerialQuery(byte[] command, byte[] expectedEndOfMessage, int timeout)
         {
-            Write(command);
-            Read(expectedEndOfMessage, timeout);
+            SerialWrite(command);
+            SerialRead(expectedEndOfMessage, timeout);
         }
 
-        private void Write(byte[] command)
+        private void SerialWrite(byte[] command)
         {
             OnActivity();
-            LogBytes(">>", command);
+
+            if (VerboseLoggingEnabled)
+                LogBytes(">>", command);
+
             _sp.DiscardInBuffer();
             _sp.DiscardOutBuffer();
             _sp.Write(command, 0, command.Length);
         }
 
-        private byte[] Read(byte[] expectedResponse, int timeout)
+        private byte[] SerialRead(byte[] expectedResponse, int timeout)
         {
             OnActivity();
             bool responseReceived;
@@ -272,7 +275,9 @@ namespace TapExtensions.Instruments.BarcodeScanner
             } while (!responseReceived);
 
             timer.Stop();
-            LogBytes("<<", response.ToArray());
+
+            if (VerboseLoggingEnabled)
+                LogBytes("<<", response.ToArray());
 
             if (!responseReceived)
                 throw new InvalidOperationException("Did not receive the expected end of message");
@@ -297,16 +302,12 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
             var msg = new StringBuilder();
             foreach (var c in bytes)
-            {
-                var j = c;
-                if (j >= 0x20 && j <= 0x7E)
-                    msg.Append((char)j);
+                if (c >= 0x20 && c <= 0x7E)
+                    msg.Append((char)c);
                 else
                     msg.Append("{" + c.ToString("X2") + "}");
-            }
 
-            if (VerboseLoggingEnabled)
-                Log.Debug($"{_sp.PortName} {direction} {msg}");
+            Log.Debug($"{_sp.PortName} {direction} {msg}");
         }
 
         private void SetCommand(string command, int timeout)
@@ -315,7 +316,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
             // The scanner returns '0x06' if successfully set, or '0x15' if failure.
             var cmdBytes = Encoding.ASCII.GetBytes(command);
             var expectedSuccessfulReply = new byte[] { 0x06 };
-            Query(cmdBytes, expectedSuccessfulReply, timeout);
+            SerialQuery(cmdBytes, expectedSuccessfulReply, timeout);
         }
     }
 }

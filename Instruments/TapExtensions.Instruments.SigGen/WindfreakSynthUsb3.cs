@@ -39,20 +39,20 @@ namespace TapExtensions.Instruments.SigGen
             base.Open();
 
             // +) Show model type
-            Log.Debug("Model Type: " + Query("+").Trim('\n'));
+            Log.Debug("Model Type: " + SerialQuery("+").Trim('\n'));
 
             // -) Show serial number
-            Log.Debug("Serial Number: " + Query("-").Trim('\n'));
+            Log.Debug("Serial Number: " + SerialQuery("-").Trim('\n'));
 
             // v0) Show firmware version
-            Log.Debug("Firmware Version: " + Query("v0").Trim('\n'));
+            Log.Debug("Firmware Version: " + SerialQuery("v0").Trim('\n'));
 
             // v1) Shows hardware version
-            Log.Debug("Hardware Version: " + Query("v1").Trim('\n'));
+            Log.Debug("Hardware Version: " + SerialQuery("v1").Trim('\n'));
 
             // x) Set reference (0=external / 1=internal)
-            Write("x1");
-            if (!Query("x?").Contains("1"))
+            SerialWrite("x1");
+            if (!SerialQuery("x?").Contains("1"))
                 throw new InvalidOperationException("Unable to set reference to internal");
 
             SetRfOutputState(EState.Off);
@@ -77,7 +77,7 @@ namespace TapExtensions.Instruments.SigGen
 
             lock (InstLock)
             {
-                var response = Query("f?");
+                var response = SerialQuery("f?");
                 if (!double.TryParse(response, out var freqKhz))
                     throw new InvalidOperationException($"Unable to parse response of '{response}'");
 
@@ -93,7 +93,7 @@ namespace TapExtensions.Instruments.SigGen
 
             lock (InstLock)
             {
-                var response = Query("W?");
+                var response = SerialQuery("W?");
                 if (!double.TryParse(response, out amplitude))
                     throw new InvalidOperationException($"Unable to parse response of '{response}'");
             }
@@ -117,13 +117,13 @@ namespace TapExtensions.Instruments.SigGen
             lock (InstLock)
             {
                 // Set frequency
-                Write("f" + frequencyMhz.ToString("0.0#######", CultureInfo.InvariantCulture));
+                SerialWrite("f" + frequencyMhz.ToString("0.0#######", CultureInfo.InvariantCulture));
 
                 // Check frequency
                 var freqReplyMhz = GetFrequency();
 
                 // Check self-calibration
-                if (!Query("V").Contains("1"))
+                if (!SerialQuery("V").Contains("1"))
                     throw new InvalidOperationException("Self-calibration failed (output not leveled)");
 
                 const double tolerance = 1e-7;
@@ -147,13 +147,13 @@ namespace TapExtensions.Instruments.SigGen
             lock (InstLock)
             {
                 // Set amplitude
-                Write("W" + outputLevelDbm.ToString("0.0##", CultureInfo.InvariantCulture));
+                SerialWrite("W" + outputLevelDbm.ToString("0.0##", CultureInfo.InvariantCulture));
 
                 // Check amplitude
                 var replyDbm = GetOutputLevel();
 
                 // Check self-calibration
-                if (!Query("V").Contains("1"))
+                if (!SerialQuery("V").Contains("1"))
                     throw new InvalidOperationException("Self-calibration failed (output not leveled)");
 
                 if (Math.Abs(outputLevelDbm - replyDbm) > AmplitudeResolution)
