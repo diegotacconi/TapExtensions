@@ -79,7 +79,8 @@ namespace TapExtensions.Instruments.SigGen
             // Close serial port if already opened
             CloseSerialPort();
 
-            Log.Debug($"Opening serial port ({_sp.PortName})");
+            if (VerboseLoggingEnabled)
+                Log.Debug($"Opening serial port ({_sp.PortName})");
 
             // Open serial port
             _sp.Open();
@@ -100,7 +101,8 @@ namespace TapExtensions.Instruments.SigGen
             if (!_sp.IsOpen)
                 return;
 
-            Log.Debug($"Closing serial port ({_sp.PortName})");
+            if (VerboseLoggingEnabled)
+                Log.Debug($"Closing serial port ({_sp.PortName})");
 
             // Close serial port
             _sp.DiscardInBuffer();
