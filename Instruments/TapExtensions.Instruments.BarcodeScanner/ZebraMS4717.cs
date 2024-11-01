@@ -15,7 +15,6 @@ using System.Diagnostics;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using OpenTap;
 using TapExtensions.Interfaces.BarcodeScanner;
 using TapExtensions.Shared.Win32;
@@ -55,25 +54,9 @@ namespace TapExtensions.Instruments.BarcodeScanner
             Rules.Add(ValidateConnectionAddress, "Not valid", nameof(ConnectionAddress));
         }
 
-        public bool ValidateConnectionAddress()
+        private bool ValidateConnectionAddress()
         {
-            // Split addresses string into multiple address strings
-            var separators = new List<char> { ',', ';', '\t', '\n', '\r' };
-            var parts = ConnectionAddress.Split(separators.ToArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
-
-            // Remove all white-spaces from the beginning and end of the address string
-            var addresses = parts.Select(part => part.Trim()).ToList();
-
-            var validAddresses = new List<bool>();
-            foreach (var address in addresses)
-            {
-                const string comPortPattern = "^[Cc][Oo][Mm][1-9][0-9]*$";
-                const string usbDevicePattern = "^USB.*";
-                var validAddress = Regex.IsMatch(address, comPortPattern) || Regex.IsMatch(address, usbDevicePattern);
-                validAddresses.Add(validAddress);
-            }
-
-            return validAddresses.Any() && validAddresses.All(x => x);
+            return UsbSerialDevices.ValidateConnectionAddress(ConnectionAddress);
         }
 
         public override void Open()
@@ -224,7 +207,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
             return (serialNumber, productCode);
         }
 
-        private void WriteRead(byte[] command, byte[] expectedEndOfMessage, int timeout)
+        private void Query(byte[] command, byte[] expectedEndOfMessage, int timeout)
         {
             Write(command);
             Read(expectedEndOfMessage, timeout);
@@ -233,7 +216,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
         private void Write(byte[] command)
         {
             OnActivity();
-            LogBytes(_sp.PortName, ">>", command);
+            LogBytes(">>", command);
             _sp.DiscardInBuffer();
             _sp.DiscardOutBuffer();
             _sp.Write(command, 0, command.Length);
@@ -264,7 +247,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
             } while (!responseReceived);
 
             timer.Stop();
-            LogBytes(_sp.PortName, "<<", response.ToArray());
+            LogBytes("<<", response.ToArray());
 
             if (!responseReceived)
                 throw new InvalidOperationException("Did not receive the expected end of message");
@@ -282,34 +265,23 @@ namespace TapExtensions.Instruments.BarcodeScanner
             return j;
         }
 
-        private void LogBytes(string serialPortName, string direction, byte[] bytes)
+        private void LogBytes(string direction, byte[] bytes)
         {
             if (bytes == null || bytes.Length == 0)
                 return;
 
             var msg = new StringBuilder();
-            var hex = new StringBuilder();
-            var ascii = new StringBuilder();
-
             foreach (var c in bytes)
             {
-                hex.Append(c.ToString("X2") + " ");
-
                 var j = c;
                 if (j >= 0x20 && j <= 0x7E)
-                {
                     msg.Append((char)j);
-                    ascii.Append((char)j + "  ");
-                }
                 else
-                {
                     msg.Append("{" + c.ToString("X2") + "}");
-                    ascii.Append('.' + "  ");
-                }
             }
 
             if (VerboseLoggingEnabled)
-                Log.Debug($"{serialPortName} {direction} {msg}");
+                Log.Debug($"{_sp.PortName} {direction} {msg}");
         }
 
         private void Query(byte opCode, byte expectedByte)
@@ -342,7 +314,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
             message.Add(checksum[0]); // Low byte
 
             // Send message
-            WriteRead(message.ToArray(), new[] { expectedByte }, timeout);
+            Query(message.ToArray(), new[] { expectedByte }, timeout);
         }
 
         private static byte[] CalculateChecksum(byte[] bytes)

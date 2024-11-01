@@ -34,43 +34,38 @@ namespace TapExtensions.Instruments.SigGen
             Rules.Add(ValidateConnectionAddress, "Not valid", nameof(ConnectionAddress));
         }
 
-        public bool ValidateConnectionAddress()
-        {
-            return true;
-        }
-
         public override void Open()
         {
             base.Open();
 
             // +) Show model type
-            Log.Debug("Model Type: " + SerialQuery("+").Trim('\n'));
+            Log.Debug("Model Type: " + Query("+").Trim('\n'));
 
             // -) Show serial number
-            Log.Debug("Serial Number: " + SerialQuery("-").Trim('\n'));
+            Log.Debug("Serial Number: " + Query("-").Trim('\n'));
 
             // v) Show firmware version
-            Log.Debug("Firmware Version: " + SerialQuery("v").Trim('\n'));
+            Log.Debug("Firmware Version: " + Query("v").Trim('\n'));
 
             // o) set RF On(1) or Off(0)
             SetRfOutputState(EState.Off);
 
             // h) set RF High(1) or Low(0) Power
-            SerialCommand("h1");
-            if (!SerialQuery("h?").Contains("1"))
+            Write("h1");
+            if (!Query("h?").Contains("1"))
                 throw new InvalidOperationException("Unable to set the SG RF Power to High");
 
             // a) set amplitude
             SetOutputLevel(DefaultAmplitude);
 
             // g) run sweep (on=1 / off=0)
-            SerialCommand("g0");
-            if (!SerialQuery("g?").Contains("0"))
+            Write("g0");
+            if (!Query("g?").Contains("0"))
                 throw new InvalidOperationException("Unable to set the SG sweep state to Off");
 
             // x) Set reference (0=external / 1=internal)
-            SerialCommand("x1");
-            if (!SerialQuery("x?").Contains("1"))
+            Write("x1");
+            if (!Query("x?").Contains("1"))
                 throw new InvalidOperationException("Unable to set reference to internal");
 
             // f) set frequency
@@ -94,7 +89,7 @@ namespace TapExtensions.Instruments.SigGen
 
             lock (InstLock)
             {
-                var response = SerialQuery("f?");
+                var response = Query("f?");
                 if (!double.TryParse(response, out var freqKhz))
                     throw new InvalidOperationException($"Unable to parse response of '{response}'");
 
@@ -125,7 +120,7 @@ namespace TapExtensions.Instruments.SigGen
             lock (InstLock)
             {
                 // Set frequency
-                SerialCommand("f" + frequencyMhz.ToString("0.0#######", CultureInfo.InvariantCulture));
+                Write("f" + frequencyMhz.ToString("0.0#######", CultureInfo.InvariantCulture));
 
                 // Check frequency
                 var freqReplyMhz = GetFrequency();
@@ -184,10 +179,10 @@ namespace TapExtensions.Instruments.SigGen
             lock (InstLock)
             {
                 // Set amplitude
-                SerialCommand($"a{a:D1}");
+                Write($"a{a:D1}");
 
                 // Check amplitude
-                if (!SerialQuery("a?").Contains($"{a:D1}"))
+                if (!Query("a?").Contains($"{a:D1}"))
                     throw new InvalidOperationException($"Unable to set amplitude to 'a{a:D1}'");
 
                 const double tolerance = 0.001;
@@ -208,31 +203,31 @@ namespace TapExtensions.Instruments.SigGen
                 if (state == EState.On)
                 {
                     // Set output state
-                    SerialCommand("o1");
+                    Write("o1");
 
                     // Set frequency
                     // Note: The output doesn't turn on if there is no freq command after the "o1" command
                     SetFrequency(_frequencyMhz);
 
                     // Check output state (On=1 / Off=0)
-                    if (!SerialQuery("o?").Contains("1"))
+                    if (!Query("o?").Contains("1"))
                         throw new InvalidOperationException("Unable to set the RF output state to On");
 
                     // Check phase lock status (lock=1 / unlock=0)
-                    if (!SerialQuery("p").Contains("1"))
+                    if (!Query("p").Contains("1"))
                         throw new InvalidOperationException("Unable to set the RF output state to On (phase unlocked)");
                 }
                 else
                 {
                     // Set output state
-                    SerialCommand("o0");
+                    Write("o0");
 
                     // Check output state (On=1 / Off=0)
-                    if (!SerialQuery("o?").Contains("0"))
+                    if (!Query("o?").Contains("0"))
                         throw new InvalidOperationException("Unable to set the RF output state to Off");
 
                     // Check phase lock status (lock=1 / unlock=0)
-                    if (!SerialQuery("p").Contains("0"))
+                    if (!Query("p").Contains("0"))
                         throw new InvalidOperationException("Unable to set the RF output state to Off (phase locked)");
                 }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Management;
+using System.Text.RegularExpressions;
 
 namespace TapExtensions.Shared.Win32
 {
@@ -14,6 +15,27 @@ namespace TapExtensions.Shared.Win32
             public string ComPort { get; set; }
             public string UsbAddress { get; set; }
             public string Description { get; set; }
+        }
+
+        public static bool ValidateConnectionAddress(string connectionAddress)
+        {
+            // Split addresses string into multiple address strings
+            var separators = new List<char> { ',', ';', '\t', '\n', '\r' };
+            var parts = connectionAddress.Split(separators.ToArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            // Remove all white-spaces from the beginning and end of the address string
+            var addresses = parts.Select(part => part.Trim()).ToList();
+
+            var validAddresses = new List<bool>();
+            foreach (var address in addresses)
+            {
+                const string comPortPattern = "^[Cc][Oo][Mm][1-9][0-9]*$";
+                const string usbDevicePattern = "^USB.*";
+                var validAddress = Regex.IsMatch(address, comPortPattern) || Regex.IsMatch(address, usbDevicePattern);
+                validAddresses.Add(validAddress);
+            }
+
+            return validAddresses.Any() && validAddresses.All(x => x);
         }
 
         public static UsbSerialDevice FindUsbSerialDevice(string connectionAddresses)

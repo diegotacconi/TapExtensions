@@ -12,7 +12,6 @@ using System.Diagnostics;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using OpenTap;
 using TapExtensions.Interfaces.BarcodeScanner;
 using TapExtensions.Shared.Win32;
@@ -59,25 +58,9 @@ namespace TapExtensions.Instruments.BarcodeScanner
                 "Must be greater than zero", nameof(MaxIterationCount));
         }
 
-        public bool ValidateConnectionAddress()
+        private bool ValidateConnectionAddress()
         {
-            // Split addresses string into multiple address strings
-            var separators = new List<char> { ',', ';', '\t', '\n', '\r' };
-            var parts = ConnectionAddress.Split(separators.ToArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
-
-            // Remove all white-spaces from the beginning and end of the address string
-            var addresses = parts.Select(part => part.Trim()).ToList();
-
-            var validAddresses = new List<bool>();
-            foreach (var address in addresses)
-            {
-                const string comPortPattern = "^[Cc][Oo][Mm][1-9][0-9]*$";
-                const string usbDevicePattern = "^USB.*";
-                var validAddress = Regex.IsMatch(address, comPortPattern) || Regex.IsMatch(address, usbDevicePattern);
-                validAddresses.Add(validAddress);
-            }
-
-            return validAddresses.Any() && validAddresses.All(x => x);
+            return UsbSerialDevices.ValidateConnectionAddress(ConnectionAddress);
         }
 
         public override void Open()
@@ -169,7 +152,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
                 const int timeout = 5;
 
                 // Send "?" and expect the response to be "!"
-                WriteRead(new byte[] { 0x3F }, new byte[] { 0x21 }, timeout);
+                Query(new byte[] { 0x3F }, new byte[] { 0x21 }, timeout);
 
                 // Default all commands
                 SetCommand("NLS0001000;", timeout);
@@ -198,14 +181,14 @@ namespace TapExtensions.Instruments.BarcodeScanner
             try
             {
                 // Start Scanning
-                WriteRead(new byte[] { 0x1B, 0x31 }, new byte[] { 0x06 }, timeout);
+                Query(new byte[] { 0x1B, 0x31 }, new byte[] { 0x06 }, timeout);
 
                 // Attempt to read the barcode label
                 var expectedEndOfBarcodeLabel = new byte[] { 0x0D, 0x0A };
                 rawBarcodeLabel = Read(expectedEndOfBarcodeLabel, timeout);
 
                 // Stop Scanning
-                WriteRead(new byte[] { 0x1B, 0x30 }, new byte[] { 0x06 }, timeout);
+                Query(new byte[] { 0x1B, 0x30 }, new byte[] { 0x06 }, timeout);
             }
             finally
             {
@@ -249,7 +232,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
             return (serialNumber, productCode);
         }
 
-        private void WriteRead(byte[] command, byte[] expectedEndOfMessage, int timeout)
+        private void Query(byte[] command, byte[] expectedEndOfMessage, int timeout)
         {
             Write(command);
             Read(expectedEndOfMessage, timeout);
@@ -258,7 +241,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
         private void Write(byte[] command)
         {
             OnActivity();
-            LogBytes(_sp.PortName, ">>", command);
+            LogBytes(">>", command);
             _sp.DiscardInBuffer();
             _sp.DiscardOutBuffer();
             _sp.Write(command, 0, command.Length);
@@ -289,7 +272,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
             } while (!responseReceived);
 
             timer.Stop();
-            LogBytes(_sp.PortName, "<<", response.ToArray());
+            LogBytes("<<", response.ToArray());
 
             if (!responseReceived)
                 throw new InvalidOperationException("Did not receive the expected end of message");
@@ -307,34 +290,23 @@ namespace TapExtensions.Instruments.BarcodeScanner
             return j;
         }
 
-        private void LogBytes(string serialPortName, string direction, byte[] bytes)
+        private void LogBytes(string direction, byte[] bytes)
         {
             if (bytes == null || bytes.Length == 0)
                 return;
 
             var msg = new StringBuilder();
-            var hex = new StringBuilder();
-            var ascii = new StringBuilder();
-
             foreach (var c in bytes)
             {
-                hex.Append(c.ToString("X2") + " ");
-
                 var j = c;
                 if (j >= 0x20 && j <= 0x7E)
-                {
                     msg.Append((char)j);
-                    ascii.Append((char)j + "  ");
-                }
                 else
-                {
                     msg.Append("{" + c.ToString("X2") + "}");
-                    ascii.Append('.' + "  ");
-                }
             }
 
             if (VerboseLoggingEnabled)
-                Log.Debug($"{serialPortName} {direction} {msg}");
+                Log.Debug($"{_sp.PortName} {direction} {msg}");
         }
 
         private void SetCommand(string command, int timeout)
@@ -343,7 +315,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
             // The scanner returns '0x06' if successfully set, or '0x15' if failure.
             var cmdBytes = Encoding.ASCII.GetBytes(command);
             var expectedSuccessfulReply = new byte[] { 0x06 };
-            WriteRead(cmdBytes, expectedSuccessfulReply, timeout);
+            Query(cmdBytes, expectedSuccessfulReply, timeout);
         }
     }
 }

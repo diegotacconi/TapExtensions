@@ -34,30 +34,25 @@ namespace TapExtensions.Instruments.SigGen
             Rules.Add(ValidateConnectionAddress, "Not valid", nameof(ConnectionAddress));
         }
 
-        public bool ValidateConnectionAddress()
-        {
-            return true;
-        }
-
         public override void Open()
         {
             base.Open();
 
             // +) Show model type
-            Log.Debug("Model Type: " + SerialQuery("+").Trim('\n'));
+            Log.Debug("Model Type: " + Query("+").Trim('\n'));
 
             // -) Show serial number
-            Log.Debug("Serial Number: " + SerialQuery("-").Trim('\n'));
+            Log.Debug("Serial Number: " + Query("-").Trim('\n'));
 
             // v0) Show firmware version
-            Log.Debug("Firmware Version: " + SerialQuery("v0").Trim('\n'));
+            Log.Debug("Firmware Version: " + Query("v0").Trim('\n'));
 
             // v1) Shows hardware version
-            Log.Debug("Hardware Version: " + SerialQuery("v1").Trim('\n'));
+            Log.Debug("Hardware Version: " + Query("v1").Trim('\n'));
 
             // x) Set reference (0=external / 1=internal)
-            SerialCommand("x1");
-            if (!SerialQuery("x?").Contains("1"))
+            Write("x1");
+            if (!Query("x?").Contains("1"))
                 throw new InvalidOperationException("Unable to set reference to internal");
 
             SetRfOutputState(EState.Off);
@@ -82,7 +77,7 @@ namespace TapExtensions.Instruments.SigGen
 
             lock (InstLock)
             {
-                var response = SerialQuery("f?");
+                var response = Query("f?");
                 if (!double.TryParse(response, out var freqKhz))
                     throw new InvalidOperationException($"Unable to parse response of '{response}'");
 
@@ -98,7 +93,7 @@ namespace TapExtensions.Instruments.SigGen
 
             lock (InstLock)
             {
-                var response = SerialQuery("W?");
+                var response = Query("W?");
                 if (!double.TryParse(response, out amplitude))
                     throw new InvalidOperationException($"Unable to parse response of '{response}'");
             }
@@ -122,13 +117,13 @@ namespace TapExtensions.Instruments.SigGen
             lock (InstLock)
             {
                 // Set frequency
-                SerialCommand("f" + frequencyMhz.ToString("0.0#######", CultureInfo.InvariantCulture));
+                Write("f" + frequencyMhz.ToString("0.0#######", CultureInfo.InvariantCulture));
 
                 // Check frequency
                 var freqReplyMhz = GetFrequency();
 
                 // Check self-calibration
-                if (!SerialQuery("V").Contains("1"))
+                if (!Query("V").Contains("1"))
                     throw new InvalidOperationException("Self-calibration failed (output not leveled)");
 
                 const double tolerance = 1e-7;
@@ -152,13 +147,13 @@ namespace TapExtensions.Instruments.SigGen
             lock (InstLock)
             {
                 // Set amplitude
-                SerialCommand("W" + outputLevelDbm.ToString("0.0##", CultureInfo.InvariantCulture));
+                Write("W" + outputLevelDbm.ToString("0.0##", CultureInfo.InvariantCulture));
 
                 // Check amplitude
                 var replyDbm = GetOutputLevel();
 
                 // Check self-calibration
-                if (!SerialQuery("V").Contains("1"))
+                if (!Query("V").Contains("1"))
                     throw new InvalidOperationException("Self-calibration failed (output not leveled)");
 
                 if (Math.Abs(outputLevelDbm - replyDbm) > AmplitudeResolution)

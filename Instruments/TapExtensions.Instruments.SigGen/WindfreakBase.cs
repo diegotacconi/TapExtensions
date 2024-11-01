@@ -24,6 +24,11 @@ namespace TapExtensions.Instruments.SigGen
 
         private SerialPort _sp;
 
+        private protected bool ValidateConnectionAddress()
+        {
+            return UsbSerialDevices.ValidateConnectionAddress(ConnectionAddress);
+        }
+
         public override void Open()
         {
             base.Open();
@@ -105,9 +110,9 @@ namespace TapExtensions.Instruments.SigGen
             IsConnected = false;
         }
 
-        public virtual string SerialQuery(string command)
+        private protected virtual string Query(string command)
         {
-            SerialCommand(command);
+            Write(command);
 
             OnActivity();
             var response = string.Empty;
@@ -128,7 +133,7 @@ namespace TapExtensions.Instruments.SigGen
             return response;
         }
 
-        public virtual void SerialCommand(string command)
+        private protected virtual void Write(string command)
         {
             OnActivity();
 
