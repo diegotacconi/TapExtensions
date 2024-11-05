@@ -16,7 +16,7 @@ namespace TapExtensions.Steps.BarcodeScanner
             try
             {
                 var rawBytes = BarcodeScanner.GetRawBytes();
-                Log.Debug(AsciiBytesToString(rawBytes));
+                Log.Info(AsciiBytesToString(rawBytes));
                 UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)
