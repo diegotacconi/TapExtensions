@@ -31,13 +31,10 @@ namespace TapExtensions.Steps.BarcodeScanner
             var msg = new StringBuilder();
             if (bytes != null && bytes.Length != 0)
                 foreach (var c in bytes)
-                {
-                    var j = c;
-                    if (j >= 0x20 && j <= 0x7E)
-                        msg.Append((char)j);
+                    if (c >= 0x20 && c <= 0x7E)
+                        msg.Append((char)c);
                     else
                         msg.Append("{" + c.ToString("X2") + "}");
-                }
 
             return msg.ToString();
         }

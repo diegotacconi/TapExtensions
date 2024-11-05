@@ -221,7 +221,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
             OnActivity();
 
             if (VerboseLoggingEnabled)
-                Log.Debug("{0} >> {1}", _sp.PortName, BytesToString(command));
+                Log.Debug("{0} >> {1}", _sp.PortName, AsciiBytesToString(command));
 
             _sp.DiscardInBuffer();
             _sp.DiscardOutBuffer();
@@ -255,7 +255,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
             timer.Stop();
 
             if (VerboseLoggingEnabled && response.Count > 0)
-                Log.Debug("{0} << {1}", _sp.PortName, BytesToString(response.ToArray()));
+                Log.Debug("{0} << {1}", _sp.PortName, AsciiBytesToString(response.ToArray()));
 
             if (!responseReceived)
                 throw new InvalidOperationException("Did not receive the expected end of message");
@@ -273,17 +273,15 @@ namespace TapExtensions.Instruments.BarcodeScanner
             return j;
         }
 
-        private static string BytesToString(byte[] bytes)
+        private static string AsciiBytesToString(byte[] bytes)
         {
-            if (bytes == null || bytes.Length <= 0)
-                return null;
-
             var msg = new StringBuilder();
-            foreach (var c in bytes)
-                if (c >= 0x20 && c <= 0x7E)
-                    msg.Append((char)c);
-                else
-                    msg.Append("{" + c.ToString("X2") + "}");
+            if (bytes != null && bytes.Length != 0)
+                foreach (var c in bytes)
+                    if (c >= 0x20 && c <= 0x7E)
+                        msg.Append((char)c);
+                    else
+                        msg.Append("{" + c.ToString("X2") + "}");
 
             return msg.ToString();
         }
