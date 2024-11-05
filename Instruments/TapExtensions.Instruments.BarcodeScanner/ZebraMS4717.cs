@@ -61,9 +61,6 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
         public override void Open()
         {
-            base.Open();
-            IsConnected = false;
-
             FindSerialPort();
             CheckIfBarcodeScannerIsAvailable();
         }
@@ -130,8 +127,6 @@ namespace TapExtensions.Instruments.BarcodeScanner
         public override void Close()
         {
             CloseSerialPort();
-            base.Close();
-            IsConnected = false;
         }
 
         private void CloseSerialPort()

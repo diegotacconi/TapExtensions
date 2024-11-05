@@ -31,9 +31,6 @@ namespace TapExtensions.Instruments.SigGen
 
         public override void Open()
         {
-            base.Open();
-            IsConnected = false;
-
             var portName = FindSerialPort();
             OpenSerialPort(portName);
         }
@@ -92,8 +89,6 @@ namespace TapExtensions.Instruments.SigGen
         public override void Close()
         {
             CloseSerialPort();
-            base.Close();
-            IsConnected = false;
         }
 
         private void CloseSerialPort()
