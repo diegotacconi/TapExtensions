@@ -47,8 +47,8 @@ namespace TapExtensions.Instruments.SigGen
             var found = UsbSerialDevices.FindUsbSerialDevice(ConnectionAddress);
 
             Log.Debug($"Found serial port '{found.ComPort}' " +
-                      $"with USB Address of '{found.UsbAddress}' " +
-                      $"and Description of '{found.Description}'");
+                      $"at USB Address of '{found.UsbAddress}' " +
+                      $"with Description of '{found.Description}'");
 
             return found.ComPort;
         }
