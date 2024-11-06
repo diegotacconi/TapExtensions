@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Ports;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using OpenTap;
 using TapExtensions.Interfaces.BarcodeScanner;
@@ -37,10 +38,11 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
         [Display("Verbose Logging", Order: 20,
             Description: "Enables verbose logging of serial port (UART) communication.")]
-        public bool VerboseLoggingEnabled { get; set; } = true;
+        public bool VerboseLoggingEnabled { get; set; } = false;
 
         #endregion
 
+        private const int Timeout = 5;
         private string _portName;
         private SerialPort _sp;
 
@@ -87,8 +89,8 @@ namespace TapExtensions.Instruments.BarcodeScanner
             var found = UsbSerialDevices.FindUsbSerialDevice(ConnectionAddress);
 
             Log.Debug($"Found serial port '{found.ComPort}' " +
-                      $"with USB Address of '{found.UsbAddress}' " +
-                      $"and Description of '{found.Description}'");
+                      $"at USB Address of '{found.UsbAddress}' " +
+                      $"with Description of '{found.Description}'");
 
             _portName = found.ComPort;
         }
@@ -161,7 +163,6 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
         public byte[] GetRawBytes()
         {
-            const int timeout = 5;
             byte[] rawBarcodeLabel;
 
             OpenSerialPort();
@@ -173,7 +174,12 @@ namespace TapExtensions.Instruments.BarcodeScanner
                 try
                 {
                     // Attempt to read the barcode label
-                    rawBarcodeLabel = SerialRead(new byte[0], timeout);
+                    var expectedEndOfBarcodeLabel = Array.Empty<byte>();
+                    rawBarcodeLabel = SerialRead(expectedEndOfBarcodeLabel, Timeout);
+
+                    // Always show barcode label characters
+                    if (!VerboseLoggingEnabled && rawBarcodeLabel.Length > 0)
+                        Log.Debug(AsciiBytesToString(rawBarcodeLabel));
                 }
                 finally
                 {
@@ -335,77 +341,90 @@ namespace TapExtensions.Instruments.BarcodeScanner
         private void AimOff()
         {
             // Deactivate aim pattern
+            Log.Debug(MethodBase.GetCurrentMethod()?.Name);
             Query(0xC4, CmdAck);
         }
 
         private void AimOn()
         {
             // Activate aim pattern
+            Log.Debug(MethodBase.GetCurrentMethod()?.Name);
             Query(0xC5, CmdAck);
         }
 
         private void Beep(byte beepCode)
         {
             // Sound the beeper
+            Log.Debug(MethodBase.GetCurrentMethod()?.Name);
             Query(0xE6, new[] { beepCode }, CmdAck);
         }
 
         private void LedOff()
         {
             // Turn off the specified decoder LEDs
+            Log.Debug(MethodBase.GetCurrentMethod()?.Name);
             Query(0xE8, new byte[] { 0x00 }, CmdAck);
         }
 
         private void LedOn()
         {
             // Turn on the specified decoder LEDs
+            Log.Debug(MethodBase.GetCurrentMethod()?.Name);
             Query(0xE7, new byte[] { 0x00 }, CmdAck);
         }
 
         private void ParamDefaults()
         {
             // Set all parameters to their default values
+            Log.Debug(MethodBase.GetCurrentMethod()?.Name);
             Query(0xC8, CmdAck);
         }
 
         private void ParamRequest(byte parameterNumber = 0xFE)
         {
             // Request values of certain parameters
+            Log.Debug(MethodBase.GetCurrentMethod()?.Name);
             Query(0xC7, new[] { parameterNumber }, CmdAck);
         }
 
         private void ScanDisable()
         {
             // Prevents the operator from scanning bar codes
+            Log.Debug(MethodBase.GetCurrentMethod()?.Name);
             Query(0xEA, CmdAck);
         }
 
         private void ScanEnable()
         {
             // Permits bar code scanning
+            Log.Debug(MethodBase.GetCurrentMethod()?.Name);
             Query(0xE9, CmdAck);
         }
 
         private void Sleep()
         {
             // Requests to place the decoder into low power
+            Log.Debug(MethodBase.GetCurrentMethod()?.Name);
             Query(0xEB, CmdAck);
         }
 
         private void StartSession()
         {
             // Tells the decoder to start a scan session
+            Log.Debug(MethodBase.GetCurrentMethod()?.Name);
             Query(0xE4, CmdAck);
         }
 
         private void StopSession()
         {
             // Tells the decoder to abort a decode attempt or video transmission
+            Log.Debug(MethodBase.GetCurrentMethod()?.Name);
             Query(0xE5, CmdAck);
         }
 
         private void Wakeup()
         {
+            Log.Debug(MethodBase.GetCurrentMethod()?.Name);
             SerialWrite(new byte[] { 0x00 });
             TapThread.Sleep(100);
         }

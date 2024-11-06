@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Ports;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using OpenTap;
 using TapExtensions.Interfaces.BarcodeScanner;
@@ -38,10 +39,11 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
         [Display("Verbose Logging", Order: 20,
             Description: "Enables verbose logging of serial port (UART) communication.")]
-        public bool VerboseLoggingEnabled { get; set; } = true;
+        public bool VerboseLoggingEnabled { get; set; } = false;
 
         #endregion
 
+        private const int Timeout = 5;
         private string _portName;
         private SerialPort _sp;
 
@@ -81,8 +83,8 @@ namespace TapExtensions.Instruments.BarcodeScanner
             var found = UsbSerialDevices.FindUsbSerialDevice(ConnectionAddress);
 
             Log.Debug($"Found serial port '{found.ComPort}' " +
-                      $"with USB Address of '{found.UsbAddress}' " +
-                      $"and Description of '{found.Description}'");
+                      $"at USB Address of '{found.UsbAddress}' " +
+                      $"with Description of '{found.Description}'");
 
             _portName = found.ComPort;
         }
@@ -144,22 +146,11 @@ namespace TapExtensions.Instruments.BarcodeScanner
             OpenSerialPort();
             try
             {
-                const int timeout = 5;
-
-                // Send "?" and expect the response to be "!"
-                SerialQuery(new byte[] { 0x3F }, new byte[] { 0x21 }, timeout);
-
-                // Default all commands
-                SetCommand("NLS0001000;", timeout);
-
-                // Reading mode = Trigger
-                SetCommand("NLS0302000;", timeout);
-
-                // Enable command programming
-                SetCommand("NLS0006010;", timeout);
-
-                // Enable all bar codes
-                SetCommand("NLS0001020;", timeout);
+                Wakeup();
+                DefaultAllCommands();
+                SetReadingModeToTrigger();
+                EnableCommandProgramming();
+                EnableAllBarcodes();
             }
             finally
             {
@@ -169,21 +160,26 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
         public byte[] GetRawBytes()
         {
-            const int timeout = 5;
             byte[] rawBarcodeLabel;
 
             OpenSerialPort();
             try
             {
-                // Start Scanning
-                SerialQuery(new byte[] { 0x1B, 0x31 }, new byte[] { 0x06 }, timeout);
+                StartScanning();
+                try
+                {
+                    // Attempt to read the barcode label
+                    var expectedEndOfBarcodeLabel = new byte[] { 0x0D, 0x0A };
+                    rawBarcodeLabel = SerialRead(expectedEndOfBarcodeLabel, Timeout);
 
-                // Attempt to read the barcode label
-                var expectedEndOfBarcodeLabel = new byte[] { 0x0D, 0x0A };
-                rawBarcodeLabel = SerialRead(expectedEndOfBarcodeLabel, timeout);
-
-                // Stop Scanning
-                SerialQuery(new byte[] { 0x1B, 0x30 }, new byte[] { 0x06 }, timeout);
+                    // Always show barcode label characters
+                    if (!VerboseLoggingEnabled && rawBarcodeLabel.Length > 0)
+                        Log.Debug(AsciiBytesToString(rawBarcodeLabel));
+                }
+                finally
+                {
+                    StopScanning();
+                }
             }
             finally
             {
@@ -314,5 +310,52 @@ namespace TapExtensions.Instruments.BarcodeScanner
             var expectedSuccessfulReply = new byte[] { 0x06 };
             SerialQuery(cmdBytes, expectedSuccessfulReply, timeout);
         }
+
+        #region Rakinda's Commands
+
+        private void Wakeup()
+        {
+            // Send "?" and expect the response to be "!"
+            Log.Debug(MethodBase.GetCurrentMethod()?.Name);
+            SerialQuery(new byte[] { 0x3F }, new byte[] { 0x21 }, Timeout);
+        }
+
+        private void DefaultAllCommands()
+        {
+            Log.Debug(MethodBase.GetCurrentMethod()?.Name);
+            SetCommand("NLS0001000;", Timeout);
+        }
+
+        private void SetReadingModeToTrigger()
+        {
+            Log.Debug(MethodBase.GetCurrentMethod()?.Name);
+            SetCommand("NLS0302000;", Timeout);
+        }
+
+        private void EnableCommandProgramming()
+        {
+            Log.Debug(MethodBase.GetCurrentMethod()?.Name);
+            SetCommand("NLS0006010;", Timeout);
+        }
+
+        private void EnableAllBarcodes()
+        {
+            Log.Debug(MethodBase.GetCurrentMethod()?.Name);
+            SetCommand("NLS0001020;", Timeout);
+        }
+
+        private void StartScanning()
+        {
+            Log.Debug(MethodBase.GetCurrentMethod()?.Name);
+            SerialQuery(new byte[] { 0x1B, 0x31 }, new byte[] { 0x06 }, Timeout);
+        }
+
+        private void StopScanning()
+        {
+            Log.Debug(MethodBase.GetCurrentMethod()?.Name);
+            SerialQuery(new byte[] { 0x1B, 0x30 }, new byte[] { 0x06 }, Timeout);
+        }
+
+        #endregion
     }
 }
