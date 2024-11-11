@@ -18,7 +18,7 @@ using System.Reflection;
 using System.Text;
 using OpenTap;
 using TapExtensions.Interfaces.BarcodeScanner;
-using TapExtensions.Shared.Win32;
+using TapExtensions.Shared.SystemManagement;
 
 namespace TapExtensions.Instruments.BarcodeScanner
 {

@@ -37,7 +37,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{34D8FC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Shared", "Shared\TapExtensions.Shared\TapExtensions.Shared.csproj", "{C8F7355B-620A-4BC9-9AE2-483F5169D652}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Shared.Win32", "Shared\TapExtensions.Shared.Win32\TapExtensions.Shared.Win32.csproj", "{D51EE740-E95F-4F44-A5A9-A62784FBF42B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Shared.SystemManagement", "Shared\TapExtensions.Shared.SystemManagement\TapExtensions.Shared.SystemManagement.csproj", "{D51EE740-E95F-4F44-A5A9-A62784FBF42B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Instruments.SigGen", "Instruments\TapExtensions.Instruments.SigGen\TapExtensions.Instruments.SigGen.csproj", "{69E21D8E-51C8-4917-976E-EEC544A78D27}"
 EndProject
@@ -53,7 +53,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Results.ZipFi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Shared.Telnet", "Shared\TapExtensions.Shared.Telnet\TapExtensions.Shared.Telnet.csproj", "{39D9CFA4-8896-4B95-9222-54F7602880D6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TapExtensions.Instruments.Gpio", "Instruments\TapExtensions.Instruments.Gpio\TapExtensions.Instruments.Gpio.csproj", "{1EE2DB7D-936D-413B-B5D9-B838EF45C3C5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Instruments.Gpio", "Instruments\TapExtensions.Instruments.Gpio\TapExtensions.Instruments.Gpio.csproj", "{1EE2DB7D-936D-413B-B5D9-B838EF45C3C5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

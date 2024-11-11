@@ -4,7 +4,7 @@ using System.Linq;
 using System.Management;
 using System.Text.RegularExpressions;
 
-namespace TapExtensions.Shared.Win32
+namespace TapExtensions.Shared.SystemManagement
 {
     public static class UsbSerialDevices
     {

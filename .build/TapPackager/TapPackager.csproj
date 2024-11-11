@@ -42,7 +42,7 @@
     <ProjectReference Include="..\..\Settings\TapExtensions.Settings.Integrity\TapExtensions.Settings.Integrity.csproj" />
     <ProjectReference Include="..\..\Shared\TapExtensions.Shared\TapExtensions.Shared.csproj" />
     <ProjectReference Include="..\..\Shared\TapExtensions.Shared.Telnet\TapExtensions.Shared.Telnet.csproj" />
-    <ProjectReference Include="..\..\Shared\TapExtensions.Shared.Win32\TapExtensions.Shared.Win32.csproj" />
+    <ProjectReference Include="..\..\Shared\TapExtensions.Shared.SystemManagement\TapExtensions.Shared.SystemManagement.csproj" />
     <ProjectReference Include="..\..\Steps\TapExtensions.Steps\TapExtensions.Steps.csproj" />
   </ItemGroup>
 

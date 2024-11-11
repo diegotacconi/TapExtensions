@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO.Ports;
 using OpenTap;
-using TapExtensions.Shared.Win32;
+using TapExtensions.Shared.SystemManagement;
 
 namespace TapExtensions.Instruments.SigGen
 {
