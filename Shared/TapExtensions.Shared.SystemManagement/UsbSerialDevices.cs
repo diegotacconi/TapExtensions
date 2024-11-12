@@ -17,45 +17,7 @@ namespace TapExtensions.Shared.SystemManagement
             public string Description { get; set; }
         }
 
-        public static bool ValidateConnectionAddress(string connectionAddress)
-        {
-            // Split addresses string into multiple address strings
-            var separators = new List<char> { ',', ';', '\t', '\n', '\r' };
-            var parts = connectionAddress.Split(separators.ToArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
-
-            // Remove all white-spaces from the beginning and end of the address string
-            var addresses = parts.Select(part => part.Trim()).ToList();
-
-            var validAddresses = new List<bool>();
-            foreach (var address in addresses)
-            {
-                const string comPortPattern = "^[Cc][Oo][Mm][1-9][0-9]*$";
-                const string usbDevicePattern = "^USB.*";
-                var validAddress = Regex.IsMatch(address, comPortPattern) || Regex.IsMatch(address, usbDevicePattern);
-                validAddresses.Add(validAddress);
-            }
-
-            return validAddresses.Any() && validAddresses.All(x => x);
-        }
-
-        public static UsbSerialDevice FindUsbSerialDevice(string connectionAddresses)
-        {
-            if (string.IsNullOrWhiteSpace(connectionAddresses))
-                throw new InvalidOperationException("List of addresses cannot be empty");
-
-            // Split addresses string into multiple address strings
-            var separators = new List<char> { ',', ';', '\t', '\n', '\r' };
-            var parts = connectionAddresses.Split(separators.ToArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
-
-            // Remove all white-spaces from the beginning and end of the address string
-            var usbDeviceAddresses = parts.Select(part => part.Trim()).ToList();
-
-            var found = FindUsbAddress(usbDeviceAddresses);
-
-            return found;
-        }
-
-        public static List<UsbSerialDevice> GetAllSerialDevices()
+        public static List<UsbSerialDevice> FindAllDevices()
         {
             var devices = new List<UsbSerialDevice>();
 
@@ -77,17 +39,40 @@ namespace TapExtensions.Shared.SystemManagement
             return devices;
         }
 
-        public static UsbSerialDevice FindUsbAddress(List<string> searchItems)
+        public static bool ValidateAddress(string connectionAddresses)
+        {
+            var validAddresses = new List<bool>();
+
+            var addresses = SplitStringIntoList(connectionAddresses);
+            foreach (var address in addresses)
+            {
+                const string comPortPattern = "^[Cc][Oo][Mm][1-9][0-9]*$";
+                const string usbDevicePattern = "^USB.*";
+                var validAddress = Regex.IsMatch(address, comPortPattern) || Regex.IsMatch(address, usbDevicePattern);
+                validAddresses.Add(validAddress);
+            }
+
+            return validAddresses.Any() && validAddresses.All(x => x);
+        }
+
+        public static UsbSerialDevice FindDevice(string connectionAddresses)
+        {
+            var list = SplitStringIntoList(connectionAddresses);
+            var found = FindDevice(list);
+            return found;
+        }
+
+        private static UsbSerialDevice FindDevice(List<string> searchItems)
         {
             if (searchItems.Count == 0)
                 throw new InvalidOperationException("List of items cannot be empty");
 
             var finds = new List<UsbSerialDevice>();
-            var devices = GetAllSerialDevices();
+            var devices = FindAllDevices();
 
             foreach (var searchItem in searchItems)
             {
-                var find = FindUsbAddress(devices, searchItem);
+                var find = FindDevice(devices, searchItem);
                 if (find != null)
                 {
                     finds.Add(find);
@@ -103,7 +88,7 @@ namespace TapExtensions.Shared.SystemManagement
             return finds.First();
         }
 
-        private static UsbSerialDevice FindUsbAddress(List<UsbSerialDevice> devices, string searchItem)
+        private static UsbSerialDevice FindDevice(List<UsbSerialDevice> devices, string searchItem)
         {
             var found = new List<UsbSerialDevice>();
 
@@ -120,6 +105,21 @@ namespace TapExtensions.Shared.SystemManagement
                     "Please enter a search pattern that will return a single serial port device");
 
             return found.Any() ? found.First() : null;
+        }
+
+        private static List<string> SplitStringIntoList(string strings)
+        {
+            if (string.IsNullOrWhiteSpace(strings))
+                throw new InvalidOperationException("String cannot be empty");
+
+            // Split addresses string into multiple address strings
+            var separators = new List<char> { ',', ';', '\t', '\n', '\r' };
+            var parts = strings.Split(separators.ToArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            // Remove all white-spaces from the beginning and end of the address string
+            var list = parts.Select(part => part.Trim()).ToList();
+
+            return list;
         }
     }
 

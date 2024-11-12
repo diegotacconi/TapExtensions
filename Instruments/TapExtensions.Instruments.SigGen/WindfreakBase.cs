@@ -26,7 +26,7 @@ namespace TapExtensions.Instruments.SigGen
 
         private protected bool ValidateConnectionAddress()
         {
-            return UsbSerialDevices.ValidateConnectionAddress(ConnectionAddress);
+            return UsbSerialDevices.ValidateAddress(ConnectionAddress);
         }
 
         public override void Open()
@@ -44,7 +44,7 @@ namespace TapExtensions.Instruments.SigGen
             if (VerboseLoggingEnabled)
                 Log.Debug($"Searching for USB Address(es) of '{ConnectionAddress}'");
 
-            var found = UsbSerialDevices.FindUsbSerialDevice(ConnectionAddress);
+            var found = UsbSerialDevices.FindDevice(ConnectionAddress);
 
             Log.Debug($"Found serial port '{found.ComPort}' " +
                       $"at USB Address of '{found.UsbAddress}' " +
