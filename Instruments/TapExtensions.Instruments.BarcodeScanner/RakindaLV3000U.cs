@@ -68,7 +68,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
         public override void Open()
         {
             FindSerialPort();
-            CheckIfBarcodeScannerIsAvailable();
+            SetupScanner();
         }
 
         private void FindSerialPort()
@@ -78,7 +78,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
                     $"{nameof(ConnectionAddress)} cannot be empty");
 
             if (VerboseLoggingEnabled)
-                Log.Debug($"Searching for USB Address(es) of '{ConnectionAddress}'");
+                Log.Debug($"Searching for '{ConnectionAddress}'");
 
             var found = UsbSerialDevices.FindDevice(ConnectionAddress);
 
@@ -141,7 +141,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
             IsConnected = false;
         }
 
-        private void CheckIfBarcodeScannerIsAvailable()
+        private void SetupScanner()
         {
             OpenSerialPort();
             try
@@ -311,7 +311,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
             SerialQuery(cmdBytes, expectedSuccessfulReply, timeout);
         }
 
-        #region Rakinda's Commands
+        #region Rakinda's low-level commands
 
         private void Wakeup()
         {
