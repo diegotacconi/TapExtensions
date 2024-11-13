@@ -154,6 +154,8 @@ namespace TapExtensions.Instruments.BarcodeScanner
             {
                 Wakeup();
                 ParamDefaults();
+                ScanDisable();
+                Sleep();
             }
             finally
             {
