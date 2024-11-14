@@ -44,26 +44,29 @@ namespace TapExtensions.Instruments.SigGen
         {
             base.Open();
 
-            // +) Show model type
-            Log.Debug("Model Type: " + SerialQuery("+").Trim('\n'));
+            lock (InstLock)
+            {
+                // +) Show model type
+                Log.Debug("Model Type: " + SerialQuery("+").Trim('\n'));
 
-            // -) Show serial number
-            Log.Debug("Serial Number: " + SerialQuery("-").Trim('\n'));
+                // -) Show serial number
+                Log.Debug("Serial Number: " + SerialQuery("-").Trim('\n'));
 
-            // v0) Show firmware version
-            Log.Debug("Firmware Version: " + SerialQuery("v0").Trim('\n'));
+                // v0) Show firmware version
+                Log.Debug("Firmware Version: " + SerialQuery("v0").Trim('\n'));
 
-            // v1) Shows hardware version
-            Log.Debug("Hardware Version: " + SerialQuery("v1").Trim('\n'));
+                // v1) Shows hardware version
+                Log.Debug("Hardware Version: " + SerialQuery("v1").Trim('\n'));
 
-            // x) Set reference (0=external / 1=internal)
-            SerialWrite("x1");
-            if (!SerialQuery("x?").Contains("1"))
-                throw new InvalidOperationException("Unable to set reference to internal");
+                // x) Set reference (0=external / 1=internal)
+                SerialWrite("x1");
+                if (!SerialQuery("x?").Contains("1"))
+                    throw new InvalidOperationException("Unable to set reference to internal");
 
-            SetRfOutputState(EState.Off);
-            SetOutputLevel(DefaultAmplitude);
-            SetFrequency(DefaultFreqMhz);
+                SetRfOutputState(EState.Off);
+                SetOutputLevel(DefaultAmplitude);
+                SetFrequency(DefaultFreqMhz);
+            }
 
             _isOpen = true;
         }

@@ -34,7 +34,7 @@ namespace TapExtensions.Instruments.SigGen
         {
             // Default values
             Name = "SynthUsb2";
-            ConnectionAddress = @"USB\VID_16D0&PID_0557\004571, USB\VID_16D0&PID_0557";
+            ConnectionAddress = @"USB\VID_16D0&PID_0557";
 
             // Validation rules
             Rules.Add(ValidateConnectionAddress, "Not valid", nameof(ConnectionAddress));
@@ -44,38 +44,41 @@ namespace TapExtensions.Instruments.SigGen
         {
             base.Open();
 
-            // +) Show model type
-            Log.Debug("Model Type: " + SerialQuery("+").Trim('\n'));
+            lock (InstLock)
+            {
+                // +) Show model type
+                Log.Debug("Model Type: " + SerialQuery("+").Trim('\n'));
 
-            // -) Show serial number
-            Log.Debug("Serial Number: " + SerialQuery("-").Trim('\n'));
+                // -) Show serial number
+                Log.Debug("Serial Number: " + SerialQuery("-").Trim('\n'));
 
-            // v) Show firmware version
-            Log.Debug("Firmware Version: " + SerialQuery("v").Trim('\n'));
+                // v) Show firmware version
+                Log.Debug("Firmware Version: " + SerialQuery("v").Trim('\n'));
 
-            // o) set RF On(1) or Off(0)
-            SetRfOutputState(EState.Off);
+                // o) set RF On(1) or Off(0)
+                SetRfOutputState(EState.Off);
 
-            // h) set RF High(1) or Low(0) Power
-            SerialWrite("h1");
-            if (!SerialQuery("h?").Contains("1"))
-                throw new InvalidOperationException("Unable to set the SG RF Power to High");
+                // h) set RF High(1) or Low(0) Power
+                SerialWrite("h1");
+                if (!SerialQuery("h?").Contains("1"))
+                    throw new InvalidOperationException("Unable to set the SG RF Power to High");
 
-            // a) set amplitude
-            SetOutputLevel(DefaultAmplitude);
+                // a) set amplitude
+                SetOutputLevel(DefaultAmplitude);
 
-            // g) run sweep (on=1 / off=0)
-            SerialWrite("g0");
-            if (!SerialQuery("g?").Contains("0"))
-                throw new InvalidOperationException("Unable to set the SG sweep state to Off");
+                // g) run sweep (on=1 / off=0)
+                SerialWrite("g0");
+                if (!SerialQuery("g?").Contains("0"))
+                    throw new InvalidOperationException("Unable to set the SG sweep state to Off");
 
-            // x) Set reference (0=external / 1=internal)
-            SerialWrite("x1");
-            if (!SerialQuery("x?").Contains("1"))
-                throw new InvalidOperationException("Unable to set reference to internal");
+                // x) Set reference (0=external / 1=internal)
+                SerialWrite("x1");
+                if (!SerialQuery("x?").Contains("1"))
+                    throw new InvalidOperationException("Unable to set reference to internal");
 
-            // f) set frequency
-            SetFrequency(DefaultFreqMhz);
+                // f) set frequency
+                SetFrequency(DefaultFreqMhz);
+            }
 
             _isOpen = true;
         }
