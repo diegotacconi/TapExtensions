@@ -291,7 +291,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
         private void Query(byte opCode, byte expectedByte)
         {
-            Query(opCode, new byte[0], expectedByte);
+            Query(opCode, Array.Empty<byte>(), expectedByte);
         }
 
         private void Query(byte opCode, byte[] parameters, byte expectedByte, int timeout = 1)

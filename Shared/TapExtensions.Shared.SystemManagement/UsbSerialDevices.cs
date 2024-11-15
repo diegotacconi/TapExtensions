@@ -48,7 +48,9 @@ namespace TapExtensions.Shared.SystemManagement
             {
                 const string comPortPattern = "^[Cc][Oo][Mm][1-9][0-9]*$";
                 const string usbDevicePattern = "^USB.*";
-                var validAddress = Regex.IsMatch(address, comPortPattern) || Regex.IsMatch(address, usbDevicePattern);
+                var timeout = TimeSpan.FromSeconds(1);
+                var validAddress = Regex.IsMatch(address, comPortPattern, RegexOptions.IgnoreCase, timeout) ||
+                                   Regex.IsMatch(address, usbDevicePattern, RegexOptions.IgnoreCase, timeout);
                 validAddresses.Add(validAddress);
             }
 
