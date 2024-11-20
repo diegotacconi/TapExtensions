@@ -65,6 +65,8 @@ namespace TapExtensions.Results.ZipFile
             if (fileContents.Length == 0)
                 throw new InvalidOperationException($"{nameof(fileContents)} cannot be empty");
 
+            OnActivity();
+
             var item = new AdditionalFile { Name = fileName, Contents = fileContents };
             var duplicate = _additionalFiles.FindIndex(x => x.Name == fileName);
             if (duplicate != -1)
@@ -101,6 +103,8 @@ namespace TapExtensions.Results.ZipFile
 
         public override void OnTestPlanRunCompleted(TestPlanRun planRun, Stream logStream)
         {
+            OnActivity();
+
             var fileName = string.Format("{0}{1:d2}{2:d2}-{3:d2}{4:d2}{5:d2}_{6}",
                 DateTime.Now.Year,
                 DateTime.Now.Month,
