@@ -1,23 +1,52 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Text;
 using System.Text.RegularExpressions;
 using OpenTap;
+using TapExtensions.Interfaces.Ssh;
 
 namespace TapExtensions.Steps.Network
 {
+    [Display("PingDut",
+        Groups: new[] { "TapExtensions", "Steps", "Network" })]
+    public class PingDut : BasePing
+    {
+        [Display("Dut", Order: 1)] public ISecureShell Dut { get; set; }
+
+        public override void Run()
+        {
+            BaseRun(Dut.IpAddress);
+        }
+    }
+
     [Display("Ping",
         Groups: new[] { "TapExtensions", "Steps", "Network" })]
-    public class Ping : TestStep
+    public class Ping : BasePing
     {
-        #region Settings
-
         [Display("IP Address", Order: 1)] public string IpAddress { get; set; }
 
+        public Ping()
+        {
+            // Default values
+            IpAddress = "127.0.0.1";
+
+            // Validation rules
+            Rules.Add(() => IPAddress.TryParse(IpAddress, out _),
+                "Not a valid IPv4 Address", nameof(IpAddress));
+        }
+
+        public override void Run()
+        {
+            BaseRun(IpAddress);
+        }
+    }
+
+    public abstract class BasePing : TestStep
+    {
         [Display("Min Ping Replies", Order: 2,
-            Description: "Minimum number of successful ping replies required for this test to pass")]
+            Description: "Minimum number of successful ping replies required for passing")]
         [Unit("Pings")]
         public int MinSuccessfulReplies { get; set; }
 
@@ -25,27 +54,22 @@ namespace TapExtensions.Steps.Network
         [Unit("s")]
         public int Timeout { get; set; }
 
-        #endregion
-
-        public Ping()
+        private protected BasePing()
         {
             // Default values
-            IpAddress = "127.0.0.1";
             MinSuccessfulReplies = 4;
             Timeout = 30;
 
             // Validation rules
-            Rules.Add(() => IPAddress.TryParse(IpAddress, out _),
-                "Not a valid IPv4 Address", nameof(IpAddress));
             Rules.Add(() => Timeout > 0,
                 "Timeout must be greater than zero", nameof(Timeout));
         }
 
-        public override void Run()
+        private protected void BaseRun(string ipAddress)
         {
             try
             {
-                var pingOk = PingHost(IpAddress, Timeout, MinSuccessfulReplies);
+                var pingOk = PingHost(ipAddress, Timeout, MinSuccessfulReplies);
                 UpgradeVerdict(pingOk ? Verdict.Pass : Verdict.Fail);
             }
             catch (Exception ex)
@@ -55,7 +79,7 @@ namespace TapExtensions.Steps.Network
             }
         }
 
-        private bool PingHost(string ipAddress, int timeout, int minSuccessfulReplies)
+        private protected bool PingHost(string ipAddress, int timeout, int minSuccessfulReplies)
         {
             var pingOk = false;
             var pingOkReplies = 0;
