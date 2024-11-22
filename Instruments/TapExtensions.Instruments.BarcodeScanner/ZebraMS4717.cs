@@ -153,7 +153,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
             }
         }
 
-        public byte[] GetRawBytes()
+        public byte[] GetRawLabelContents()
         {
             byte[] rawBarcodeLabel;
 
@@ -191,7 +191,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
         public (string serialNumber, string productCode) GetSerialNumberAndProductCode()
         {
             // Scan barcode label
-            var rawBytes = GetRawBytes();
+            var rawBytes = GetRawLabelContents();
 
             // Parse barcode label
             var productCode = BarcodeLabelUtility.GetProductCode(rawBytes);

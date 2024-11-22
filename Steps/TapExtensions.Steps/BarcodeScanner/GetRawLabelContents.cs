@@ -5,9 +5,9 @@ using TapExtensions.Interfaces.BarcodeScanner;
 
 namespace TapExtensions.Steps.BarcodeScanner
 {
-    [Display("GetRawBytes",
+    [Display("GetRawLabelContents",
         Groups: new[] { "TapExtensions", "Steps", "BarcodeScanner" })]
-    public class GetRawBytes : TestStep
+    public class GetRawLabelContents : TestStep
     {
         [Display("BarcodeScanner")] public IBarcodeScanner BarcodeScanner { get; set; }
 
@@ -15,7 +15,7 @@ namespace TapExtensions.Steps.BarcodeScanner
         {
             try
             {
-                var rawBytes = BarcodeScanner.GetRawBytes();
+                var rawBytes = BarcodeScanner.GetRawLabelContents();
                 Log.Info(AsciiBytesToString(rawBytes));
                 UpgradeVerdict(Verdict.Pass);
             }

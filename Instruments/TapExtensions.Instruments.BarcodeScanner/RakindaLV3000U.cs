@@ -158,7 +158,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
             }
         }
 
-        public byte[] GetRawBytes()
+        public byte[] GetRawLabelContents()
         {
             byte[] rawBarcodeLabel;
 
@@ -203,7 +203,7 @@ namespace TapExtensions.Instruments.BarcodeScanner
                         Log.Warning($"Retrying attempt {iteration} of {maxCount} ...");
 
                     // Try to scan the barcode label
-                    var rawBytes = GetRawBytes();
+                    var rawBytes = GetRawLabelContents();
 
                     // Parse the barcode label
                     productCode = BarcodeLabelUtility.GetProductCode(rawBytes);
