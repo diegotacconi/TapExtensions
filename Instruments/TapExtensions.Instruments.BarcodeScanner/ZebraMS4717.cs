@@ -69,16 +69,6 @@ namespace TapExtensions.Instruments.BarcodeScanner
 
         private void FindSerialPort()
         {
-            /*
-            // List USB devices
-            if (VerboseLoggingEnabled)
-            {
-                var devices = UsbSerialDevices.FindAllDevices();
-                foreach (var device in devices)
-                    Log.Debug($"'{device.ComPort}', '{device.UsbAddress}', '{device.Description}'.");
-            }
-            */
-
             if (string.IsNullOrWhiteSpace(ConnectionAddress))
                 throw new InvalidOperationException(
                     $"{nameof(ConnectionAddress)} cannot be empty");

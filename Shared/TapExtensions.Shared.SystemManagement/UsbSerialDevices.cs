@@ -17,7 +17,7 @@ namespace TapExtensions.Shared.SystemManagement
             public string Description { get; set; }
         }
 
-        public static List<UsbSerialDevice> FindAllDevices()
+        private static List<UsbSerialDevice> FindAllDevices()
         {
             var devices = new List<UsbSerialDevice>();
 
