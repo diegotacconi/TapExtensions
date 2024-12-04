@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using OpenTap;
 
-namespace TapExtensions.Steps.Publish
+namespace TapExtensions.Steps.Publish.Custom
 {
     internal class CustomResult<T> where T : IComparable
     {

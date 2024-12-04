@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using OpenTap;
 
-namespace TapExtensions.Steps.Publish
+namespace TapExtensions.Steps.Publish.Custom
 {
     public enum EBase
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using OpenTap;
 
-namespace TapExtensions.Steps.Publish
+namespace TapExtensions.Steps.Publish.Custom
 {
     public abstract class TestStepBaseWithCustomPublish : TestStep
     {
@@ -75,7 +75,7 @@ namespace TapExtensions.Steps.Publish
             UpdateUniqueParameter();
             InitIResults();
             resultName = resultName.Replace(Name, this.GetFormattedName());
-            ICustomPublish.Publish<T>(resultName, result, lowerLimit, upperLimit, unit, verdict, comment, SuppressResult);
+            ICustomPublish.Publish(resultName, result, lowerLimit, upperLimit, unit, verdict, comment, SuppressResult);
             UpgradeVerdict(verdict);
         }
 

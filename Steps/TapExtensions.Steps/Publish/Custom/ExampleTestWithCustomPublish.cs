@@ -1,10 +1,10 @@
 ﻿using System;
 using OpenTap;
 
-namespace TapExtensions.Steps.Publish
+namespace TapExtensions.Steps.Publish.Custom
 {
     [Display("ExampleTestWithCustomPublish",
-        Groups: new[] { "TapExtensions", "Steps", "Publish" })]
+        Groups: new[] { "TapExtensions", "Steps", "Publish", "Custom" })]
     public class ExampleTestWithCustomPublish : TestStepBaseWithCustomPublish
     {
         #region Settings

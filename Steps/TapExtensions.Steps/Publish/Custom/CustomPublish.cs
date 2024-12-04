@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace TapExtensions.Steps.Publish
+namespace TapExtensions.Steps.Publish.Custom
 {
     public class CustomPublish : ICustomPublish
     {
