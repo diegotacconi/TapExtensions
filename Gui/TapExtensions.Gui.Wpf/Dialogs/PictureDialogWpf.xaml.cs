@@ -75,7 +75,7 @@ namespace TapExtensions.Gui.Wpf.Dialogs
 
         private void SetDialogWindowControls()
         {
-            // Shot title
+            // Show title
             if (!string.IsNullOrWhiteSpace(WindowTitle))
             {
                 TitleTextBlock.Text = WindowTitle;
