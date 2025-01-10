@@ -18,7 +18,11 @@ namespace TapExtensions.Steps.I2c.Devices
         {
             try
             {
-                var tmp102 = new Tmp102(I2CAdapter, DeviceAddress);
+                var tmp102 = new Tmp102
+                {
+                    I2CAdapter = I2CAdapter,
+                    DeviceAddress = DeviceAddress
+                };
                 var temperature = tmp102.ReadTemperature();
                 Log.Debug($"TMP102 temperature = {temperature} C");
                 UpgradeVerdict(Verdict.Pass);

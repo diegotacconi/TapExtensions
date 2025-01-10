@@ -8,14 +8,8 @@ namespace TapExtensions.Steps.I2c.Devices
 {
     public class Tmp102
     {
-        private readonly II2C _i2C;
-        private readonly int _deviceAddress;
-
-        public Tmp102(II2C i2C, int deviceAddress = 0x48)
-        {
-            _i2C = i2C;
-            _deviceAddress = deviceAddress; // 0x48
-        }
+        public II2C I2CAdapter { get; set; }
+        public ushort DeviceAddress { get; set; } = 0x48;
 
         public double ReadTemperature()
         {
@@ -41,7 +35,7 @@ namespace TapExtensions.Steps.I2c.Devices
              * Bit D0 of LSB indicates normal mode (EM bit = 0) or extended mode (EM bit = 1), and can be used to distinguish between the two
              * temperature register data formats.
              */
-            var temperatureReg = _i2C.Read((ushort)_deviceAddress, 2, new byte[] { 0x00 });
+            var temperatureReg = I2CAdapter.Read(DeviceAddress, 2, new byte[] { 0x00 });
             return temperatureReg;
         }
 
