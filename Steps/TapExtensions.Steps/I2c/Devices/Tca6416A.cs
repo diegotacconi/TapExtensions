@@ -17,10 +17,37 @@ using TapExtensions.Interfaces.I2c;
 
 namespace TapExtensions.Steps.I2c.Devices
 {
-    public class Tca6416A
+    // ReSharper disable InconsistentNaming
+    public enum ETca6416Pin
     {
-        public II2C I2CAdapter { get; set; }
-        public ushort DeviceAddress { get; set; } = 0x20;
+        P00_Pin04 = 0b0000_0000_0000_0001,
+        P01_Pin05 = 0b0000_0000_0000_0010,
+        P02_Pin06 = 0b0000_0000_0000_0100,
+        P03_Pin07 = 0b0000_0000_0000_1000,
+        P04_Pin08 = 0b0000_0000_0001_0000,
+        P05_Pin09 = 0b0000_0000_0010_0000,
+        P06_Pin10 = 0b0000_0000_0100_0000,
+        P07_Pin11 = 0b0000_0000_1000_0000,
+        P10_Pin13 = 0b0000_0001_0000_0000,
+        P11_Pin14 = 0b0000_0010_0000_0000,
+        P12_Pin15 = 0b0000_0100_0000_0000,
+        P13_Pin16 = 0b0000_1000_0000_0000,
+        P14_Pin17 = 0b0001_0000_0000_0000,
+        P15_Pin18 = 0b0010_0000_0000_0000,
+        P16_Pin19 = 0b0100_0000_0000_0000,
+        P17_Pin20 = 0b1000_0000_0000_0000
+    }
+
+    public class Tca6416A : IGpioDevice
+    {
+        private readonly II2C _i2CAdapter;
+        private readonly ushort _deviceAddress;
+
+        public Tca6416A(II2C i2CAdapter, ushort deviceAddress = 0x20)
+        {
+            _i2CAdapter = i2CAdapter;
+            _deviceAddress = deviceAddress;
+        }
 
         public byte[] ReadRegisters(out ushort level, out ushort drive, out ushort polarity, out ushort direction)
         {
@@ -68,7 +95,7 @@ namespace TapExtensions.Steps.I2c.Devices
              *
              */
             // var register = _i2C.Read((ushort)_deviceAddress, 8, new byte[] { 0x00 });
-            var register = I2CAdapter.Read(DeviceAddress, 8, new byte[] { 0x00 });
+            var register = _i2CAdapter.Read(_deviceAddress, 8, new byte[] { 0x00 });
             level = (ushort)((register[1] << 8) | register[0]);
             drive = (ushort)((register[3] << 8) | register[2]);
             polarity = (ushort)((register[5] << 8) | register[4]);
@@ -100,27 +127,4 @@ namespace TapExtensions.Steps.I2c.Devices
 
         #endregion
     }
-
-    /*
-    // ReSharper disable InconsistentNaming
-    public enum ETca6416Pin
-    {
-        P00_PIN_04 = 0b0000_0000_0000_0001,
-        P01_PIN_05 = 0b0000_0000_0000_0010,
-        P02_PIN_06 = 0b0000_0000_0000_0100,
-        P03_PIN_07 = 0b0000_0000_0000_1000,
-        P04_PIN_08 = 0b0000_0000_0001_0000,
-        P05_PIN_09 = 0b0000_0000_0010_0000,
-        P06_PIN_10 = 0b0000_0000_0100_0000,
-        P07_PIN_11 = 0b0000_0000_1000_0000,
-        P10_PIN_13 = 0b0000_0001_0000_0000,
-        P11_PIN_14 = 0b0000_0010_0000_0000,
-        P12_PIN_15 = 0b0000_0100_0000_0000,
-        P13_PIN_16 = 0b0000_1000_0000_0000,
-        P14_PIN_17 = 0b0001_0000_0000_0000,
-        P15_PIN_18 = 0b0010_0000_0000_0000,
-        P16_PIN_19 = 0b0100_0000_0000_0000,
-        P17_PIN_20 = 0b1000_0000_0000_0000
-    }
-    */
 }
