@@ -29,8 +29,10 @@ namespace TapExtensions.Steps.I2c.Devices
                 var measuredLevel = tca6416A.GetPinLevel((int)PinNumber);
                 if (measuredLevel != ExpectedLevel)
                     throw new InvalidOperationException(
-                        $"Measured level of '{measuredLevel}' is not equal to the expected level of '{ExpectedLevel}'");
+                        $"Pin '{PinNumber}' measured a level of '{measuredLevel}', " +
+                        $"which is not equal to the expected level of '{ExpectedLevel}'");
 
+                Log.Debug($"Pin '{PinNumber}' measured '{measuredLevel}'");
                 UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)

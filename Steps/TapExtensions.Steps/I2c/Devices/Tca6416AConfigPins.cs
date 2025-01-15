@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using OpenTap;
 using TapExtensions.Interfaces.Gpio;
 using TapExtensions.Interfaces.I2c;
@@ -44,17 +43,6 @@ namespace TapExtensions.Steps.I2c.Devices
             {
                 var tca6416A = new Tca6416A(I2CAdapter, DeviceAddress);
 
-                // Debug start
-                var registers = tca6416A.ReadRegisters(out var lvl, out var drive, out var polarity, out var dir);
-                var binaryString = string.Join(" ", registers.Select(x => Convert.ToString(x, 2).PadLeft(8, '0')));
-                Log.Debug($"Registers = {binaryString}");
-                Log.Debug($"Lvl       = {Convert.ToString(lvl, 2).PadLeft(16, '0')}");
-                Log.Debug($"Drive     = {Convert.ToString(drive, 2).PadLeft(16, '0')}");
-                Log.Debug($"Polarity  = {Convert.ToString(polarity, 2).PadLeft(16, '0')}");
-                Log.Debug($"Dir       = {Convert.ToString(dir, 2).PadLeft(16, '0')}");
-                // Debug end
-
-                /*
                 foreach (var config in ListOfPins)
                 {
                     tca6416A.SetPinDirection((int)config.Pin, config.Direction);
@@ -62,7 +50,6 @@ namespace TapExtensions.Steps.I2c.Devices
                     if (config.Direction == EDirection.Output)
                         tca6416A.SetPinDrive((int)config.Pin, config.Drive);
                 }
-                */
 
                 UpgradeVerdict(Verdict.Pass);
             }

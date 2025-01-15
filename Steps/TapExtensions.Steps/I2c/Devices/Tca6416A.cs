@@ -12,6 +12,7 @@
 // At power on or after a reset, the I/Os are configured as inputs.
 
 using System;
+using OpenTap;
 using TapExtensions.Interfaces.Gpio;
 using TapExtensions.Interfaces.I2c;
 
@@ -20,26 +21,27 @@ namespace TapExtensions.Steps.I2c.Devices
     // ReSharper disable InconsistentNaming
     public enum ETca6416Pin
     {
-        P00_Pin04 = 0b0000_0000_0000_0001,
-        P01_Pin05 = 0b0000_0000_0000_0010,
-        P02_Pin06 = 0b0000_0000_0000_0100,
-        P03_Pin07 = 0b0000_0000_0000_1000,
-        P04_Pin08 = 0b0000_0000_0001_0000,
-        P05_Pin09 = 0b0000_0000_0010_0000,
-        P06_Pin10 = 0b0000_0000_0100_0000,
-        P07_Pin11 = 0b0000_0000_1000_0000,
-        P10_Pin13 = 0b0000_0001_0000_0000,
-        P11_Pin14 = 0b0000_0010_0000_0000,
-        P12_Pin15 = 0b0000_0100_0000_0000,
-        P13_Pin16 = 0b0000_1000_0000_0000,
-        P14_Pin17 = 0b0001_0000_0000_0000,
-        P15_Pin18 = 0b0010_0000_0000_0000,
-        P16_Pin19 = 0b0100_0000_0000_0000,
-        P17_Pin20 = 0b1000_0000_0000_0000
+        P00_Pin04 = 0, // 0b0000_0000_0000_0001  =  1 << 0  =  1
+        P01_Pin05 = 1, // 0b0000_0000_0000_0010  =  1 << 1  =  2
+        P02_Pin06 = 2, // 0b0000_0000_0000_0100  =  1 << 2  =  4
+        P03_Pin07 = 3, // 0b0000_0000_0000_1000  =  1 << 3  =  8
+        P04_Pin08 = 4, // 0b0000_0000_0001_0000  =  1 << 4  =  16
+        P05_Pin09 = 5, // 0b0000_0000_0010_0000  =  1 << 5  =  32
+        P06_Pin10 = 6, // 0b0000_0000_0100_0000  =  1 << 6  =  64
+        P07_Pin11 = 7, // 0b0000_0000_1000_0000  =  1 << 7  =  128
+        P10_Pin13 = 8, // 0b0000_0001_0000_0000  =  1 << 8  =  256
+        P11_Pin14 = 9, // 0b0000_0010_0000_0000  =  1 << 9  =  512
+        P12_Pin15 = 10, // 0b0000_0100_0000_0000  =  1 << 10  =  1024
+        P13_Pin16 = 11, // 0b0000_1000_0000_0000  =  1 << 11  =  2048
+        P14_Pin17 = 12, // 0b0001_0000_0000_0000  =  1 << 12  =  4096
+        P15_Pin18 = 13, // 0b0010_0000_0000_0000  =  1 << 13  =  8192
+        P16_Pin19 = 14, // 0b0100_0000_0000_0000  =  1 << 14  =  16384
+        P17_Pin20 = 15 // 0b1000_0000_0000_0000  =  1 << 15  =  32768
     }
 
     public class Tca6416A : IGpioDevice
     {
+        private readonly TraceSource log = Log.CreateSource("Tca6416A");
         private readonly II2C _i2CAdapter;
         private readonly ushort _deviceAddress;
 
@@ -49,7 +51,8 @@ namespace TapExtensions.Steps.I2c.Devices
             _deviceAddress = deviceAddress;
         }
 
-        public byte[] ReadRegisters(out ushort level, out ushort drive, out ushort polarity, out ushort direction)
+        private void ReadRegisters(out ushort inputLevels, out ushort outputDrives, out ushort polarities,
+            out ushort directions)
         {
             /*
              * The Input Port registers (registers 0 and 1) reflect the incoming logic levels of the pins,
@@ -94,20 +97,109 @@ namespace TapExtensions.Steps.I2c.Devices
              * +------+------+------+------+------+------+------+------+------+------+------+------+------+------+------+------+
              *
              */
-            // var register = _i2C.Read((ushort)_deviceAddress, 8, new byte[] { 0x00 });
-            var register = _i2CAdapter.Read(_deviceAddress, 8, new byte[] { 0x00 });
-            level = (ushort)((register[1] << 8) | register[0]);
-            drive = (ushort)((register[3] << 8) | register[2]);
-            polarity = (ushort)((register[5] << 8) | register[4]);
-            direction = (ushort)((register[7] << 8) | register[6]);
-            return register;
+
+            inputLevels = ReadInputLevels();
+            outputDrives = ReadOutputDrives();
+            polarities = ReadPolarities();
+            directions = ReadDirections();
+
+            log.Debug($"InputLevels  = {ToBinaryString(inputLevels)}");
+            log.Debug($"OutputDrives = {ToBinaryString(outputDrives)}");
+            log.Debug($"Polarities   = {ToBinaryString(polarities)}");
+            log.Debug($"Directions   = {ToBinaryString(directions)}");
         }
+
+        private ushort ReadInputLevels()
+        {
+            var registers = _i2CAdapter.Read(_deviceAddress, 2, new byte[] { 0x00 });
+            var inputLevels = (ushort)((registers[1] << 8) | registers[0]);
+            return inputLevels;
+        }
+
+        private ushort ReadOutputDrives()
+        {
+            var registers = _i2CAdapter.Read(_deviceAddress, 2, new byte[] { 0x02 });
+            var outputDrives = (ushort)((registers[1] << 8) | registers[0]);
+            return outputDrives;
+        }
+
+        private ushort ReadPolarities()
+        {
+            var registers = _i2CAdapter.Read(_deviceAddress, 2, new byte[] { 0x04 });
+            var polarities = (ushort)((registers[1] << 8) | registers[0]);
+            return polarities;
+        }
+
+        private ushort ReadDirections()
+        {
+            var registers = _i2CAdapter.Read(_deviceAddress, 2, new byte[] { 0x06 });
+            var directions = (ushort)((registers[1] << 8) | registers[0]);
+            return directions;
+        }
+
+
+        #region Bit Manipulations
+
+        private static bool IsBitSet(ushort number, int bitIndex)
+        {
+            if (bitIndex < 0 || bitIndex > 15)
+                throw new ArgumentOutOfRangeException(
+                    nameof(bitIndex), "Must be a bit position index in the range of 0-15.");
+
+            return (number & (1 << bitIndex)) != 0;
+        }
+
+        private static ushort SetBit(ushort number, int bitIndex)
+        {
+            if (bitIndex < 0 || bitIndex > 15)
+                throw new ArgumentOutOfRangeException(
+                    nameof(bitIndex), "Must be a bit position index in the range of 0-15.");
+
+            return (ushort)(number | (1 << bitIndex));
+        }
+
+        private static ushort ClearBit(ushort number, int bitIndex)
+        {
+            if (bitIndex < 0 || bitIndex > 15)
+                throw new ArgumentOutOfRangeException(
+                    nameof(bitIndex), "Must be a bit position index in the range of 0-15.");
+
+            var mask = (ushort)(1 << bitIndex);
+            var invertedMask = (ushort)~mask;
+            return (ushort)(number & invertedMask);
+        }
+
+        private static string ToBinaryString(ushort number)
+        {
+            return Convert.ToString(number, 2).PadLeft(16, '0');
+        }
+
+        private static bool IsPowerOfTwo(ushort number)
+        {
+            return number != 0 && (number & (number - 1)) == 0;
+        }
+
+        #endregion
 
         #region GPIO Interface Implementation
 
         public void SetPinDirection(int pin, EDirection direction)
         {
-            throw new NotImplementedException();
+            if (pin < 0 || pin > 15)
+                throw new ArgumentOutOfRangeException(
+                    nameof(pin), "Must be a bit position index in the range of 0-15.");
+
+            var directions = ReadDirections();
+
+            // 0 = Output, 1 = Input
+            if (direction == EDirection.Output)
+                directions = ClearBit(directions, pin);
+            else
+                directions = SetBit(directions, pin);
+
+            var command = BitConverter.GetBytes(directions);
+            _i2CAdapter.Write(_deviceAddress, new byte[] { 0x06 }, command);
+            log.Debug($"Directions = {ToBinaryString(directions)}");
         }
 
         public void SetPinPull(int pin, EPull pull)
@@ -117,12 +209,24 @@ namespace TapExtensions.Steps.I2c.Devices
 
         public void SetPinDrive(int pin, EDrive drive)
         {
-            throw new NotImplementedException();
+            if (pin < 0 || pin > 15)
+                throw new ArgumentOutOfRangeException(
+                    nameof(pin), "Must be a bit position index in the range of 0-15.");
+
+            log.Debug("SetPinDrive NotImplementedException");
         }
 
         public ELevel GetPinLevel(int pin)
         {
-            throw new NotImplementedException();
+            if (pin < 0 || pin > 15)
+                throw new ArgumentOutOfRangeException(
+                    nameof(pin), "Must be a bit position index in the range of 0-15.");
+
+            var inputLevels = ReadInputLevels();
+            log.Debug($"InputLevels = {ToBinaryString(inputLevels)}");
+
+            var level = IsBitSet(inputLevels, pin) ? ELevel.High : ELevel.Low;
+            return level;
         }
 
         #endregion
