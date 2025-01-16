@@ -1,6 +1,5 @@
 ﻿using System;
 using OpenTap;
-using TapExtensions.Interfaces.Gpio;
 using TapExtensions.Interfaces.I2c;
 
 namespace TapExtensions.Steps.I2c.Devices

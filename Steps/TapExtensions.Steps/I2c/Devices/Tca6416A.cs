@@ -177,11 +177,6 @@ namespace TapExtensions.Steps.I2c.Devices
             return Convert.ToString(number, 2).PadLeft(16, '0');
         }
 
-        private static bool IsPowerOfTwo(ushort number)
-        {
-            return number != 0 && (number & (number - 1)) == 0;
-        }
-
         #endregion
 
         #region GPIO Interface Implementation
