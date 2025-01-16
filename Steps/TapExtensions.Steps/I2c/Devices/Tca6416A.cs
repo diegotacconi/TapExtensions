@@ -51,8 +51,9 @@ namespace TapExtensions.Steps.I2c.Devices
             _deviceAddress = deviceAddress;
         }
 
-        private void ReadRegisters(out ushort inputLevels, out ushort outputDrives, out ushort polarities,
-            out ushort directions)
+        #region Registers
+
+        public void ReadAllRegisters()
         {
             /*
              * The Input Port registers (registers 0 and 1) reflect the incoming logic levels of the pins,
@@ -98,15 +99,16 @@ namespace TapExtensions.Steps.I2c.Devices
              *
              */
 
-            inputLevels = ReadInputLevels();
-            outputDrives = ReadOutputDrives();
-            polarities = ReadPolarities();
-            directions = ReadDirections();
+            var inputLevels = ReadInputLevels();
+            var outputDrives = ReadOutputDrives();
+            var polarities = ReadPolarities();
+            var directions = ReadDirections();
 
-            log.Debug($"InputLevels  = {ToBinaryString(inputLevels)}");
-            log.Debug($"OutputDrives = {ToBinaryString(outputDrives)}");
-            log.Debug($"Polarities   = {ToBinaryString(polarities)}");
-            log.Debug($"Directions   = {ToBinaryString(directions)}");
+            log.Debug("| InputLevels      | OutputDrives     | Polarities       | Directions       |");
+            log.Debug($"| {ToBinaryString(inputLevels)} " +
+                      $"| {ToBinaryString(outputDrives)} " +
+                      $"| {ToBinaryString(polarities)} " +
+                      $"| {ToBinaryString(directions)} |");
         }
 
         private ushort ReadInputLevels()
@@ -137,6 +139,7 @@ namespace TapExtensions.Steps.I2c.Devices
             return directions;
         }
 
+        #endregion
 
         #region Bit Manipulations
 
@@ -191,7 +194,7 @@ namespace TapExtensions.Steps.I2c.Devices
 
             var directions = ReadDirections();
 
-            // 0 = Output, 1 = Input
+            // Output = 0, Input = 1
             if (direction == EDirection.Output)
                 directions = ClearBit(directions, pin);
             else
@@ -213,7 +216,16 @@ namespace TapExtensions.Steps.I2c.Devices
                 throw new ArgumentOutOfRangeException(
                     nameof(pin), "Must be a bit position index in the range of 0-15.");
 
-            log.Debug("SetPinDrive NotImplementedException");
+            var outputDrives = ReadOutputDrives();
+
+            if (drive == EDrive.DriveLow)
+                outputDrives = ClearBit(outputDrives, pin);
+            else
+                outputDrives = SetBit(outputDrives, pin);
+
+            var command = BitConverter.GetBytes(outputDrives);
+            _i2CAdapter.Write(_deviceAddress, new byte[] { 0x02 }, command);
+            log.Debug($"OutputDrives = {ToBinaryString(outputDrives)}");
         }
 
         public ELevel GetPinLevel(int pin)

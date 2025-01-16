@@ -5,9 +5,9 @@ using TapExtensions.Interfaces.I2c;
 
 namespace TapExtensions.Steps.I2c.Devices
 {
-    [Display("Tca6416ASetPinDrive",
+    [Display("Tca6416ASetPinDirection",
         Groups: new[] { "TapExtensions", "Steps", "I2c", "Devices" })]
-    public class Tca6416ASetPinDrive : TestStep
+    public class Tca6416ASetPinDirection : TestStep
     {
         [Display("Aardvark I2C Adapter", Order: 1)]
         public II2C I2CAdapter { get; set; }
@@ -18,17 +18,16 @@ namespace TapExtensions.Steps.I2c.Devices
 
         [Display("Pin Number", Order: 3)] public ETca6416Pin PinNumber { get; set; }
 
-        [Display("Pin Output Drive", Order: 4)]
-        public EDrive Drive { get; set; }
+        [Display("Direction", Order: 4)] public EDirection Direction { get; set; }
 
         public override void Run()
         {
             try
             {
                 var tca6416A = new Tca6416A(I2CAdapter, DeviceAddress);
-                tca6416A.SetPinDrive((int)PinNumber, Drive);
+                tca6416A.SetPinDirection((int)PinNumber, Direction);
 
-                Log.Debug($"Set {PinNumber} to {Drive}");
+                Log.Debug($"Set {PinNumber} as {Direction}");
                 UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)
