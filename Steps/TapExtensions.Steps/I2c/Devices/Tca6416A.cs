@@ -21,22 +21,24 @@ namespace TapExtensions.Steps.I2c.Devices
     // ReSharper disable InconsistentNaming
     public enum ETca6416Pin
     {
-        P00_Pin04 = 0, // 0b0000_0000_0000_0001  =  1 << 0  =  1
-        P01_Pin05 = 1, // 0b0000_0000_0000_0010  =  1 << 1  =  2
-        P02_Pin06 = 2, // 0b0000_0000_0000_0100  =  1 << 2  =  4
-        P03_Pin07 = 3, // 0b0000_0000_0000_1000  =  1 << 3  =  8
-        P04_Pin08 = 4, // 0b0000_0000_0001_0000  =  1 << 4  =  16
-        P05_Pin09 = 5, // 0b0000_0000_0010_0000  =  1 << 5  =  32
-        P06_Pin10 = 6, // 0b0000_0000_0100_0000  =  1 << 6  =  64
-        P07_Pin11 = 7, // 0b0000_0000_1000_0000  =  1 << 7  =  128
-        P10_Pin13 = 8, // 0b0000_0001_0000_0000  =  1 << 8  =  256
-        P11_Pin14 = 9, // 0b0000_0010_0000_0000  =  1 << 9  =  512
-        P12_Pin15 = 10, // 0b0000_0100_0000_0000  =  1 << 10  =  1024
-        P13_Pin16 = 11, // 0b0000_1000_0000_0000  =  1 << 11  =  2048
-        P14_Pin17 = 12, // 0b0001_0000_0000_0000  =  1 << 12  =  4096
-        P15_Pin18 = 13, // 0b0010_0000_0000_0000  =  1 << 13  =  8192
-        P16_Pin19 = 14, // 0b0100_0000_0000_0000  =  1 << 14  =  16384
-        P17_Pin20 = 15 // 0b1000_0000_0000_0000  =  1 << 15  =  32768
+        // Enum's number is the bit position index, as in 2 to the power of the bit position index.
+        // Examples: 2^0 = 1, 2^1 = 2, ... , 2^15 = 32768.
+        P00_Pin04 = 0,
+        P01_Pin05 = 1,
+        P02_Pin06 = 2,
+        P03_Pin07 = 3,
+        P04_Pin08 = 4,
+        P05_Pin09 = 5,
+        P06_Pin10 = 6,
+        P07_Pin11 = 7,
+        P10_Pin13 = 8,
+        P11_Pin14 = 9,
+        P12_Pin15 = 10,
+        P13_Pin16 = 11,
+        P14_Pin17 = 12,
+        P15_Pin18 = 13,
+        P16_Pin19 = 14,
+        P17_Pin20 = 15
     }
 
     public class Tca6416A : IGpioDevice
@@ -202,7 +204,7 @@ namespace TapExtensions.Steps.I2c.Devices
 
         public void SetPinPull(int pin, EPull pull)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public void SetPinDrive(int pin, EDrive drive)
