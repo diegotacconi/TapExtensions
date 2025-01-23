@@ -4,8 +4,8 @@ using TapExtensions.Interfaces.Gpio;
 
 namespace TapExtensions.Steps.Gpio
 {
-    [Display("SetGpioPinDirection", Groups: new[] { "TapExtensions", "Steps", "Gpio" })]
-    public class SetGpioPinDirection : TestStep
+    [Display("GpioSetPinDirection", Groups: new[] { "TapExtensions", "Steps", "Gpio" })]
+    public class GpioSetPinDirection : TestStep
     {
         [Display("Gpio", Order: 1)] public IGpio Gpio { get; set; }
 
@@ -18,6 +18,7 @@ namespace TapExtensions.Steps.Gpio
             try
             {
                 Gpio.SetPinDirection(PinNumber, Direction);
+                Log.Debug($"Set pin {PinNumber} as {Direction}");
                 UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)

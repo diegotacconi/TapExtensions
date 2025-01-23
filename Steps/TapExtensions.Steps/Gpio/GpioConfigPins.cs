@@ -5,8 +5,8 @@ using TapExtensions.Interfaces.Gpio;
 
 namespace TapExtensions.Steps.Gpio
 {
-    [Display("SetMultipleGpioPins", Groups: new[] { "TapExtensions", "Steps", "Gpio" })]
-    public class SetMultipleGpioPins : TestStep
+    [Display("GpioConfigPins", Groups: new[] { "TapExtensions", "Steps", "Gpio" })]
+    public class GpioConfigPins : TestStep
     {
         [Display("Gpio", Order: 1)] public IGpio Gpio { get; set; }
 
