@@ -7,6 +7,7 @@ namespace TapExtensions.Steps.DcPwr
 {
     [Display("DcPowerOn",
         Groups: new[] { "TapExtensions", "Steps", "DcPwr" })]
+    [AllowAnyChild]
     public class DcPowerOn : TestStep
     {
         #region Settings
@@ -54,8 +55,8 @@ namespace TapExtensions.Steps.DcPwr
             // Default values
             Voltage = 0;
             Current = 0;
-            TimeDelayBeforePowerOn = 0;
-            TimeDelayAfterPowerOn = 0;
+            TimeDelayBeforePowerOn = 1;
+            TimeDelayAfterPowerOn = 1;
             VoltageLimitLow = -0.01;
             VoltageLimitHigh = 0.01;
             CurrentLimitLow = -0.01;
@@ -81,31 +82,50 @@ namespace TapExtensions.Steps.DcPwr
             try
             {
                 if (!DcPwr.IsConnected)
-                    throw new InvalidOperationException("Power Supply not connected or initialized!");
+                    throw new InvalidOperationException($"Cannot connect to {DcPwr}.");
 
                 DcPwr.SetOutputState(EState.Off);
 
+                Sleep(TimeDelayBeforePowerOn);
+
+                // Measure voltage and current, when the power is off
+                var voltageWhenPowerOff = DcPwr.MeasureVoltage();
+                var currentWhenPowerOff = DcPwr.MeasureCurrent();
+
+                // Voltage and current should be near zero, when the power is off
+                if (Math.Abs(voltageWhenPowerOff) > 2)
+                    throw new InvalidOperationException(
+                        $"The voltage of {Math.Round(voltageWhenPowerOff, 3)} Volts is not near zero. " +
+                        "The voltage should be near zero, when the power supply is off.");
+
+                if (Math.Abs(currentWhenPowerOff) > 0.1)
+                    throw new InvalidOperationException(
+                        $"The current of {Math.Round(currentWhenPowerOff, 3)} Amps is not near zero. " +
+                        "The current should be near zero, when the power supply is off.");
+
+                // Optionally, run child steps to switch routes, when the power is off
+                RunChildSteps();
+
                 DcPwr.SetCurrent(Current);
                 DcPwr.SetVoltage(Voltage);
-
-                TapThread.Sleep(TimeSpan.FromSeconds(TimeDelayBeforePowerOn));
-
                 DcPwr.SetOutputState(EState.On);
 
-                TapThread.Sleep(TimeSpan.FromSeconds(TimeDelayAfterPowerOn));
+                Sleep(TimeDelayAfterPowerOn);
 
+                // Measure voltage and current, when the power is on
                 var measuredVoltage = DcPwr.MeasureVoltage();
                 var measuredCurrent = DcPwr.MeasureCurrent();
 
+                // Report voltage and current, when the power is on
                 if (measuredVoltage < VoltageLimitLow || measuredVoltage > VoltageLimitHigh)
                     throw new InvalidOperationException(
-                        $"The measured voltage of {Math.Round(measuredVoltage, 3)} is not " +
-                        $"within the expected limits of {VoltageLimitLow} to {VoltageLimitHigh}");
+                        $"The measured voltage of {Math.Round(measuredVoltage, 3)} is not within " +
+                        $"the expected limits of {VoltageLimitLow} to {VoltageLimitHigh} Volts.");
 
                 if (measuredCurrent < CurrentLimitLow || measuredCurrent > CurrentLimitHigh)
                     throw new InvalidOperationException(
-                        $"The measured voltage of {Math.Round(measuredCurrent, 3)} is not " +
-                        $"within the expected limits of {CurrentLimitLow} to {CurrentLimitHigh}");
+                        $"The measured current of {Math.Round(measuredCurrent, 3)} is not within " +
+                        $"the expected limits of {CurrentLimitLow} to {CurrentLimitHigh} Amps.");
 
                 UpgradeVerdict(Verdict.Pass);
             }
@@ -114,6 +134,18 @@ namespace TapExtensions.Steps.DcPwr
                 Log.Error(ex.Message);
                 UpgradeVerdict(Verdict.Fail);
             }
+        }
+
+        private static void Sleep(double timeDelay)
+        {
+            if (timeDelay <= 0)
+                return;
+
+            // Only show a log message when the delay is not too brief
+            if (timeDelay > 1)
+                Log.Debug($"Waiting {timeDelay} s");
+
+            TapThread.Sleep(TimeSpan.FromSeconds(timeDelay));
         }
     }
 }

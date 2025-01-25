@@ -9,16 +9,33 @@ namespace TapExtensions.Steps.DcPwr
         Groups: new[] { "TapExtensions", "Steps", "DcPwr" })]
     public class DcPowerOff : TestStep
     {
-        [Display("DcPwr", Group: "Instruments",
+        #region Settings
+
+        [Display("DcPwr", Order: 1,
             Description: "DC Power Supply instrument interface")]
         public IDcPwr DcPwr { get; set; }
+
+        [Display("Measure Voltage And Current", Order: 2,
+            Description: "Measure before turning off the power")]
+        public bool MeasureVoltageAndCurrent { get; set; } = false;
+
+        #endregion
 
         public override void Run()
         {
             try
             {
                 if (!DcPwr.IsConnected)
-                    throw new InvalidOperationException("Power Supply not connected or initialized!");
+                    throw new InvalidOperationException($"Cannot connect to {DcPwr}.");
+
+                if (MeasureVoltageAndCurrent)
+                {
+                    var measuredVoltage = DcPwr.MeasureVoltage();
+                    var measuredCurrent = DcPwr.MeasureCurrent();
+                    Log.Debug("Before turning off the power, " +
+                              $"the voltage is {Math.Round(measuredVoltage, 3)} V, and " +
+                              $"the current is {Math.Round(measuredCurrent, 3)} A.");
+                }
 
                 DcPwr.SetOutputState(EState.Off);
 
