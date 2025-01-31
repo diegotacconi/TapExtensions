@@ -4,7 +4,8 @@ using TapExtensions.Interfaces.Gpio;
 
 namespace TapExtensions.Steps.Gpio
 {
-    [Display("GpioSetPinDrive", Groups: new[] { "TapExtensions", "Steps", "Gpio" })]
+    [Display("GpioSetPinDrive",
+        Groups: new[] { "TapExtensions", "Steps", "Gpio" })]
     public class GpioSetPinDrive : TestStep
     {
         [Display("Gpio", Order: 1)] public IGpio Gpio { get; set; }

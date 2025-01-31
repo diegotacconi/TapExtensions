@@ -4,7 +4,8 @@ using TapExtensions.Interfaces.Gpio;
 
 namespace TapExtensions.Steps.Gpio
 {
-    [Display("GpioSetPinPull", Groups: new[] { "TapExtensions", "Steps", "Gpio" })]
+    [Display("GpioSetPinPull",
+        Groups: new[] { "TapExtensions", "Steps", "Gpio" })]
     public class GpioSetPinPull : TestStep
     {
         [Display("Gpio", Order: 1)] public IGpio Gpio { get; set; }

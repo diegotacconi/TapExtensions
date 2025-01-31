@@ -1,4 +1,62 @@
-﻿using System;
+﻿// https://github.com/raspberrypi/utils/blob/master/pinctrl
+
+/*
+   pinctrl can get and print the state of a GPIO (or all GPIOs)
+   and can be used to set the function, pulls and value of a GPIO.
+   pinctrl must be run as root.
+   Use:
+     pinctrl [-p] [-v] get [GPIO]
+   OR
+     pinctrl [-p] [-v] [-e] set <GPIO> [options]
+   OR
+     pinctrl [-p] [-v] poll <GPIO>
+   OR
+     pinctrl [-p] [-v] funcs [GPIO]
+   OR
+     pinctrl [-p] [-v] lev [GPIO]
+   OR
+     pinctrl -c <chip> [funcs] [GPIO]
+
+   GPIO is a comma-separated list of GPIO names, numbers or ranges (without
+   spaces), e.g. 4 or 18-21 or BT_ON,9-11
+
+   Note that omitting [GPIO] from "pinctrl get" prints all GPIOs.
+   If the -p option is given, GPIO numbers are replaced by pin numbers on the
+   40-way header. If the -v option is given, the output is more verbose. Including
+   the -e option in a "set" causes pinctrl to echo back the new pin states.
+   pinctrl funcs will dump all the possible GPIO alt functions in CSV format
+   or if [GPIO] is specified the alternate funcs just for that specific GPIO.
+   The -c option allows the alt functions (and only the alt function) for a named
+   chip to be displayed, even if that chip is not present in the current system.
+
+   Valid [options] for pinctrl set are:
+     ip      set GPIO as input
+     op      set GPIO as output
+     a0-a8   set GPIO to alt function in the range 0 to 8 (range varies by model)
+     no      set GPIO to no function (NONE)
+     pu      set GPIO in-pad pull up
+     pd      set GPIO in-pad pull down
+     pn      set GPIO pull none (no pull)
+     dh      set GPIO to drive high (1) level (only valid if set to be an output)
+     dl      set GPIO to drive low (0) level (only valid if set to be an output)
+
+   Examples:
+     pinctrl get              Prints state of all GPIOs one per line
+     pinctrl get 10           Prints state of GPIO10
+     pinctrl get 10,11        Prints state of GPIO10 and GPIO11
+     pinctrl set 10 a2        Set GPIO10 to fsel 2 function (nand_wen_clk)
+     pinctrl -e set 10 pu     Enable GPIO10 ~50k in-pad pull up, echoing the result
+     pinctrl set 10 pd        Enable GPIO10 ~50k in-pad pull down
+     pinctrl set 10 op        Set GPIO10 to be an output
+     pinctrl set 10 dl        Set GPIO10 to output low/zero (must already be set as an output)
+     pinctrl set 10 ip pd     Set GPIO10 to input with pull down
+     pinctrl set 35 a1 pu     Set GPIO35 to fsel 1 (jtag_2_clk) with pull up
+     pinctrl set 20 op pn dh  Set GPIO20 to output with no pull and driving high
+     pinctrl lev 4            Prints the level (1 or 0) of GPIO4
+     pinctrl -c bcm2835 9-11  Display the alt functions for GPIOs 9-11 on bcm2835
+ */
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TapExtensions.Interfaces.Gpio;
@@ -11,50 +69,82 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
 
         public void SetPinDirection(int pin, EDirection direction)
         {
-            var cmd = $"sudo pinctrl set {pin} {EnumToString(direction)}";
-            if (!SendSshQuery(cmd, 5, out _))
+            var cmd = $"sudo pinctrl -e set {pin} {EnumToString(direction)}";
+            if (!SendSshQuery(cmd, 5, out var response))
                 throw new InvalidOperationException(
                     $"Exit status was not 0, when executing to the command of '{cmd}'");
 
-            // ToDo: verify by sending "sudo pinctrl get" and checking response
+            VerifyResponse(response, direction);
         }
 
         public void SetPinPull(int pin, EPull pull)
         {
-            var cmd = $"sudo pinctrl set {pin} {EnumToString(pull)}";
-            if (!SendSshQuery(cmd, 5, out _))
+            // The Raspberry Pi GPIO pin typically have an in-pad pull-up or pull-down
+            // resistance value of approximately 50K Ohms.
+
+            var cmd = $"sudo pinctrl -e set {pin} {EnumToString(pull)}";
+            if (!SendSshQuery(cmd, 5, out var response))
                 throw new InvalidOperationException(
                     $"Exit status was not 0, when executing to the command of '{cmd}'");
 
-            // ToDo: verify by sending "sudo pinctrl get" and checking response
+            VerifyResponse(response, pull);
         }
 
         public void SetPinDrive(int pin, EDrive drive)
         {
-            var cmd = $"sudo pinctrl set {pin} {EnumToString(drive)}";
-            if (!SendSshQuery(cmd, 5, out _))
+            var cmd = $"sudo pinctrl -e set {pin} {EnumToString(drive)}";
+            if (!SendSshQuery(cmd, 5, out var response))
                 throw new InvalidOperationException(
                     $"Exit status was not 0, when executing to the command of '{cmd}'");
 
-            // ToDo: verify by sending "sudo pinctrl get" and checking response
+            VerifyResponse(response, drive);
         }
 
         public ELevel GetPinLevel(int pin)
+        {
+            var (_, _, level) = GetPin(pin);
+            return level;
+        }
+
+        public void SetPin(int pin, EDirection direction, EPull pull)
+        {
+            var cmd = $"sudo pinctrl -e set {pin} {EnumToString(direction)} {EnumToString(pull)}";
+            if (!SendSshQuery(cmd, 5, out var response))
+                throw new InvalidOperationException(
+                    $"Exit status was not 0, when executing to the command of '{cmd}'");
+
+            VerifyResponse(response, direction);
+            VerifyResponse(response, pull);
+        }
+
+        public void SetPin(int pin, EDirection direction, EPull pull, EDrive drive)
+        {
+            var cmd = $"sudo pinctrl -e set {pin} {EnumToString(direction)} {EnumToString(pull)} {EnumToString(drive)}";
+            if (!SendSshQuery(cmd, 5, out var response))
+                throw new InvalidOperationException(
+                    $"Exit status was not 0, when executing to the command of '{cmd}'");
+
+            VerifyResponse(response, direction);
+            VerifyResponse(response, pull);
+            VerifyResponse(response, drive);
+        }
+
+        public (EDirection direction, EPull pull, ELevel level) GetPin(int pin)
         {
             var cmd = $"sudo pinctrl get {pin}";
             if (!SendSshQuery(cmd, 5, out var response))
                 throw new InvalidOperationException(
                     $"Exit status was not 0, when executing to the command of '{cmd}'");
 
-            var measuredLevel = (ELevel)ParseLevel(response);
-            return measuredLevel;
+            var (direction, pull, level) = ParseResponse(response);
+            return (direction, pull, level);
         }
 
         #endregion
 
         #region Private Methods
 
-        private readonly Dictionary<Enum, string> _dictionary =
+        private static readonly Dictionary<Enum, string> _dictionary =
             new Dictionary<Enum, string>
             {
                 { EDirection.Input, "ip" },
@@ -68,7 +158,26 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
                 { ELevel.High, "hi" }
             };
 
-        private protected string EnumToString(Enum key)
+        private protected static ELevel DriveToLevel(EDrive drive)
+        {
+            ELevel level;
+
+            switch (drive)
+            {
+                case EDrive.DriveLow:
+                    level = ELevel.Low;
+                    break;
+                case EDrive.DriveHigh:
+                    level = ELevel.High;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(drive), drive, null);
+            }
+
+            return level;
+        }
+
+        private protected static string EnumToString(Enum key)
         {
             if (!_dictionary.TryGetValue(key, out var value))
                 throw new InvalidOperationException(
@@ -77,7 +186,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
             return value;
         }
 
-        private protected Enum StringToEnum(string value)
+        private protected static Enum StringToEnum(string value)
         {
             if (!_dictionary.ContainsValue(value))
                 throw new InvalidOperationException(
@@ -85,16 +194,6 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
 
             var key = _dictionary.FirstOrDefault(x => x.Value == value).Key;
             return key;
-        }
-
-        private protected Enum ParseLevel(string response)
-        {
-            // "%2d: %2s %s %s | %s // %s%s%s\n"
-            // "%2d: %2s    %s | %s // %s%s%s\n"
-            //    6: ip    pu | hi // GPIO6 = input
-            var levelString = GetStringBetween(response, " | ", " // ");
-            var levelEnum = StringToEnum(levelString);
-            return levelEnum;
         }
 
         private protected static string GetStringBetween(string text, string before, string after)
@@ -120,43 +219,46 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
             return text.Substring(x, y - x);
         }
 
-        #endregion
-
-        /*
-        #region Settings
-
-        // ReSharper disable InconsistentNaming
-        public enum ERaspiGpio
+        private protected static (EDirection direction, EPull pull, ELevel level) ParseResponse(string response)
         {
-            GPIO_02_PINHDR_03 = 2,
-            GPIO_03_PINHDR_05 = 3,
-            GPIO_04_PINHDR_07 = 4,
-            GPIO_05_PINHDR_29 = 5,
-            GPIO_06_PINHDR_31 = 6,
-            GPIO_07_PINHDR_26 = 7,
-            GPIO_08_PINHDR_24 = 8,
-            GPIO_09_PINHDR_21 = 9,
-            GPIO_10_PINHDR_19 = 10,
-            GPIO_11_PINHDR_23 = 11,
-            GPIO_12_PINHDR_32 = 12,
-            GPIO_13_PINHDR_33 = 13,
-            GPIO_14_PINHDR_08 = 14,
-            GPIO_15_PINHDR_10 = 15,
-            GPIO_16_PINHDR_36 = 16,
-            GPIO_17_PINHDR_11 = 17,
-            GPIO_18_PINHDR_12 = 18,
-            GPIO_19_PINHDR_35 = 19,
-            GPIO_20_PINHDR_38 = 20,
-            GPIO_21_PINHDR_40 = 21,
-            GPIO_22_PINHDR_15 = 22,
-            GPIO_23_PINHDR_16 = 23,
-            GPIO_24_PINHDR_18 = 24,
-            GPIO_25_PINHDR_22 = 25,
-            GPIO_26_PINHDR_37 = 26,
-            GPIO_27_PINHDR_13 = 27
+            // "%2d: %2s %s %s | %s // %s%s%s\n"
+            // "%2d: %2s    %s | %s // %s%s%s\n"
+            //    6: ip    pu | hi // GPIO6 = input
+
+            var pin = int.Parse(GetStringBetween(response, "", ": "));
+            var middleSection = GetStringBetween(response, ": ", " | ");
+            var fields = middleSection.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            var direction = (EDirection)StringToEnum(fields.First());
+            var pull = (EPull)StringToEnum(fields.Last());
+            var level = (ELevel)StringToEnum(GetStringBetween(response, " | ", " // "));
+
+            return (direction, pull, level);
+        }
+
+        private protected static void VerifyResponse(string response, EDirection direction)
+        {
+            var (directionResponse, _, _) = ParseResponse(response);
+            if (direction != directionResponse)
+                throw new InvalidOperationException(
+                    $"Error setting direction to {direction}");
+        }
+
+        private protected static void VerifyResponse(string response, EPull pull)
+        {
+            var (_, pullResponse, _) = ParseResponse(response);
+            if (pull != pullResponse)
+                throw new InvalidOperationException(
+                    $"Error setting pull to {pull}");
+        }
+
+        private protected static void VerifyResponse(string response, EDrive drive)
+        {
+            var (_, _, levelResponse) = ParseResponse(response);
+            if (DriveToLevel(drive) != levelResponse)
+                throw new InvalidOperationException(
+                    $"Error setting drive to {drive} (the level measured was {levelResponse})");
         }
 
         #endregion
-        */
     }
 }

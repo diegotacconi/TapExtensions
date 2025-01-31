@@ -2,15 +2,15 @@
 using OpenTap;
 using TapExtensions.Interfaces.Gpio;
 
-namespace TapExtensions.Steps.Gpio
+namespace TapExtensions.Steps.Gpio.Raspi
 {
-    [Display("GpioGetPinLevel",
-        Groups: new[] { "TapExtensions", "Steps", "Gpio" })]
-    public class GpioGetPinLevel : TestStep
+    [Display("RaspiGpioGetPinLevel",
+        Groups: new[] { "TapExtensions", "Steps", "Gpio", "Raspi" })]
+    public class RaspiGpioGetPinLevel : TestStep
     {
         [Display("Gpio", Order: 1)] public IGpio Gpio { get; set; }
 
-        [Display("Pin Number", Order: 2)] public int PinNumber { get; set; }
+        [Display("Pin Number", Order: 2)] public ERaspiGpio PinNumber { get; set; }
 
         [Display("Expected Pin Level", Order: 3)]
         public ELevel ExpectedLevel { get; set; }
@@ -19,7 +19,7 @@ namespace TapExtensions.Steps.Gpio
         {
             try
             {
-                var measuredLevel = Gpio.GetPinLevel(PinNumber);
+                var measuredLevel = Gpio.GetPinLevel((int)PinNumber);
                 if (measuredLevel != ExpectedLevel)
                     throw new InvalidOperationException(
                         $"Pin {PinNumber} measured an input level of {measuredLevel}, " +
