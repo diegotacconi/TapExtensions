@@ -2,13 +2,13 @@
 // https://www.ti.com/amc
 
 using System;
+using System.Collections.Generic;
 using TapExtensions.Interfaces.I2c;
 
 namespace TapExtensions.Steps.PaBias
 {
     public class Amc
     {
-        // private readonly TraceSource log = Log.CreateSource(nameof(AmcChip));
         private readonly II2C _i2CAdapter;
         private readonly ushort _deviceAddress;
         private static readonly byte[] Page1 = { 0x7E, 0x01 };
@@ -22,6 +22,59 @@ namespace TapExtensions.Steps.PaBias
         public void SetPage(byte[] page)
         {
             _i2CAdapter.Write(_deviceAddress, page);
+        }
+
+        public List<string> ReadAll()
+        {
+            var lines = new List<string>();
+
+            const int bus = 0;
+            var page = Page1[1];
+
+            // get config page
+            SetPage(Page1);
+            for (byte reg = 0; reg <= 41; reg++)
+            {
+                // Get reg value
+                var res = _i2CAdapter.Read(_deviceAddress, 1, new[] { reg })[0];
+                lines.Add($"{bus},0x{_deviceAddress:X2},{page},0x{reg:X2},0x{res:X2}");
+            }
+
+            /*
+            # get clamp values
+            page=2
+            $(i2c_access -b /dev/i2c-$bus -d $addr -S "0x7E $page")
+            for reg in `seq 16 1 19`;do
+                # get reg value
+                res=$(i2c_access -b /dev/i2c-$bus -d $addr -G "1 $reg")
+                #echo $bus,$addr,$page,$reg,$res
+                #printf '0x%02X,0x%02X\n' "$reg" $res
+                printf '%02d,0x%02X,%01d,0x%02X,0x%02X\n' "$bus" $addr "$page" "$reg" $res
+
+            done
+               
+            # get LUTS and base values
+
+            # lutdis
+            $(i2c_access -b /dev/i2c-$bus -d $addr -S "0x7E 0x01")
+            $(i2c_access -b /dev/i2c-$bus -d $addr -S "0x0A 0x11")
+
+            for page in `seq 4 1 5`;do
+                $(i2c_access -b /dev/i2c-$bus -d $addr -S "0x7E $page")
+                for reg in `seq 1 2 107`;do
+                    # get reg value
+                    res=$(i2c_access -b /dev/i2c-$bus -d $addr -G "1 $reg")
+                    #echo $bus,$addr,$page,$reg,$res
+                    printf '%02d,0x%02X,%01d,0x%02X,0x%02X\n' "$bus" $addr "$page" "$reg" $res
+                done
+            done
+
+            # lut enable
+            $(i2c_access -b /dev/i2c-$bus -d $addr -S "0x7E 0x01")
+            $(i2c_access -b /dev/i2c-$bus -d $addr -S "0x0A 0x01")
+             */
+
+            return lines;
         }
 
         public double MeasureTemperature()
@@ -71,7 +124,7 @@ namespace TapExtensions.Steps.PaBias
         private static int FromTwosComplement(uint twosComplement, int bits)
         {
             if (bits < 1 || bits > 32)
-                throw new ArgumentOutOfRangeException(nameof(bits), 
+                throw new ArgumentOutOfRangeException(nameof(bits),
                     "Parameter value out of range!");
             if (bits < 32 && twosComplement > (1 << bits) - 1)
                 throw new ArgumentOutOfRangeException(nameof(twosComplement),
