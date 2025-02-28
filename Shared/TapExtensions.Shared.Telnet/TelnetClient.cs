@@ -1,4 +1,6 @@
-﻿using System;
+﻿// https://github.com/jchristn/SuperSimpleTcp
+
+using System;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
