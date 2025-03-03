@@ -135,12 +135,13 @@ namespace TapExtensions.Duts.Uart
             var data = serialPort.ReadExisting();
             _readBuffer.Append(data);
             ReadEvent?.Invoke(_readBuffer.ToString());
-            LogLineByLine(data);
+            LogLineByLine(data, _sp.PortName);
         }
 
         public bool Expect(string expectedResponse, int timeout)
         {
             // Start monitoring serial port
+            _readBuffer.Clear();
             _response = string.Empty;
             _responseReceived = false;
             _expectedResponse = expectedResponse;
@@ -188,43 +189,49 @@ namespace TapExtensions.Duts.Uart
             _sp.WriteLine(command);
         }
 
-        private void LogLineByLine(string data)
+        private void LogLineByLine(string data, string tag)
         {
             foreach (var c in data)
             {
                 _logBuffer.Append(c);
 
                 // Show one line per log message
-                if (c == '\n' || c == '\r')
+                if (c != '\n' && c != '\r')
+                    continue;
+
+                var currentLine = _logBuffer.ToString();
+                _logBuffer.Clear();
+
+                // Skip the rest if verbose is not enabled
+                if (!VerboseLoggingEnabled)
+                    continue;
+
+                // Split into lines
+                var lines = currentLine.Split(new[] { "\r\n", "\n\r", "\r", "\n" },
+                    StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (var line in lines)
                 {
-                    var currentLine = _logBuffer.ToString();
-                    _logBuffer.Clear();
+                    // Go to the next foreach line, if string is empty
+                    if (string.IsNullOrWhiteSpace(line))
+                        continue;
 
-                    if (!VerboseLoggingEnabled)
-                        continue; // Go to the next foreach character
+                    // Remove ANSI escape codes from log message
+                    var lineWithoutAnsiEscapeCodes =
+                        Regex.Replace(line, @"\x1B\[[^@-~]*[@-~]", "", RegexOptions.Compiled);
 
-                    // Split into lines
-                    var lines = currentLine.Split(new[] { "\r\n", "\n\r", "\r", "\n" },
-                        StringSplitOptions.RemoveEmptyEntries);
+                    // Go to the next foreach line, if string is empty
+                    if (string.IsNullOrWhiteSpace(lineWithoutAnsiEscapeCodes))
+                        continue;
 
-                    foreach (var line in lines)
-                    {
-                        if (string.IsNullOrWhiteSpace(line))
-                            continue; // Go to the next foreach line
+                    var msg = $"{tag} << {lineWithoutAnsiEscapeCodes}";
 
-                        // Remove ANSI escape codes from log message
-                        var lineWithoutAnsiEscapeCodes =
-                            Regex.Replace(line, @"\x1B\[[^@-~]*[@-~]", "", RegexOptions.Compiled);
+                    // Truncate log message to a maximum sting length
+                    const int maxLength = 500;
+                    if (msg.Length > maxLength)
+                        msg = msg.Substring(0, maxLength) + "***";
 
-                        var msg = $"{_sp.PortName} << {lineWithoutAnsiEscapeCodes}";
-
-                        // Truncate log message to a maximum sting length
-                        const int maxLength = 500;
-                        if (msg.Length > maxLength)
-                            msg = msg.Substring(0, maxLength) + "***";
-
-                        Log.Debug(msg);
-                    }
+                    Log.Debug(msg);
                 }
             }
         }

@@ -1,5 +1,8 @@
 ﻿// https://github.com/cminyard/ser2net
 
+// sudo apt install ser2net
+// cat /etc/ser2net.yaml
+
 using System;
 using System.Net;
 using System.Text;
@@ -109,6 +112,7 @@ namespace TapExtensions.Duts.Uart
         public bool Expect(string expectedResponse, int timeout)
         {
             // Start monitoring serial port
+            _readBuffer.Clear();
             _response = string.Empty;
             _responseReceived = false;
             _expectedResponse = expectedResponse;
@@ -166,38 +170,38 @@ namespace TapExtensions.Duts.Uart
                 _logBuffer.Append(c);
 
                 // Show one line per log message
-                if (c == '\n' || c == '\r')
+                if (c != '\n' && c != '\r')
+                    continue;
+
+                var currentLine = _logBuffer.ToString();
+                _logBuffer.Clear();
+
+                // Split into lines
+                var lines = currentLine.Split(new[] { "\r\n", "\n\r", "\r", "\n" },
+                    StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (var line in lines)
                 {
-                    var currentLine = _logBuffer.ToString();
-                    _logBuffer.Clear();
+                    // Go to the next foreach line, if string is empty
+                    if (string.IsNullOrWhiteSpace(line))
+                        continue;
 
-                    // Split into lines
-                    var lines = currentLine.Split(new[] { "\r\n", "\n\r", "\r", "\n" },
-                        StringSplitOptions.RemoveEmptyEntries);
+                    // Remove ANSI escape codes from log message
+                    var lineWithoutAnsiEscapeCodes =
+                        Regex.Replace(line, @"\x1B\[[^@-~]*[@-~]", "", RegexOptions.Compiled);
 
-                    foreach (var line in lines)
-                    {
-                        // Go to the next foreach line, if string is empty
-                        if (string.IsNullOrWhiteSpace(line))
-                            continue;
+                    // Go to the next foreach line, if string is empty
+                    if (string.IsNullOrWhiteSpace(lineWithoutAnsiEscapeCodes))
+                        continue;
 
-                        // Remove ANSI escape codes from log message
-                        var lineWithoutAnsiEscapeCodes =
-                            Regex.Replace(line, @"\x1B\[[^@-~]*[@-~]", "", RegexOptions.Compiled);
+                    var msg = $"{tag} << {lineWithoutAnsiEscapeCodes}";
 
-                        // Go to the next foreach line, if string is empty
-                        if (string.IsNullOrWhiteSpace(lineWithoutAnsiEscapeCodes))
-                            continue;
+                    // Truncate log message to a maximum sting length
+                    const int maxLength = 500;
+                    if (msg.Length > maxLength)
+                        msg = msg.Substring(0, maxLength) + "***";
 
-                        var msg = $"{tag} << {lineWithoutAnsiEscapeCodes}";
-
-                        // Truncate log message to a maximum sting length
-                        const int maxLength = 500;
-                        if (msg.Length > maxLength)
-                            msg = msg.Substring(0, maxLength) + "***";
-
-                        Log.Debug(msg);
-                    }
+                    Log.Debug(msg);
                 }
             }
         }
