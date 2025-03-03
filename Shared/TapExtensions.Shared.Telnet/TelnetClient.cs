@@ -39,7 +39,7 @@ namespace TapExtensions.Shared.Telnet
 
         #region Private-Members
 
-        private const string Header = "[Telnet] ";
+        private const string Header = "[TelnetClient] ";
         private TelnetClientSettings _settings = new TelnetClientSettings();
         private TelnetClientEvents _events = new TelnetClientEvents();
         private readonly string _ipAddress;
@@ -266,7 +266,7 @@ namespace TapExtensions.Shared.Telnet
                     _tcpClient.Dispose();
                 }
 
-                Logger?.Invoke($"{Header}dispose complete");
+                Logger?.Invoke($"{Header}Dispose complete");
             }
         }
 
@@ -300,41 +300,41 @@ namespace TapExtensions.Shared.Telnet
                 }
                 catch (AggregateException)
                 {
-                    Logger?.Invoke($"{Header}data receiver canceled, disconnected");
+                    Logger?.Invoke($"{Header}Data receiver canceled, disconnected");
                     break;
                 }
                 catch (IOException)
                 {
-                    Logger?.Invoke($"{Header}data receiver canceled, disconnected");
+                    Logger?.Invoke($"{Header}Data receiver canceled, disconnected");
                     break;
                 }
                 catch (SocketException)
                 {
-                    Logger?.Invoke($"{Header}data receiver canceled, disconnected");
+                    Logger?.Invoke($"{Header}Data receiver canceled, disconnected");
                     break;
                 }
                 catch (TaskCanceledException)
                 {
-                    Logger?.Invoke($"{Header}data receiver task canceled, disconnected");
+                    Logger?.Invoke($"{Header}Data receiver task canceled, disconnected");
                     break;
                 }
                 catch (OperationCanceledException)
                 {
-                    Logger?.Invoke($"{Header}data receiver operation canceled, disconnected");
+                    Logger?.Invoke($"{Header}Data receiver operation canceled, disconnected");
                     break;
                 }
                 catch (ObjectDisposedException)
                 {
-                    Logger?.Invoke($"{Header}data receiver canceled due to disposal, disconnected");
+                    Logger?.Invoke($"{Header}Data receiver canceled due to disposal, disconnected");
                     break;
                 }
                 catch (Exception e)
                 {
-                    Logger?.Invoke($"{Header}data receiver exception:{Environment.NewLine}{e}{Environment.NewLine}");
+                    Logger?.Invoke($"{Header}Data receiver exception:{Environment.NewLine}{e}{Environment.NewLine}");
                     break;
                 }
 
-            Logger?.Invoke($"{Header}disconnection detected");
+            Logger?.Invoke($"{Header}Disconnection detected");
 
             IsConnected = false;
 
@@ -484,7 +484,7 @@ namespace TapExtensions.Shared.Telnet
 
                 if (DateTime.Now > timeoutTime)
                 {
-                    Logger?.Invoke($"{Header}disconnecting from {ServerAddress} due to timeout");
+                    Logger?.Invoke($"{Header}Disconnecting from {ServerAddress} due to timeout");
                     IsConnected = false;
                     _isTimeout = true;
                     _tokenSource.Cancel(); // DataReceiver will fire events including dispose
@@ -503,7 +503,7 @@ namespace TapExtensions.Shared.Telnet
 
                 if (!PollSocket())
                 {
-                    Logger?.Invoke($"{Header}disconnecting from {ServerAddress} due to connection lost");
+                    Logger?.Invoke($"{Header}Disconnecting from {ServerAddress} due to connection lost");
                     IsConnected = false;
                     _tokenSource.Cancel(); // DataReceiver will fire events including dispose
                 }
@@ -533,7 +533,7 @@ namespace TapExtensions.Shared.Telnet
             }
             catch (SocketException ex)
             {
-                Logger?.Invoke($"{Header}poll socket from {ServerAddress} failed with ex = {ex}");
+                Logger?.Invoke($"{Header}Poll socket from {ServerAddress} failed with ex = {ex}");
                 return ex.SocketErrorCode == SocketError.TimedOut;
             }
             catch (Exception)
