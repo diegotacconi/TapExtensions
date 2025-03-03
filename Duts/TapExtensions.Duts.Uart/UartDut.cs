@@ -133,52 +133,9 @@ namespace TapExtensions.Duts.Uart
         {
             var serialPort = (SerialPort)sender;
             var data = serialPort.ReadExisting();
-
             _readBuffer.Append(data);
             ReadEvent?.Invoke(_readBuffer.ToString());
-
             LogLineByLine(data);
-        }
-
-        private void LogLineByLine(string data)
-        {
-            foreach (var c in data)
-            {
-                _logBuffer.Append(c);
-
-                // Show one line per log message
-                if (c == '\n' || c == '\r')
-                {
-                    var currentLine = _logBuffer.ToString();
-                    _logBuffer.Clear();
-
-                    if (!VerboseLoggingEnabled)
-                        continue; // Go to the next foreach character
-
-                    // Split into lines
-                    var lines = currentLine.Split(new[] { "\r\n", "\n\r", "\r", "\n" },
-                        StringSplitOptions.RemoveEmptyEntries);
-
-                    foreach (var line in lines)
-                    {
-                        if (string.IsNullOrWhiteSpace(line))
-                            continue; // Go to the next foreach line
-
-                        // Remove ANSI escape codes from log message
-                        var lineWithoutAnsiEscapeCodes =
-                            Regex.Replace(line, @"\x1B\[[^@-~]*[@-~]", "", RegexOptions.Compiled);
-
-                        var msg = $"{_sp.PortName} << {lineWithoutAnsiEscapeCodes}";
-
-                        // Truncate log message to a maximum sting length
-                        const int maxLength = 500;
-                        if (msg.Length > maxLength)
-                            msg = msg.Substring(0, maxLength) + "***";
-
-                        Log.Debug(msg);
-                    }
-                }
-            }
         }
 
         public bool Expect(string expectedResponse, int timeout)
@@ -229,6 +186,47 @@ namespace TapExtensions.Duts.Uart
             //     Log.Debug($"{_sp.PortName} >> {command}");
             _sp.DiscardOutBuffer();
             _sp.WriteLine(command);
+        }
+
+        private void LogLineByLine(string data)
+        {
+            foreach (var c in data)
+            {
+                _logBuffer.Append(c);
+
+                // Show one line per log message
+                if (c == '\n' || c == '\r')
+                {
+                    var currentLine = _logBuffer.ToString();
+                    _logBuffer.Clear();
+
+                    if (!VerboseLoggingEnabled)
+                        continue; // Go to the next foreach character
+
+                    // Split into lines
+                    var lines = currentLine.Split(new[] { "\r\n", "\n\r", "\r", "\n" },
+                        StringSplitOptions.RemoveEmptyEntries);
+
+                    foreach (var line in lines)
+                    {
+                        if (string.IsNullOrWhiteSpace(line))
+                            continue; // Go to the next foreach line
+
+                        // Remove ANSI escape codes from log message
+                        var lineWithoutAnsiEscapeCodes =
+                            Regex.Replace(line, @"\x1B\[[^@-~]*[@-~]", "", RegexOptions.Compiled);
+
+                        var msg = $"{_sp.PortName} << {lineWithoutAnsiEscapeCodes}";
+
+                        // Truncate log message to a maximum sting length
+                        const int maxLength = 500;
+                        if (msg.Length > maxLength)
+                            msg = msg.Substring(0, maxLength) + "***";
+
+                        Log.Debug(msg);
+                    }
+                }
+            }
         }
     }
 }
