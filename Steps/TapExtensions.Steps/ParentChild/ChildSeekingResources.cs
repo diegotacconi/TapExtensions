@@ -8,7 +8,7 @@ using OpenTap;
 
 namespace TapExtensions.Steps.ParentChild
 {
-    [Display("ChildSeekingResources2",
+    [Display("ChildSeekingResources",
         Groups: new[] { "TapExtensions", "Steps", "ParentChild" })]
     [AllowAsChildIn(typeof(ParentWithResources))]
     public class ChildSeekingResources : TestStep
