@@ -36,6 +36,8 @@ namespace TapExtensions.Steps.Examples
 
         public override void PrePlanRun()
         {
+            base.PrePlanRun();
+
             // Check validation rules, and do not run if there are any errors with the input values
             ThrowOnValidationError(true);
         }
