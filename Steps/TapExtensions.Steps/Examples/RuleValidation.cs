@@ -34,10 +34,15 @@ namespace TapExtensions.Steps.Examples
             return ShouldBeTrue;
         }
 
-        public override void Run()
+        public override void PrePlanRun()
         {
             // Check validation rules, and do not run if there are any errors with the input values
             ThrowOnValidationError(true);
+        }
+
+        public override void Run()
+        {
+            // Nothing to do
         }
     }
 }
