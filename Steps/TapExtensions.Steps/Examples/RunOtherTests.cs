@@ -9,19 +9,25 @@ namespace TapExtensions.Steps.Examples
         {
             var stepOne = new LogStep
             {
-                LogMessage = "Hello World",
+                Message = "Hello 1",
                 Severity = LogStep.ESeverity.Warning
             };
 
             stepOne.Run();
 
+
             var stepTwo = new LogStep
             {
-                LogMessage = "Hello World Again",
+                Message = "Hello 2",
                 Severity = LogStep.ESeverity.Warning
             };
 
             stepTwo.Run();
+
+
+            new LogStep { Message = "Hello 3" }.Run();
+            new LogStep { Message = "Hello 4" }.Run();
+            new LogStep { Message = "Hello 5" }.Run();
         }
     }
 }

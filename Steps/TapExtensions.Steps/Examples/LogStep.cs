@@ -2,45 +2,36 @@ using OpenTap;
 
 namespace TapExtensions.Steps.Examples
 {
-
     [Display("LogStep", Groups: new[] { "TapExtensions", "Steps", "Examples" })]
     public class LogStep : TestStep
     {
-        [Display("Log Message", "The log message to be output.", Order: -1)]
-        public string LogMessage { get; set; }
+        [Display("Message", Order: 1)] public string Message { get; set; } = "";
 
         public enum ESeverity
         {
             Debug,
-            [Display("Information")] Info,
+            Info,
             Warning,
             Error
         }
 
-        [Display("Log Severity", "What log level the message will be written at.")]
-        public ESeverity Severity { get; set; }
-
-        public LogStep()
-        {
-            Severity = ESeverity.Info;
-            LogMessage = "";
-        }
+        [Display("Severity", Order: 2)] public ESeverity Severity { get; set; } = ESeverity.Info;
 
         public override void Run()
         {
             switch (Severity)
             {
                 case ESeverity.Debug:
-                    Log.Debug(LogMessage);
+                    Log.Debug(Message);
                     break;
                 case ESeverity.Info:
-                    Log.Info(LogMessage);
+                    Log.Info(Message);
                     break;
                 case ESeverity.Warning:
-                    Log.Warning(LogMessage);
+                    Log.Warning(Message);
                     break;
                 case ESeverity.Error:
-                    Log.Error(LogMessage);
+                    Log.Error(Message);
                     break;
             }
         }
