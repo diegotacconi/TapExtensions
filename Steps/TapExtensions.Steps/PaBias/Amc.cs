@@ -52,7 +52,7 @@ namespace TapExtensions.Steps.PaBias
                 printf '%02d,0x%02X,%01d,0x%02X,0x%02X\n' "$bus" $addr "$page" "$reg" $res
 
             done
-               
+
             # get LUTS and base values
 
             # lutdis

@@ -8,8 +8,7 @@ namespace TapExtensions.Steps.I2c.Devices
         Groups: new[] { "TapExtensions", "Steps", "I2c", "Devices" })]
     public class Tca6416AReadAllRegisters : TestStep
     {
-        [Display("Aardvark I2C Adapter", Order: 1)]
-        public II2C I2CAdapter { get; set; }
+        [Display("I2C Adapter", Order: 1)] public II2C I2CAdapter { get; set; }
 
         [Display("Device Address", Order: 2)]
         [Unit("Hex", StringFormat: "X2")]
