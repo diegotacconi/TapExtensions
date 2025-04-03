@@ -69,8 +69,15 @@ namespace TapExtensions.Steps.I2c.Devices
 
         private ushort ReadRegister(byte[] regAddress)
         {
-            var register = _i2CAdapter.Read(_deviceAddress, 2, regAddress);
-            return (ushort)((register[0] << 8) | register[1]);
+            var regValue = _i2CAdapter.Read(_deviceAddress, 2, regAddress);
+            return (ushort)((regValue[0] << 8) | regValue[1]);
+        }
+
+        private void WriteRegister(byte[] regAddress, ushort regValue)
+        {
+            var bytes = BitConverter.GetBytes(regValue);
+            Array.Reverse(bytes, 0, bytes.Length);
+            _i2CAdapter.Write(_deviceAddress, regAddress, bytes);
         }
 
         private ushort ReadConversionRegister()
@@ -93,7 +100,43 @@ namespace TapExtensions.Steps.I2c.Devices
             return ReadRegister(new byte[] { 0x03 });
         }
 
+        private void WriteConfigRegister()
+        {
+            // var configBefore = ReadConfigRegister();
+            // _log.Debug($" Config (Before) = {ToBinaryString(configBefore)}");
+
+            // defaultValue = 0b1000_0101_1000_0011;
+            ushort ain0 = 0b1100_0101_1000_0011;
+            ushort ain1 = 0b1101_0101_1000_0011;
+            ushort ain2 = 0b1110_0101_1000_0011;
+            ushort ain3 = 0b1111_0101_1000_0011;
+
+            WriteRegister(new byte[] { 0x01 }, ain0);
+
+            // var configAfter = ReadConfigRegister();
+            // _log.Debug($" Config (after)  = {ToBinaryString(configAfter)}");
+        }
+
         #endregion
+
+        public double Measure()
+        {
+            WriteConfigRegister();
+
+            var conversion = ReadConversionRegister();
+            _log.Debug($" conversion  = {ToBinaryString(conversion)}");
+
+            // Remove 4 bits
+            var value = (ushort)(conversion >> 4);
+            _log.Debug($" value       = {ToBinaryString(value)}");
+
+            const double gain = 4.096; // from -2.048 to +2.048
+            const double scale = 4096;
+            var voltage = gain * value / scale;
+
+            _log.Debug($" voltage     = {voltage}");
+            return voltage;
+        }
 
         #region Bit Manipulations
 
@@ -118,6 +161,7 @@ namespace TapExtensions.Steps.I2c.Devices
             return ConvertToCurrent(msb, lsb);
         }
         */
+
 
         private static double ConvertToCurrent(int msb, int lsb)
         {
