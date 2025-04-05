@@ -2,6 +2,7 @@
 // https://www.ti.com/product/ADS1015
 
 using System;
+using System.Collections.Generic;
 using OpenTap;
 using TapExtensions.Interfaces.I2c;
 
@@ -19,11 +20,9 @@ namespace TapExtensions.Steps.I2c.Devices
             _deviceAddress = deviceAddress;
         }
 
-        #region Registers
+        #region Documentation
 
-        public (ushort conversion, ushort config, ushort loThresh, ushort hiThresh) ReadAllRegisters()
-        {
-            /*
+        /*
             +------------------+---------------------------------------------------------+---------------------------------------------------------+---------------------------------+
             |     Register     | bit15  bit14  bit13  bit12  bit11  bit10  bit9   bit8   | bit7   bit6   bit5   bit4   bit3   bit2   bit1   bit0   |      Default (Reset) Value      |
             +------------------+---------------------------------------------------------+---------------------------------------------------------+---------------------------------+
@@ -32,37 +31,24 @@ namespace TapExtensions.Steps.I2c.Devices
             | 10b : Lo_thresh  |                                                         |                                                         | 1000 0000 0000 0000 = 0x80 0x00 |
             | 11b : Hi_thresh  |                                                         |                                                         | 0111 1111 1111 1111 = 0x7F 0xFF |
             +------------------+---------------------------------------------------------+---------------------------------------------------------+---------------------------------+
+        */
 
-            Bit15, OS, Operational status or single-shot conversion start
-                When writing:
-                    0b : No effect
-                    1b : Start a single conversion (when in power-down state)
-                When reading:
-                    0b : Device is currently performing a conversion
-                    1b : Device is not currently performing a conversion
+        #endregion
 
-            Bits14:12, MUX[2:0], Input multiplexer configuration
-                These bits configure the input multiplexer.
-                    000b : AINP = AIN0 and AINN = AIN1 (default)
-                    001b : AINP = AIN0 and AINN = AIN3
-                    010b : AINP = AIN1 and AINN = AIN3
-                    011b : AINP = AIN2 and AINN = AIN3
-                    100b : AINP = AIN0 and AINN = GND
-                    101b : AINP = AIN1 and AINN = GND
-                    110b : AINP = AIN2 and AINN = GND
-                    111b : AINP = AIN3 and AINN = GND
-            */
+        #region Registers
 
+        public (ushort conversion, ushort config, ushort loThresh, ushort hiThresh) ReadAllRegisters()
+        {
             var conversion = ReadConversionRegister();
             var config = ReadConfigRegister();
             var loThresh = ReadLowerThresholdRegister();
             var hiThresh = ReadHigherThresholdRegister();
 
             _log.Debug("| Conversion       | Config           | Lower Threshold  | Higher Threshold |");
-            _log.Debug($"| {ToBinaryString(conversion)} " +
-                       $"| {ToBinaryString(config)} " +
-                       $"| {ToBinaryString(loThresh)} " +
-                       $"| {ToBinaryString(hiThresh)} |");
+            _log.Debug($"| {BinaryToString(conversion)} " +
+                       $"| {BinaryToString(config)} " +
+                       $"| {BinaryToString(loThresh)} " +
+                       $"| {BinaryToString(hiThresh)} |");
 
             return (conversion, config, loThresh, hiThresh);
         }
@@ -71,13 +57,6 @@ namespace TapExtensions.Steps.I2c.Devices
         {
             var regValue = _i2CAdapter.Read(_deviceAddress, 2, regAddress);
             return (ushort)((regValue[0] << 8) | regValue[1]);
-        }
-
-        private void WriteRegister(byte[] regAddress, ushort regValue)
-        {
-            var bytes = BitConverter.GetBytes(regValue);
-            Array.Reverse(bytes, 0, bytes.Length);
-            _i2CAdapter.Write(_deviceAddress, regAddress, bytes);
         }
 
         private ushort ReadConversionRegister()
@@ -100,52 +79,123 @@ namespace TapExtensions.Steps.I2c.Devices
             return ReadRegister(new byte[] { 0x03 });
         }
 
-        private void WriteConfigRegister()
+        private void WriteRegister(byte[] regAddress, ushort regValue)
         {
-            // var configBefore = ReadConfigRegister();
-            // _log.Debug($" Config (Before) = {ToBinaryString(configBefore)}");
+            var bytes = BitConverter.GetBytes(regValue);
+            Array.Reverse(bytes, 0, bytes.Length);
+            _i2CAdapter.Write(_deviceAddress, regAddress, bytes);
+        }
 
-            // defaultValue = 0b1000_0101_1000_0011;
-            ushort ain0 = 0b1100_0101_1000_0011;
-            ushort ain1 = 0b1101_0101_1000_0011;
-            ushort ain2 = 0b1110_0101_1000_0011;
-            ushort ain3 = 0b1111_0101_1000_0011;
-
-            WriteRegister(new byte[] { 0x01 }, ain0);
-
-            // var configAfter = ReadConfigRegister();
-            // _log.Debug($" Config (after)  = {ToBinaryString(configAfter)}");
+        private void WriteConfigRegister(ushort regValue)
+        {
+            WriteRegister(new byte[] { 0x01 }, regValue);
         }
 
         #endregion
 
-        public double Measure()
+        /// <summary> Programmable Gain Amplifier (PGA) with input ranges from ±256mV to ±6.144V </summary>
+        public enum EGainPrecision
         {
-            WriteConfigRegister();
+            [Display("Range = \u00b16.144V and LSB Size = 3mV")]
+            Range0,
 
+            [Display("Range = \u00b14.096V and LSB Size = 2mV")]
+            Range1,
+
+            [Display("Range = \u00b12.048V and LSB Size = 1mV")]
+            Range2,
+
+            [Display("Range = \u00b11.024V and LSB Size = 0.5mV")]
+            Range3,
+
+            [Display("Range = \u00b10.512V and LSB Size = 0.25mV")]
+            Range4,
+
+            [Display("Range = \u00b10.256V and LSB Size = 0.125mV")]
+            Range5
+        }
+
+        /// <summary> Input multiplexer (MUX) </summary>
+        public enum EInputMux
+        {
+            [Display("AINp = AIN0 and AINn = GND")]
+            Ain0,
+
+            [Display("AINp = AIN1 and AINn = GND")]
+            Ain1,
+
+            [Display("AINp = AIN2 and AINn = GND")]
+            Ain2,
+
+            [Display("AINp = AIN3 and AINn = GND")]
+            Ain3
+        }
+
+        internal static (ushort gainBits, double gainLsbSize) GetGainBits(EGainPrecision gainPrecisionSelection)
+        {
+            var gainDictionary = new Dictionary<EGainPrecision, (ushort gainBits, double gainLsbSize)>
+            {
+                { EGainPrecision.Range0, (0b0000_0000_0000_0000, 3) },
+                { EGainPrecision.Range1, (0b0000_0010_0000_0000, 2) },
+                { EGainPrecision.Range2, (0b0000_0100_0000_0000, 1) },
+                { EGainPrecision.Range3, (0b0000_0110_0000_0000, 0.5) },
+                { EGainPrecision.Range4, (0b0000_1000_0000_0000, 0.25) },
+                { EGainPrecision.Range5, (0b0000_1010_0000_0000, 0.125) }
+            };
+
+            if (!gainDictionary.TryGetValue(gainPrecisionSelection, out var gainTuple))
+                throw new ArgumentException(
+                    $"{nameof(gainDictionary)} does not have an entry for {nameof(gainPrecisionSelection)}={gainPrecisionSelection}.");
+
+            return gainTuple;
+        }
+
+        internal static ushort GetInputBits(EInputMux inputMuxSelection)
+        {
+            var inputDictionary = new Dictionary<EInputMux, ushort>
+            {
+                { EInputMux.Ain0, 0b0100_0000_0000_0000 },
+                { EInputMux.Ain1, 0b0101_0000_0000_0000 },
+                { EInputMux.Ain2, 0b0110_0000_0000_0000 },
+                { EInputMux.Ain3, 0b0111_0000_0000_0000 }
+            };
+
+            if (!inputDictionary.TryGetValue(inputMuxSelection, out var inputBits))
+                throw new ArgumentException(
+                    $"{nameof(inputDictionary)} does not have an entry for {nameof(inputMuxSelection)}={inputMuxSelection}.");
+
+            return inputBits;
+        }
+
+        public double ConfigAndMeasure(EInputMux inputMux, EGainPrecision gainPrecision)
+        {
+            // Config
+            var (gainBits, gainLsbSize) = GetGainBits(gainPrecision);
+            var inputBits = GetInputBits(inputMux);
+            const ushort commonBits = 0b1000_0001_1000_0011;
+            var regValue = (ushort)(commonBits | inputBits | gainBits);
+            WriteConfigRegister(regValue);
+            _log.Debug($" config      = {BinaryToString(regValue)}");
+
+            // Measure
             var conversion = ReadConversionRegister();
-            _log.Debug($" conversion  = {ToBinaryString(conversion)}");
+            _log.Debug($" conversion  = {BinaryToString(conversion)}");
 
-            // Remove 4 bits
+            // Remove 4 bits (to get actual value)
             var value = (ushort)(conversion >> 4);
-            _log.Debug($" value       = {ToBinaryString(value)}");
+            _log.Debug($" value       = {BinaryToString(value)}");
 
-            const double gain = 4.096; // from -2.048 to +2.048
-            const double scale = 4096;
-            var voltage = gain * value / scale;
-
+            // Convert to Voltage
+            var voltage = gainLsbSize * value / 1000;
             _log.Debug($" voltage     = {voltage}");
+
             return voltage;
         }
 
-        #region Bit Manipulations
-
-        private static string ToBinaryString(ushort number)
+        private static string BinaryToString(ushort number)
         {
             return Convert.ToString(number, 2).PadLeft(16, '0');
         }
-
-        #endregion
 
         /*
         public double MeasureCurrent(byte adc)
@@ -161,7 +211,6 @@ namespace TapExtensions.Steps.I2c.Devices
             return ConvertToCurrent(msb, lsb);
         }
         */
-
 
         private static double ConvertToCurrent(int msb, int lsb)
         {

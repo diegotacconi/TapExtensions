@@ -14,12 +14,18 @@ namespace TapExtensions.Steps.I2c.Devices
         [Unit("Hex", StringFormat: "X2")]
         public ushort DeviceAddress { get; set; } = 0x48;
 
+        [Display("Input Multiplexer", Order: 3)]
+        public Ads1015.EInputMux InputMux { get; set; } = Ads1015.EInputMux.Ain0;
+
+        [Display("Gain Precision", Order: 4)]
+        public Ads1015.EGainPrecision GainPrecision { get; set; } = Ads1015.EGainPrecision.Range2;
+
         public override void Run()
         {
             try
             {
                 var ads1015 = new Ads1015(I2CAdapter, DeviceAddress);
-                ads1015.Measure();
+                ads1015.ConfigAndMeasure(InputMux, GainPrecision);
                 UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)
