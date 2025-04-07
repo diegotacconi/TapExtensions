@@ -17,15 +17,15 @@ namespace TapExtensions.Steps.I2c.Devices
         [Display("Input Multiplexer", Order: 3)]
         public Ads1015.EInputMux InputMux { get; set; } = Ads1015.EInputMux.Ain0;
 
-        [Display("Gain Precision", Order: 4)]
-        public Ads1015.EGainPrecision GainPrecision { get; set; } = Ads1015.EGainPrecision.Range2;
+        [Display("Gain Resolution", Order: 4)]
+        public Ads1015.EGainResolution GainResolution { get; set; } = Ads1015.EGainResolution.Range2;
 
         public override void Run()
         {
             try
             {
                 var ads1015 = new Ads1015(I2CAdapter, DeviceAddress);
-                ads1015.ConfigAndMeasure(InputMux, GainPrecision);
+                ads1015.ConfigAndMeasure(InputMux, GainResolution);
                 UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)
