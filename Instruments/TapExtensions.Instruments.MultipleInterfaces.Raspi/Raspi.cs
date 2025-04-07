@@ -121,7 +121,6 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
             throw new NotImplementedException();
         }
 
-        // https://davemateer.com/2021/06/15/ssh-and-sftp-with-ssh-net
         public bool SendSshQuery(string command, int timeout, out string response)
         {
             if (_sshClient == null || !_sshClient.IsConnected)
@@ -136,8 +135,13 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
 
             OnActivity();
             response = cmd.Execute();
-            if (!string.IsNullOrWhiteSpace(response))
-                Log.Debug($"SSH << {response}");
+
+            var lines = response.Split(new[] { "\r\n", "\n\r", "\r", "\n" },
+                StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var line in lines)
+                if (!string.IsNullOrWhiteSpace(line))
+                    Log.Debug($"SSH << {line}");
 
             return cmd.ExitStatus == 0;
         }
