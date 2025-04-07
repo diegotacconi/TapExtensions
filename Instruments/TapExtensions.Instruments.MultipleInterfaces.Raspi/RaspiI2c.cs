@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenTap;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using TapExtensions.Interfaces.I2c;
@@ -96,7 +97,54 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
 
         public void Write(ushort slaveAddress, byte[] regAddress, byte[] command)
         {
-            throw new NotImplementedException();
+            /*
+                Usage: i2cset [-f] [-y] [-m MASK] [-r] [-a] I2CBUS CHIP-ADDRESS DATA-ADDRESS [VALUE] ... [MODE]
+                    I2CBUS is an integer or an I2C bus name
+                    ADDRESS is an integer (0x08 - 0x77, or 0x00 - 0x7f if -a is given)
+                    MODE is one of:
+                        c (byte, no value)
+                        b (byte data, default)
+                        w (word data)
+                        i (I2C block data)
+                        s (SMBus block data)
+                        Append p for SMBus PEC
+
+                Examples:
+                pi@lmi:~ $ sudo i2cset -y 1 0x48 0x01 0xc5 0x83 i
+                pi@lmi:~ $ sudo i2cget -y 1 0x48 0x01 i 2
+                0xc5 0x83
+                pi@lmi:~ $
+             */
+
+            if (slaveAddress <= 0)
+                throw new InvalidOperationException(
+                    $"I2C: {nameof(slaveAddress)} must be greater than zero.");
+
+            if (command == null)
+                throw new InvalidOperationException(
+                    $"I2C: {nameof(command)} cannot be null.");
+
+            if (regAddress == null)
+                throw new InvalidOperationException(
+                    $"{nameof(regAddress)} cannot be null.");
+
+            var dataAddress = regAddress.First();
+
+            var addressLength = Convert.ToUInt16(regAddress.Length);
+            var commandLength = Convert.ToUInt16(command.Length);
+            var addressPlusCommand = new byte[addressLength + commandLength];
+
+            for (var i = 0; i < addressLength; i++)
+                addressPlusCommand[i] = regAddress[i];
+
+            for (int i = addressLength; i < addressLength + commandLength; i++)
+                addressPlusCommand[i] = command[i - addressLength];
+
+            // I2CWrite(slaveAddress, addressPlusCommand, AardvarkI2cFlags.AA_I2C_NO_FLAGS);
+            // var status = AardvarkWrapper.net_aa_i2c_write(AardvarkHandle, slaveAddress, flags, commandLength, command);
+
+            // var myCommand = $"sudo i2cset -y {I2CBus} 0x{slaveAddress:X2} 0x{dataAddress:X2} i {numOfBytes}";
+            // SendSshQuery(myCommand, 5, out _);
         }
 
         #endregion
