@@ -1,6 +1,17 @@
 ﻿// Texas Instruments ADS1015 Precision ADC (Analog to Digital Converter)
 // https://www.ti.com/product/ADS1015
 
+/*
+    +------------------+---------------------------------------------------------+---------------------------------------------------------+---------------------------------+
+    |     Register     | bit15  bit14  bit13  bit12  bit11  bit10  bit9   bit8   | bit7   bit6   bit5   bit4   bit3   bit2   bit1   bit0   |      Default (Reset) Value      |
+    +------------------+---------------------------------------------------------+---------------------------------------------------------+---------------------------------+
+    | 00b : Conversion |                                                         |                                                         | 0000 0000 0000 0000 = 0x00 0x00 |
+    | 01b : Config     | OS     MUX2   MUX1   MUX0   PGA2   PGA1   PGA0   MODE   | DR2    DR1    DR2    C_MODE C_POL  C_PAT  C_QUE1 C_QUE0 | 1000 0101 1000 0011 = 0x85 0x83 |
+    | 10b : Lo_thresh  |                                                         |                                                         | 1000 0000 0000 0000 = 0x80 0x00 |
+    | 11b : Hi_thresh  |                                                         |                                                         | 0111 1111 1111 1111 = 0x7F 0xFF |
+    +------------------+---------------------------------------------------------+---------------------------------------------------------+---------------------------------+
+ */
+
 using System;
 using System.Collections.Generic;
 using OpenTap;
@@ -19,21 +30,6 @@ namespace TapExtensions.Steps.I2c.Devices
             _i2CAdapter = i2C;
             _deviceAddress = deviceAddress;
         }
-
-        #region Documentation
-
-        /*
-            +------------------+---------------------------------------------------------+---------------------------------------------------------+---------------------------------+
-            |     Register     | bit15  bit14  bit13  bit12  bit11  bit10  bit9   bit8   | bit7   bit6   bit5   bit4   bit3   bit2   bit1   bit0   |      Default (Reset) Value      |
-            +------------------+---------------------------------------------------------+---------------------------------------------------------+---------------------------------+
-            | 00b : Conversion |                                                         |                                                         | 0000 0000 0000 0000 = 0x00 0x00 |
-            | 01b : Config     | OS     MUX2   MUX1   MUX0   PGA2   PGA1   PGA0   MODE   | DR2    DR1    DR2    C_MODE C_POL  C_PAT  C_QUE1 C_QUE0 | 1000 0101 1000 0011 = 0x85 0x83 |
-            | 10b : Lo_thresh  |                                                         |                                                         | 1000 0000 0000 0000 = 0x80 0x00 |
-            | 11b : Hi_thresh  |                                                         |                                                         | 0111 1111 1111 1111 = 0x7F 0xFF |
-            +------------------+---------------------------------------------------------+---------------------------------------------------------+---------------------------------+
-        */
-
-        #endregion
 
         /// <summary> Programmable Gain Amplifier (PGA) with input ranges from ±256mV to ±6.144V </summary>
         public enum EGainResolution
@@ -55,15 +51,15 @@ namespace TapExtensions.Steps.I2c.Devices
             [Display("AINp = AIN3 and AINn = GND")] Ain3
         }
 
-        public double ConfigAndMeasure(EInputMux inputMux, EGainResolution gainResolution)
+        public double MeasureVoltage(EInputMux inputMux, EGainResolution gainResolution)
         {
             // Config
             var (gainBits, gainLsbSize) = GetGainBits(gainResolution);
             var inputBits = GetInputBits(inputMux);
             const ushort commonBits = 0b1000_0001_1000_0011;
             var regValue = (ushort)(commonBits | inputBits | gainBits);
-            WriteConfigRegister(regValue);
             _log.Debug($" config      = {BinaryToString(regValue)}");
+            WriteConfigRegister(regValue);
 
             // Measure
             var conversion = ReadConversionRegister();
@@ -91,7 +87,10 @@ namespace TapExtensions.Steps.I2c.Devices
 
             var msb = bytes[0];
             var lsb = bytes[1];
-            return ConvertToCurrent(msb, lsb);
+            var value = (uint)((msb << 4) + (lsb >> 4));
+            const double gain = 1.63;
+            var current = gain * value / 1000;
+            return current;
         }
         */
 
@@ -154,14 +153,6 @@ namespace TapExtensions.Steps.I2c.Devices
         private static string BinaryToString(ushort number)
         {
             return Convert.ToString(number, 2).PadLeft(16, '0');
-        }
-
-        private static double ConvertToCurrent(int msb, int lsb)
-        {
-            var value = (uint)((msb << 4) + (lsb >> 4));
-            const double gain = 1.63;
-            var current = gain * value / 1000;
-            return current;
         }
 
         private ushort ReadRegister(byte[] regAddress)

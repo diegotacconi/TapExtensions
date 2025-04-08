@@ -4,9 +4,9 @@ using TapExtensions.Interfaces.I2c;
 
 namespace TapExtensions.Steps.I2c.Devices
 {
-    [Display("Ads1015Measure",
+    [Display("Ads1015MeasureVoltage",
         Groups: new[] { "TapExtensions", "Steps", "I2c", "Devices" })]
-    public class Ads1015Measure : TestStep
+    public class Ads1015MeasureVoltage : TestStep
     {
         [Display("I2C Adapter", Order: 1)] public II2C I2CAdapter { get; set; }
 
@@ -25,7 +25,7 @@ namespace TapExtensions.Steps.I2c.Devices
             try
             {
                 var ads1015 = new Ads1015(I2CAdapter, DeviceAddress);
-                ads1015.ConfigAndMeasure(InputMux, GainResolution);
+                ads1015.MeasureVoltage(InputMux, GainResolution);
                 UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)

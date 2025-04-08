@@ -1,7 +1,22 @@
-﻿using OpenTap;
+﻿/*
+   Usage:
+     i2cget [-f] [-y] [-a] I2CBUS CHIP-ADDRESS [DATA-ADDRESS [MODE [LENGTH]]]
+
+   Examples:
+     $ sudo i2cget -y 1 0x48 0x01 i 2
+     0x85 0x83
+
+   Usage:
+     i2cset [-f] [-y] [-m MASK] [-r] [-a] I2CBUS CHIP-ADDRESS DATA-ADDRESS [VALUE] ... [MODE]
+
+   Examples:
+     $ sudo i2cset -y 1 0x48 0x01 0xc5 0x83 i
+ */
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using TapExtensions.Interfaces.I2c;
 
 namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
@@ -19,30 +34,6 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
 
         public byte[] Read(ushort slaveAddress, ushort numOfBytes, byte[] regAddress)
         {
-            /*
-                Usage: i2cget [-f] [-y] [-a] I2CBUS CHIP-ADDRESS [DATA-ADDRESS [MODE [LENGTH]]]
-                    I2CBUS is an integer or an I2C bus name
-                    ADDRESS is an integer (0x08 - 0x77, or 0x00 - 0x7f if -a is given)
-                    MODE is one of:
-                        b (read byte data, default)
-                        w (read word data)
-                        c (write byte/read byte)
-                        s (read SMBus block data)
-                        i (read I2C block data)
-                        Append p for SMBus PEC
-                    LENGTH is the I2C block data length (between 1 and 32, default 32)
-
-                Examples:
-                    pi@lmi:~ $ i2cget -y 1 0x48 0x00 i 2
-                    0x00 0x00
-                    pi@lmi:~ $ i2cget -y 1 0x48 0x01 i 2
-                    0x85 0x83
-                    pi@lmi:~ $ i2cget -y 1 0x48 0x02 i 2
-                    0x80 0x00
-                    pi@lmi:~ $ i2cget -y 1 0x48 0x03 i 2
-                    0x7f 0xff
-             */
-
             if (slaveAddress <= 0)
                 throw new InvalidOperationException(
                     $"{nameof(slaveAddress)} must be greater than zero.");
@@ -56,8 +47,8 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
                     $"{nameof(regAddress)} cannot be null.");
 
             var dataAddress = regAddress.First();
-            var command = $"sudo i2cget -y {I2CBus} 0x{slaveAddress:X2} 0x{dataAddress:X2} i {numOfBytes}";
-            SendSshQuery(command, 5, out var response);
+            var sshCommand = $"sudo i2cget -y {I2CBus} 0x{slaveAddress:X2} 0x{dataAddress:X2} i {numOfBytes}";
+            SendSshQuery(sshCommand, 5, out var response);
 
             if (string.IsNullOrWhiteSpace(response))
                 throw new InvalidOperationException("No response");
@@ -97,57 +88,35 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
 
         public void Write(ushort slaveAddress, byte[] regAddress, byte[] command)
         {
-            /*
-                Usage: i2cset [-f] [-y] [-m MASK] [-r] [-a] I2CBUS CHIP-ADDRESS DATA-ADDRESS [VALUE] ... [MODE]
-                    I2CBUS is an integer or an I2C bus name
-                    ADDRESS is an integer (0x08 - 0x77, or 0x00 - 0x7f if -a is given)
-                    MODE is one of:
-                        c (byte, no value)
-                        b (byte data, default)
-                        w (word data)
-                        i (I2C block data)
-                        s (SMBus block data)
-                        Append p for SMBus PEC
-
-                Examples:
-                pi@lmi:~ $ sudo i2cset -y 1 0x48 0x01 0xc5 0x83 i
-                pi@lmi:~ $ sudo i2cget -y 1 0x48 0x01 i 2
-                0xc5 0x83
-                pi@lmi:~ $
-             */
-
             if (slaveAddress <= 0)
                 throw new InvalidOperationException(
-                    $"I2C: {nameof(slaveAddress)} must be greater than zero.");
-
-            if (command == null)
-                throw new InvalidOperationException(
-                    $"I2C: {nameof(command)} cannot be null.");
+                    $"{nameof(slaveAddress)} must be greater than zero.");
 
             if (regAddress == null)
                 throw new InvalidOperationException(
                     $"{nameof(regAddress)} cannot be null.");
 
-            var dataAddress = regAddress.First();
+            if (command == null)
+                throw new InvalidOperationException(
+                    $"{nameof(command)} cannot be null.");
 
-            var addressLength = Convert.ToUInt16(regAddress.Length);
+            var regAddressLength = Convert.ToUInt16(regAddress.Length);
             var commandLength = Convert.ToUInt16(command.Length);
-            var addressPlusCommand = new byte[addressLength + commandLength];
+            var regAddressPlusCommand = new byte[regAddressLength + commandLength];
 
-            for (var i = 0; i < addressLength; i++)
-                addressPlusCommand[i] = regAddress[i];
+            for (var i = 0; i < regAddressLength; i++)
+                regAddressPlusCommand[i] = regAddress[i];
 
-            for (int i = addressLength; i < addressLength + commandLength; i++)
-                addressPlusCommand[i] = command[i - addressLength];
+            for (int i = regAddressLength; i < regAddressLength + commandLength; i++)
+                regAddressPlusCommand[i] = command[i - regAddressLength];
 
-            // I2CWrite(slaveAddress, addressPlusCommand, AardvarkI2cFlags.AA_I2C_NO_FLAGS);
-            // var status = AardvarkWrapper.net_aa_i2c_write(AardvarkHandle, slaveAddress, flags, commandLength, command);
-
-            // var myCommand = $"sudo i2cset -y {I2CBus} 0x{slaveAddress:X2} 0x{dataAddress:X2} i {numOfBytes}";
-            // SendSshQuery(myCommand, 5, out _);
+            var sshCommand = $"sudo i2cset -y {I2CBus} 0x{slaveAddress:X2} {BytesToHexString(regAddressPlusCommand)} i";
+            SendSshQuery(sshCommand, 5, out _);
         }
 
         #endregion
+
+        #region Private Methods
 
         private static byte[] HexStringToBytes(string hexValues)
         {
@@ -172,5 +141,16 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
 
             return bytes.ToArray();
         }
+
+        private static string BytesToHexString(byte[] bytes)
+        {
+            var hex = new StringBuilder();
+            foreach (var b in bytes)
+                hex.AppendFormat("0x{0:X2} ", b);
+
+            return hex.ToString().Trim();
+        }
+
+        #endregion
     }
 }
