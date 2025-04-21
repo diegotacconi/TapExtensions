@@ -15,18 +15,22 @@ namespace TapExtensions.Steps.SigGen
 
         [Display("Set Frequency", Order: 2, Group: "Parameters")]
         [Unit("MHz")]
-        public double FrequencyMhz { get; set; } = 1000;
+        public Enabled<double> FrequencyMhz { get; set; } = new Enabled<double> { IsEnabled = true, Value = 1000 };
 
         [Display("Set Amplitude", Order: 3, Group: "Parameters")]
         [Unit("dBm")]
-        public double AmplitudeDbm { get; set; } = 0;
+        public Enabled<double> AmplitudeDbm { get; set; } = new Enabled<double> { IsEnabled = true, Value = 0 };
 
         public override void Run()
         {
             try
             {
-                SigGen.SetFrequency(FrequencyMhz);
-                SigGen.SetOutputLevel(AmplitudeDbm);
+                if (FrequencyMhz.IsEnabled)
+                    SigGen.SetFrequency(FrequencyMhz.Value);
+
+                if (AmplitudeDbm.IsEnabled)
+                    SigGen.SetOutputLevel(AmplitudeDbm.Value);
+
                 SigGen.SetRfOutputState(EState.On);
                 UpgradeVerdict(Verdict.Pass);
             }
