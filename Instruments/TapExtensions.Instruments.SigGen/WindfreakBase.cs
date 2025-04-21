@@ -13,6 +13,7 @@ namespace TapExtensions.Instruments.SigGen
             Description: "Examples:\n" +
                          " USB\\VID_16D0&PID_0557\\004571\n" +
                          " USB\\VID_16D0&PID_0557\n" +
+                         " USB\\VID_0483&PID_A3E8\n" +
                          " COM5")]
         public string ConnectionAddress { get; set; }
 
@@ -63,10 +64,10 @@ namespace TapExtensions.Instruments.SigGen
             {
                 PortName = portName,
                 BaudRate = 9600, // Not applicable
-                Parity = Parity.None,
-                DataBits = 8,
-                StopBits = StopBits.One,
-                Handshake = Handshake.RequestToSend,
+                Parity = Parity.None, // Not applicable
+                DataBits = 8, // Not applicable
+                StopBits = StopBits.One, // Not applicable
+                Handshake = Handshake.RequestToSend, // Not applicable
                 ReadTimeout = 2000,
                 WriteTimeout = 2000,
                 DtrEnable = true,
