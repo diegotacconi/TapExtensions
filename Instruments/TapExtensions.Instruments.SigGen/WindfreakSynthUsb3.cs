@@ -35,7 +35,7 @@ namespace TapExtensions.Instruments.SigGen
         {
             // Default values
             Name = "SynthUsb3";
-            ConnectionAddress = @"USB\VID_16D0&PID_0000"; // ToDo: PID
+            ConnectionAddress = @"USB\VID_0483&PID_A3E8";
             // Validation rules
             Rules.Add(ValidateConnectionAddress, "Not valid", nameof(ConnectionAddress));
         }
@@ -87,10 +87,8 @@ namespace TapExtensions.Instruments.SigGen
             lock (InstLock)
             {
                 var response = SerialQuery("f?");
-                if (!double.TryParse(response, out var freqKhz))
+                if (!double.TryParse(response, out freqMhz))
                     throw new InvalidOperationException($"Unable to parse response of '{response}'");
-
-                freqMhz = freqKhz * 0.001;
             }
 
             return freqMhz;
@@ -112,7 +110,23 @@ namespace TapExtensions.Instruments.SigGen
 
         public EState GetRfOutputState()
         {
-            throw new NotImplementedException();
+            lock (InstLock)
+            {
+                // Get output state (On=1 / Off=0)
+                var response = SerialQuery("E?");
+
+                switch (response)
+                {
+                    case string a when a.Contains("1"):
+                        return EState.On;
+
+                    case string b when b.Contains("0"):
+                        return EState.Off;
+
+                    default:
+                        throw new InvalidOperationException("Unable to get the RF output state");
+                }
+            }
         }
 
         public void SetFrequency(double frequencyMhz)
@@ -176,7 +190,37 @@ namespace TapExtensions.Instruments.SigGen
 
         public void SetRfOutputState(EState state)
         {
-            throw new NotImplementedException();
+            lock (InstLock)
+            {
+                if (state == EState.On)
+                {
+                    // Set output state
+                    SerialWrite("E1");
+
+                    // Check output state
+                    if (GetRfOutputState() != EState.On)
+                        throw new InvalidOperationException("Unable to set the RF output state to On");
+
+                    // Check phase lock status (lock=1 / unlock=0)
+                    if (!SerialQuery("p").Contains("1"))
+                        throw new InvalidOperationException("Unable to set the RF output state to On (phase unlocked)");
+                }
+                else
+                {
+                    // Set output state
+                    SerialWrite("E0");
+
+                    // Check output state
+                    if (GetRfOutputState() != EState.Off)
+                        throw new InvalidOperationException("Unable to set the RF output state to Off");
+
+                    // Check phase lock status (lock=1 / unlock=0)
+                    if (!SerialQuery("p").Contains("0"))
+                        throw new InvalidOperationException("Unable to set the RF output state to Off (phase locked)");
+                }
+
+                Log.Debug($"Set RF output state to {state}");
+            }
         }
     }
 }
