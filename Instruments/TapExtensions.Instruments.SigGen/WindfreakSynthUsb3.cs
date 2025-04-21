@@ -35,7 +35,7 @@ namespace TapExtensions.Instruments.SigGen
         {
             // Default values
             Name = "SynthUsb3";
-            ConnectionAddress = @"USB\VID_0483&PID_A3E8";
+            ConnectionAddress = @"USB\VID_1209&PID_6669; USB\VID_0483&PID_A3E8";
             // Validation rules
             Rules.Add(ValidateConnectionAddress, "Not valid", nameof(ConnectionAddress));
         }
@@ -147,7 +147,7 @@ namespace TapExtensions.Instruments.SigGen
 
                 // Check self-calibration
                 if (!SerialQuery("V").Contains("1"))
-                    throw new InvalidOperationException("Self-calibration failed (output not leveled)");
+                    Log.Warning("Self-calibration failed (output not leveled), when setting the frequency");
 
                 const double tolerance = 1e-7;
                 if (Math.Abs(frequencyMhz - freqReplyMhz) > tolerance)
@@ -175,9 +175,13 @@ namespace TapExtensions.Instruments.SigGen
                 // Check amplitude
                 var replyDbm = GetOutputLevel();
 
+                // Show raw VGA DAC value, where 0 is minimal gain and 63 is maximum gain. Response is non-linear.
+                SerialQuery("a?");
+
                 // Check self-calibration
                 if (!SerialQuery("V").Contains("1"))
-                    throw new InvalidOperationException("Self-calibration failed (output not leveled)");
+                    throw new InvalidOperationException(
+                        "Self-calibration failed (output not leveled), when setting the amplitude");
 
                 if (Math.Abs(outputLevelDbm - replyDbm) > AmplitudeResolution)
                     Log.Warning($"Set amplitude to {replyDbm} dBm, with a amplitude error of " +
