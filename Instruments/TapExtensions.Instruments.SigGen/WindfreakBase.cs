@@ -13,6 +13,7 @@ namespace TapExtensions.Instruments.SigGen
             Description: "Examples:\n" +
                          " USB\\VID_16D0&PID_0557\\004571\n" +
                          " USB\\VID_16D0&PID_0557\n" +
+                         " USB\\VID_1209&PID_6669\n" +
                          " USB\\VID_0483&PID_A3E8\n" +
                          " COM5")]
         public string ConnectionAddress { get; set; }
