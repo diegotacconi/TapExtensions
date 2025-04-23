@@ -10,6 +10,9 @@
   <Files>
 
     <!-- DLL files -->
+    <File Path="Packages/TapExtensions/TapExtensions.Duts.RadioShell.dll" SourcePath="TapExtensions.Duts.RadioShell.dll">
+      <SetAssemblyInfo Attributes="Version" />
+    </File>
     <File Path="Packages/TapExtensions/TapExtensions.Duts.Ssh.dll" SourcePath="TapExtensions.Duts.Ssh.dll">
       <SetAssemblyInfo Attributes="Version" />
     </File>
@@ -23,6 +26,9 @@
       <SetAssemblyInfo Attributes="Version" />
     </File>
     <File Path="Packages/TapExtensions/TapExtensions.Instruments.DcPwr.dll" SourcePath="TapExtensions.Instruments.DcPwr.dll">
+      <SetAssemblyInfo Attributes="Version" />
+    </File>
+    <File Path="Packages/TapExtensions/TapExtensions.Instruments.Gpio.dll" SourcePath="TapExtensions.Instruments.Gpio.dll">
       <SetAssemblyInfo Attributes="Version" />
     </File>
     <File Path="Packages/TapExtensions/TapExtensions.Instruments.MultipleInterfaces.Aardvark.dll" SourcePath="TapExtensions.Instruments.MultipleInterfaces.Aardvark.dll">
@@ -55,25 +61,6 @@
     <File Path="Packages/TapExtensions/TapExtensions.Steps.dll" SourcePath="TapExtensions.Steps.dll">
       <SetAssemblyInfo Attributes="Version" />
     </File>
-
-    <!-- PDB files -->
-    <!--
-    <File Path="Packages/TapExtensions/TapExtensions.Duts.Ssh.pdb" SourcePath="TapExtensions.Duts.Ssh.pdb" />
-    <File Path="Packages/TapExtensions/TapExtensions.Duts.Uart.pdb" SourcePath="TapExtensions.Duts.Uart.pdb" />
-    <File Path="Packages/TapExtensions/TapExtensions.Gui.Wpf.pdb" SourcePath="TapExtensions.Gui.Wpf.pdb" />
-    <File Path="Packages/TapExtensions/TapExtensions.Instruments.BarcodeScanner.pdb" SourcePath="TapExtensions.Instruments.BarcodeScanner.pdb" />
-    <File Path="Packages/TapExtensions/TapExtensions.Instruments.DcPwr.pdb" SourcePath="TapExtensions.Instruments.DcPwr.pdb" />
-    <File Path="Packages/TapExtensions/TapExtensions.Instruments.MultipleInterfaces.Aardvark.pdb" SourcePath="TapExtensions.Instruments.MultipleInterfaces.Aardvark.pdb" />
-    <File Path="Packages/TapExtensions/TapExtensions.Instruments.MultipleInterfaces.Raspi.pdb" SourcePath="TapExtensions.Instruments.MultipleInterfaces.Raspi.pdb" />
-    <File Path="Packages/TapExtensions/TapExtensions.Instruments.SigGen.pdb" SourcePath="TapExtensions.Instruments.SigGen.pdb" />
-    <File Path="Packages/TapExtensions/TapExtensions.Interfaces.pdb" SourcePath="TapExtensions.Interfaces.pdb" />
-    <File Path="Packages/TapExtensions/TapExtensions.Results.ZipFile.pdb" SourcePath="TapExtensions.Results.ZipFile.pdb" />
-    <File Path="Packages/TapExtensions/TapExtensions.Settings.Integrity.pdb" SourcePath="TapExtensions.Settings.Integrity.pdb" />
-    <File Path="Packages/TapExtensions/TapExtensions.Shared.pdb" SourcePath="TapExtensions.Shared.pdb" />
-    <File Path="Packages/TapExtensions/TapExtensions.Shared.SystemManagement.pdb" SourcePath="TapExtensions.Shared.SystemManagement.pdb" />
-    <File Path="Packages/TapExtensions/TapExtensions.Shared.Telnet.pdb" SourcePath="TapExtensions.Shared.Telnet.pdb" />
-    <File Path="Packages/TapExtensions/TapExtensions.Steps.pdb" SourcePath="TapExtensions.Steps.pdb" />
-    -->
   </Files>
 
 </Package>

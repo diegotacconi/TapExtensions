@@ -29,11 +29,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Duts\TapExtensions.Duts.RadioShell\TapExtensions.Duts.RadioShell.csproj" />
     <ProjectReference Include="..\..\Duts\TapExtensions.Duts.Ssh\TapExtensions.Duts.Ssh.csproj" />
     <ProjectReference Include="..\..\Duts\TapExtensions.Duts.Uart\TapExtensions.Duts.Uart.csproj" />
     <ProjectReference Include="..\..\Gui\TapExtensions.Gui.Wpf\TapExtensions.Gui.Wpf.csproj" />
     <ProjectReference Include="..\..\Instruments\TapExtensions.Instruments.BarcodeScanner\TapExtensions.Instruments.BarcodeScanner.csproj" />
     <ProjectReference Include="..\..\Instruments\TapExtensions.Instruments.DcPwr\TapExtensions.Instruments.DcPwr.csproj" />
+    <ProjectReference Include="..\..\Instruments\TapExtensions.Instruments.Gpio\TapExtensions.Instruments.Gpio.csproj" />
     <ProjectReference Include="..\..\Instruments\TapExtensions.Instruments.MultipleInterfaces.Aardvark\TapExtensions.Instruments.MultipleInterfaces.Aardvark.csproj" />
     <ProjectReference Include="..\..\Instruments\TapExtensions.Instruments.MultipleInterfaces.Raspi\TapExtensions.Instruments.MultipleInterfaces.Raspi.csproj" />
     <ProjectReference Include="..\..\Instruments\TapExtensions.Instruments.SigGen\TapExtensions.Instruments.SigGen.csproj" />
