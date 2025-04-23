@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35931.197 d17.13
+VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Steps", "Steps", "{38ABC1DA-7E70-4598-B0E0-FBB77F9F05B3}"
 EndProject
@@ -55,7 +55,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Shared.Telnet
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Instruments.Gpio", "Instruments\TapExtensions.Instruments.Gpio\TapExtensions.Instruments.Gpio.csproj", "{1EE2DB7D-936D-413B-B5D9-B838EF45C3C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TapExtensions.Duts.CustomShell", "Duts\TapExtensions.Duts.CustomShell\TapExtensions.Duts.CustomShell.csproj", "{305F9913-9549-420D-99AF-F00EF7B53D26}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TapExtensions.Duts.RadioShell", "Duts\TapExtensions.Duts.RadioShell\TapExtensions.Duts.RadioShell.csproj", "{E4F1B73D-98B8-DE66-3797-32A1AF101C52}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -131,10 +131,10 @@ Global
 		{1EE2DB7D-936D-413B-B5D9-B838EF45C3C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1EE2DB7D-936D-413B-B5D9-B838EF45C3C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1EE2DB7D-936D-413B-B5D9-B838EF45C3C5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{305F9913-9549-420D-99AF-F00EF7B53D26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{305F9913-9549-420D-99AF-F00EF7B53D26}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{305F9913-9549-420D-99AF-F00EF7B53D26}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{305F9913-9549-420D-99AF-F00EF7B53D26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4F1B73D-98B8-DE66-3797-32A1AF101C52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4F1B73D-98B8-DE66-3797-32A1AF101C52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4F1B73D-98B8-DE66-3797-32A1AF101C52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4F1B73D-98B8-DE66-3797-32A1AF101C52}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -157,7 +157,7 @@ Global
 		{5FF88E2D-5A71-41C1-AB80-77A0045635A7} = {798B7510-669C-4A94-B74E-ADE8EC0F2319}
 		{39D9CFA4-8896-4B95-9222-54F7602880D6} = {34D8FC14-432B-43CC-BD77-697BD2B86294}
 		{1EE2DB7D-936D-413B-B5D9-B838EF45C3C5} = {6536E8DB-FFA1-4E97-91E7-DBA37839B386}
-		{305F9913-9549-420D-99AF-F00EF7B53D26} = {A21FD5A5-C473-4C8C-B929-A658A40020B4}
+		{E4F1B73D-98B8-DE66-3797-32A1AF101C52} = {A21FD5A5-C473-4C8C-B929-A658A40020B4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4A1F67F2-6AC5-4761-9B2F-17DE13AAFB3B}

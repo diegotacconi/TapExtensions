@@ -105,6 +105,11 @@ namespace TapExtensions.Duts.Ssh
             IsConnected = false;
         }
 
+        public bool Ping(uint timeOutMs, uint pingRetryIntervalMs, uint requiredConsecutiveReplies)
+        {
+            throw new NotImplementedException();
+        }
+
         private void ScpConnect()
         {
             if (_scpClient == null)

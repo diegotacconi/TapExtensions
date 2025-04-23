@@ -11,6 +11,8 @@ namespace TapExtensions.Interfaces.Ssh
 
         void Disconnect();
 
+        bool Ping(uint timeOutMs, uint pingRetryIntervalMs, uint requiredConsecutiveReplies);
+
         void UploadFiles(List<(string localFile, string remoteFile)> files);
 
         void DownloadFiles(List<(string remoteFile, string localFile)> files);
