@@ -234,6 +234,8 @@ namespace TapExtensions.Duts.RadioShell
                     throw new FileNotFoundException($"The file {localFile} could not be found");
 
                 Log.Debug($"SCP uploading file from PC {localFile} to DUT {remoteFile}");
+
+                OnActivity();
                 ScpClient.Upload(new FileInfo(localFile), remoteFile);
             }
         }
@@ -253,6 +255,8 @@ namespace TapExtensions.Duts.RadioShell
                     throw new InvalidOperationException("Remote filename cannot be empty");
 
                 Log.Debug($"SCP downloading file from DUT {remoteFile} to PC {localFile}");
+
+                OnActivity();
                 ScpClient.Download(remoteFile, new FileInfo(localFile));
             }
         }
@@ -262,9 +266,45 @@ namespace TapExtensions.Duts.RadioShell
             VerifySshConnection();
             var sshCommand = SshClient.CreateCommand(command);
             sshCommand.CommandTimeout = new TimeSpan(0, 0, 0, timeout, 0);
+
+            if (VerboseLoggingEnabled)
+                Log.Debug($"SSH >> {sshCommand.CommandText}");
+
+            OnActivity();
             sshCommand.Execute();
             response = sshCommand.Result;
+
+            foreach (var msg in GetLogMessages(response))
+                Log.Debug($"SSH << {msg}");
+
             return sshCommand.ExitStatus == 0;
+        }
+
+        private static List<string> GetLogMessages(string paragraph)
+        {
+            var messages = new List<string>();
+
+            // Split into lines
+            var lines = paragraph.Split(new[] { "\r\n", "\n\r", "\r", "\n" },
+                StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var line in lines)
+            {
+                if (string.IsNullOrWhiteSpace(line))
+                    continue; // Go to the next foreach line
+
+                // Remove ANSI escape codes from log message
+                var msg = Regex.Replace(line, @"\x1B\[[^@-~]*[@-~]", "", RegexOptions.Compiled);
+
+                // Truncate long message to a maximum sting length
+                const int maxLength = 500;
+                if (msg.Length > maxLength)
+                    msg = msg.Substring(0, maxLength) + "***";
+
+                messages.Add(msg);
+            }
+
+            return messages;
         }
 
         internal virtual void ConnectSsh()

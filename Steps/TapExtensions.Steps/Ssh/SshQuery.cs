@@ -31,6 +31,8 @@ namespace TapExtensions.Steps.Ssh
             Timeout = 5;
 
             // Validation rules
+            Rules.Add(() => !string.IsNullOrEmpty(Command),
+                "Command cannot be empty", nameof(Command));
             Rules.Add(() => Timeout >= 0,
                 "Must be greater than or equal to zero", nameof(Timeout));
         }
