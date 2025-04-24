@@ -54,6 +54,7 @@ namespace TapExtensions.Duts.RadioShell
 
         public RadioShellDut()
         {
+            Name = nameof(RadioShellDut);
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             InitializedRadioHashSet = new HashSet<string>();
         }
@@ -71,7 +72,7 @@ namespace TapExtensions.Duts.RadioShell
                     throw new TimeoutException("Ping timed out!");
             }
 
-            CreateRadioAccess(DutUserName, DutPassword, Port, TimeoutMs, VerboseLogging);
+            CreateRadioAccess(Username, Password, Port, TimeoutMs, VerboseLoggingEnabled);
             if (DutRadioAccess == null)
                 throw new InvalidOperationException($"{nameof(DutRadioAccess)} is null!");
             DutRadioAccess.Connect(DutIp, Port);
@@ -85,10 +86,10 @@ namespace TapExtensions.Duts.RadioShell
             {
                 DutUserName = userName,
                 DutPassword = password,
-                VerboseLogging = VerboseLogging,
+                VerboseLogging = VerboseLoggingEnabled,
                 CommandSendTimeoutMs = timeOut,
                 OpenTimeoutMs = RadioOpenTimeoutMs,
-                SshKeepAlive = new TimeSpan(0, 0, 0, 0, SshKeepAliveMs),
+                SshKeepAlive = new TimeSpan(0, 0, 0, SshKeepAliveInterval, 0),
                 ConnectionRetryDelay = RadioOpenRetryDelay,
                 DutCommandPromptRegex = CommandPromptRegex
             };
@@ -146,8 +147,6 @@ namespace TapExtensions.Duts.RadioShell
 
         #region ISecureShell
 
-        protected const string ConnectionSetting = "DUT Setting";
-
         public override void Open()
         {
             IsConnected = false;
@@ -202,20 +201,16 @@ namespace TapExtensions.Duts.RadioShell
         public virtual void Connect()
         {
             Disconnect();
-            if (ConnectionTypes.Equals(EDutConnectionTypes.None))
-                return;
-            if (ConnectionTypes.HasFlag(EDutConnectionTypes.Ssh))
-                ConnectSsh();
-            if (ConnectionTypes.HasFlag(EDutConnectionTypes.Scp))
-                ConnectScp();
-            if (ConnectionTypes.HasFlag(EDutConnectionTypes.Sftp))
-                throw new InvalidOperationException("SFTP connection not implemented");
+
+            ConnectSsh();
+            ConnectScp();
+
             IsConnected = true;
         }
 
         public virtual void Disconnect()
         {
-            if (VerboseLogging)
+            if (VerboseLoggingEnabled)
                 Log.Debug($"Disconnecting SSH and SCP from {DutIp}.");
             SshClient?.Disconnect();
             ScpClient?.Disconnect();
@@ -275,8 +270,8 @@ namespace TapExtensions.Duts.RadioShell
         internal virtual void ConnectSsh()
         {
             var connectTimeoutSw = new Stopwatch();
-            SshClient = new SshClient(DutIp, DutUserName, DutPassword);
-            SshClient.KeepAliveInterval = new TimeSpan(0, 0, 0, 0, SshKeepAliveMs);
+            SshClient = new SshClient(DutIp, Username, Password);
+            SshClient.KeepAliveInterval = new TimeSpan(0, 0, 0, SshKeepAliveInterval, 0);
             connectTimeoutSw.Start();
             Log.Debug($"Open SSH connection to {DutIp}");
             do
@@ -299,8 +294,8 @@ namespace TapExtensions.Duts.RadioShell
         internal virtual void ConnectScp()
         {
             var connectTimeoutSw = new Stopwatch();
-            ScpClient = new ScpClient(DutIp, DutUserName, DutPassword);
-            ScpClient.KeepAliveInterval = new TimeSpan(0, 0, 0, 0, SshKeepAliveMs);
+            ScpClient = new ScpClient(DutIp, Username, Password);
+            ScpClient.KeepAliveInterval = new TimeSpan(0, 0, 0, SshKeepAliveInterval, 0);
             ScpClient.OperationTimeout = new TimeSpan(0, 0, 0, 0, ScpOperationTimeout);
             connectTimeoutSw.Start();
             Log.Debug($"Open SCP connection to {DutIp}");
@@ -338,7 +333,7 @@ namespace TapExtensions.Duts.RadioShell
         [XmlIgnore] public SshClient SshClient { get; set; }
         [XmlIgnore] public ScpClient ScpClient { get; set; }
 
-        [Display("DUT IP", Group: ConnectionSetting, Order: 1)]
+        [Display("IP Address", Group: "SSH Settings", Order: 1)]
         public virtual string DutIp { get; set; }
 
         [XmlIgnore]
@@ -348,49 +343,36 @@ namespace TapExtensions.Duts.RadioShell
             set => DutIp = value;
         }
 
-        [Display("DUT Ssh port", Group: ConnectionSetting, Order: 2.2)]
+        [Display("Port", Group: "SSH Settings", Order: 2)]
         public virtual uint SshPort { get; set; }
 
-        [Display("DUT Ssh user name", Group: ConnectionSetting, Order: 3)]
-        public virtual string DutUserName { get; set; }
+        [Display("Username", Group: "SSH Settings", Order: 3)]
+        public virtual string Username { get; set; }
 
-        [Display("DUT Ssh user password", Group: ConnectionSetting, Order: 4)]
-        public virtual string DutPassword { get; set; }
+        [Display("Password", Group: "SSH Settings", Order: 4)]
+        public virtual string Password { get; set; }
 
-        [Display("SSH connection timeout.", Group: ConnectionSetting, Order: 4.1)]
+        [Display("SSH connection timeout.", Group: "SSH Settings", Order: 4.1)]
         [Unit("msec")]
         public virtual uint SshConnectionTimeout { get; set; } = 60000;
 
-        [Display("Ssh Connection Retry Delay", Group: ConnectionSetting,
+        [Display("Ssh Connection Retry Delay", Group: "SSH Settings",
             Description: "In case of connection establishment failure, set time delay to wait until" +
                          " SSH,SCP or SFTP connection establishment is retried.", Order: 4.14)]
         [Unit("msec")]
         public virtual uint SshConnectionRetryDelay { get; set; } = 5000;
 
-        [Display("DUT Ssh keep alive time", Group: ConnectionSetting, Order: 4.4)]
-        [Unit("msec")]
-        public virtual int SshKeepAliveMs { get; set; } = 5000;
+        [Display("Keep Alive Interval", Group: "SSH Settings", Order: 4.4)]
+        [Unit("s")]
+        public virtual int SshKeepAliveInterval { get; set; } = 5;
 
-        [Display("SCP operation timeout", Group: ConnectionSetting, Order: 4.5)]
+        [Display("SCP operation timeout", Group: "SSH Settings", Order: 4.5)]
         [Unit("msec")]
         public virtual int ScpOperationTimeout { get; set; } = 120000;
 
-        [Flags]
-        public enum EDutConnectionTypes
-        {
-            None = 0,
-            Ssh = 1,
-            Scp = 2,
-            Sftp = 4
-        }
-
-        [Display("Connection Types", Group: ConnectionSetting, Order: 4.6,
-            Description: "Type of connection that are opened.")]
-        public EDutConnectionTypes ConnectionTypes { get; set; } = EDutConnectionTypes.Scp | EDutConnectionTypes.Ssh;
-
-        [Display("Verbose Radio/SSH logging", Group: ConnectionSetting, Order: 99,
-            Description: "Enable Radio/SSH debug logging")]
-        public virtual bool VerboseLogging { get; set; } = false;
+        [Display("Verbose Logging", Group: "SSH Settings", Order: 99,
+            Description: "Enables verbose logging of SSH communication.")]
+        public virtual bool VerboseLoggingEnabled { get; set; } = false;
 
         #endregion
 
