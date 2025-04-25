@@ -45,8 +45,10 @@ jobs:
 
     - name: Setup DotNet
       uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '6.0.x'
 
-    - name: Display dotnet version
+    - name: Show DotNet Version
       run: dotnet --version
 
     - name: Install Dependencies
@@ -68,6 +70,9 @@ jobs:
 
     - name: Setup DotNet
       uses: actions/setup-dotnet@v4
+
+    - name: Show DotNet Version
+      run: dotnet --version
 
     - name: Install Dependencies
       run: dotnet restore
