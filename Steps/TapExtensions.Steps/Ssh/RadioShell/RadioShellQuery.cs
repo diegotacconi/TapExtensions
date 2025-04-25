@@ -12,18 +12,18 @@ namespace TapExtensions.Steps.Ssh.RadioShell
 
         [Display("Dut", Order: 1)] public IRadioShell Dut { get; set; }
 
-        [Display("Command", Order: 2)] public string Command { get; set; }
+        [Display("Radio Command", Order: 2)] public string RadioCommand { get; set; }
 
         #endregion
 
         public RadioShellQuery()
         {
             // Default values
-            Command = "";
+            RadioCommand = "";
 
             // Validation rules
-            Rules.Add(() => !string.IsNullOrEmpty(Command),
-                "Command cannot be empty", nameof(Command));
+            Rules.Add(() => !string.IsNullOrEmpty(RadioCommand),
+                "Command cannot be empty", nameof(RadioCommand));
         }
 
         public override void Run()
@@ -34,7 +34,7 @@ namespace TapExtensions.Steps.Ssh.RadioShell
 
             try
             {
-                Dut.SendRadioCommand(Command, out _);
+                Dut.SendRadioCommand(RadioCommand, out _);
                 UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)
