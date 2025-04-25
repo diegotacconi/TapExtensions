@@ -59,15 +59,15 @@ namespace TapExtensions.Duts.RadioShell
             InitializedRadioHashSet = new HashSet<string>();
         }
 
-        public virtual void ConnectDutRadio(uint timeOutInMs, uint successfulReplies)
+        public virtual void ConnectDutRadio(uint timeoutMs, uint minSuccessfulPingReplies)
         {
-            const uint pingIntervalMs = 1000;
+            const uint pingRetryIntervalMs = 1000;
             Log.Debug("--- ConnectDut ---");
             DutRadioAccess?.Close();
             IsConnected = false;
-            if (successfulReplies > 0)
+            if (minSuccessfulPingReplies > 0)
             {
-                var pingOk = Ping(timeOutInMs, pingIntervalMs, successfulReplies);
+                var pingOk = Ping(timeoutMs, pingRetryIntervalMs, minSuccessfulPingReplies);
                 if (!pingOk)
                     throw new TimeoutException("Ping timed out!");
             }
@@ -158,44 +158,65 @@ namespace TapExtensions.Duts.RadioShell
             base.Close();
         }
 
-        public virtual bool Ping(uint timeOutMs, uint pingRetryIntervalMs, uint requiredConsecutiveReplies)
+        public virtual bool Ping(uint timeoutMs, uint retryIntervalMs, uint minSuccessfulReplies)
         {
-            if (requiredConsecutiveReplies <= 0)
-                throw new ArgumentOutOfRangeException(nameof(requiredConsecutiveReplies));
+            if (minSuccessfulReplies <= 0)
+                throw new ArgumentOutOfRangeException(nameof(minSuccessfulReplies));
+
             var address = IPAddress.Parse(DutIp);
-            var keepOnPinging = true;
+            var pingOk = false;
             var pingOkReplies = 0;
             var timer = new Stopwatch();
 
             using (var pingSender = new Ping())
             {
-                Log.Debug("Ping for target DUT " + DutIp);
+                // Create a buffer of 32 bytes of data to be transmitted.
+                var buffer = Encoding.ASCII.GetBytes("12345678901234567890123456789012");
+
+                Log.Info($"Pinging {address}");
                 timer.Start();
-                do
+
+                while (timer.ElapsedMilliseconds < timeoutMs)
                 {
-                    var pingReply = pingSender.Send(address, 4000);
-                    if (pingReply?.Status == IPStatus.Success)
+                    // Use same timeout as in DOS prompt default, which is 4 seconds
+                    var pingReply = pingSender.Send(address, 4000, buffer);
+                    if (pingReply != null && pingReply.Status == IPStatus.Success)
                     {
-                        Log.Debug("Ping status: OK");
+                        // Ping success
+                        var roundtripTime = pingReply.RoundtripTime < 1 ? "<1ms" : $"={pingReply.RoundtripTime}ms";
+                        Log.Debug(
+                            $"Ping reply from {pingReply.Address}: bytes={pingReply.Buffer.Length} time{roundtripTime} TTL={pingReply.Options.Ttl}");
+
                         pingOkReplies++;
-                        if (pingOkReplies >= requiredConsecutiveReplies) return true;
+                        if (pingOkReplies >= minSuccessfulReplies)
+                        {
+                            pingOk = true;
+                            break;
+                        }
                     }
                     else
                     {
-                        if (pingReply?.Status == IPStatus.TimedOut)
-                            Log.Debug("Ping status: No success");
+                        // Ping failure
+                        if (pingReply != null)
+                        {
+                            // Convert camelCase to sentence with spaces
+                            var status = Regex.Replace(pingReply.Status.ToString(), "([A-Z0-9]+)", " $1").ToLower()
+                                .Trim();
+                            Log.Debug($"Ping request {status} (ping failed).");
+                        }
+                        else
+                        {
+                            Log.Debug("Ping request failed.");
+                        }
 
                         pingOkReplies = 0;
                     }
 
-                    TapThread.Sleep((int)pingRetryIntervalMs);
-
-                    if (timer.ElapsedMilliseconds > timeOutMs)
-                        keepOnPinging = false;
-                } while (keepOnPinging);
-
-                return false;
+                    TapThread.Sleep((int)retryIntervalMs);
+                }
             }
+
+            return pingOk;
         }
 
         public virtual void Connect()
@@ -368,7 +389,7 @@ namespace TapExtensions.Duts.RadioShell
             if (!ScpClient.IsConnected) throw new InvalidOperationException("Scp client not connected!");
         }
 
-        #region Dut Settings Properties
+        #region SSH Settings
 
         [XmlIgnore] public SshClient SshClient { get; set; }
         [XmlIgnore] public ScpClient ScpClient { get; set; }
@@ -410,7 +431,7 @@ namespace TapExtensions.Duts.RadioShell
         [Unit("msec")]
         public virtual int ScpOperationTimeout { get; set; } = 120000;
 
-        [Display("Verbose Logging", Group: "SSH Settings", Order: 99,
+        [Display("Verbose Logging", Group: "Debug", Order: 99, Collapsed: true,
             Description: "Enables verbose logging of SSH communication.")]
         public virtual bool VerboseLoggingEnabled { get; set; } = false;
 

@@ -13,20 +13,14 @@ namespace TapExtensions.Steps.Ssh.RadioShell
 
         [Display("Dut", Order: 1)] public ISecureShell Dut { get; set; }
 
-        [Display("Timeout", Order: 2,
-            Description: "Timeout  value in milliseconds. Defines how long we wait for successful connection.")]
-        [Unit("ms")]
-        public uint Timeout { get; set; } = 30000;
+        [Display("Ping Timeout", Order: 2)]
+        [Unit("s")]
+        public uint PingTimeout { get; set; } = 30;
 
         [Display("Min Ping Replies", Order: 3,
-            Description: "Minimum number of successful ping replies required for passing")]
+            Description: "Minimum number of successful consecutive ping replies")]
         [Unit("Pings")]
         public uint MinSuccessfulPingReplies { get; set; } = 4;
-
-        [Display("Ping interval", Order: 4,
-            Description: "Interval how quick another ping request is sent.")]
-        [Unit("ms")]
-        public uint PingInterval { get; set; } = 2000;
 
         #endregion
 
@@ -41,11 +35,14 @@ namespace TapExtensions.Steps.Ssh.RadioShell
 
             try
             {
-                if (Dut.Ping(Timeout, PingInterval, MinSuccessfulPingReplies))
+                var pingTimeoutMs = PingTimeout * 1000;
+                const uint pingRetryIntervalMs = 2000;
+
+                if (Dut.Ping(pingTimeoutMs, pingRetryIntervalMs, MinSuccessfulPingReplies))
                 {
                     Dut.Connect();
                     if (Dut is IRadioShell radioShell)
-                        radioShell.ConnectDutRadio(Timeout, 0);
+                        radioShell.ConnectDutRadio(pingTimeoutMs, 0);
                 }
 
                 if (!Dut.IsConnected)
