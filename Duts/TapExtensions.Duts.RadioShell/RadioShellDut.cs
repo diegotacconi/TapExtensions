@@ -457,7 +457,7 @@ namespace TapExtensions.Duts.RadioShell
         protected const string InPrefix = "<< ";
         protected const string OutPrefix = ">> ";
         private const string RadioReturnKeyword = "ret ";
-        private const string RadioShellClientOpenCmd = "radioShellClient localhost 2000";
+        private const string RadioShellClientOpenCmd = "/home/pi/radioShell.sh"; // radioShellClient localhost 2000
 
         private SshClient ClientSsh { get; set; }
         private ShellStream ShellStream { get; set; }
