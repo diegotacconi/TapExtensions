@@ -34,7 +34,7 @@ jobs:
 
 
   Build-Linux:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
 
     steps:
 
@@ -45,6 +45,9 @@ jobs:
 
     - name: Setup DotNet
       uses: actions/setup-dotnet@v4
+
+    - name: Display dotnet version
+      run: dotnet --version
 
     - name: Install Dependencies
       run: dotnet restore
