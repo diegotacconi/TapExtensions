@@ -2,7 +2,7 @@
 {
     public interface IRadioShell : ISecureShell
     {
-        void ConnectDutRadio(uint timeOutInMs, uint successfulReplies);
+        void ConnectDutRadio(uint timeoutMs, uint minSuccessfulPingReplies);
 
         IRadioAccess CreateRadioAccess(string userName, string password, uint port, uint timeOut, bool verboseLogging);
 
