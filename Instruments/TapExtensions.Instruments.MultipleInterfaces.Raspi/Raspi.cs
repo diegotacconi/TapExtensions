@@ -5,12 +5,13 @@ using System.Collections.Generic;
 using System.Net;
 using OpenTap;
 using Renci.SshNet;
+using TapExtensions.Interfaces.Ssh;
 
 namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
 {
     [Display("Raspberry Pi",
         Groups: new[] { "TapExtensions", "Instruments", "MultipleInterfaces" })]
-    public partial class Raspi : Instrument
+    public partial class Raspi : Instrument, ISshInstrument
     {
         #region Settings
 
@@ -99,6 +100,8 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
             IsConnected = false;
         }
 
+        #region SSH Interface Implementation
+
         public void Connect()
         {
             SshConnect();
@@ -145,6 +148,8 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
 
             return cmd.ExitStatus == 0;
         }
+
+        #endregion
 
         #region Private Methods
 
