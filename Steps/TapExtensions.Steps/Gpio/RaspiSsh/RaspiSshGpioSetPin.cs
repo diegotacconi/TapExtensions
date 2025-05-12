@@ -1,4 +1,58 @@
-﻿using System;
+﻿/*
+    raspi-gpio set writes directly to the GPIO control registers
+    ignoring whatever else may be using them (such as Linux drivers) -
+    it is designed as a debug tool, only use it if you know what you
+    are doing and at your own risk!
+
+    The raspi-gpio tool is designed to help hack / debug BCM283x GPIO.
+    Running raspi-gpio with the help argument prints this help.
+    raspi-gpio can get and print the state of a GPIO (or all GPIOs)
+    and can be used to set the function, pulls and value of a GPIO.
+    raspi-gpio must be run as root.
+    Use:
+      raspi-gpio get [GPIO]
+    OR
+      raspi-gpio set <GPIO> [options]
+    OR
+      raspi-gpio funcs [GPIO]
+    OR
+      raspi-gpio raw
+
+    GPIO is a comma-separated list of pin numbers or ranges (without spaces),
+    e.g. 4 or 18-21 or 7,9-11
+
+    Note that omitting [GPIO] from raspi-gpio get prints all GPIOs.
+    raspi-gpio funcs will dump all the possible GPIO alt funcions in CSV format
+    or if [GPIO] is specified the alternate funcs just for that specific GPIO.
+
+    Valid [options] for raspi-gpio set are:
+      ip      set GPIO as input
+      op      set GPIO as output
+      a0-a5   set GPIO to alternate function alt0-alt5
+      pu      set GPIO in-pad pull up
+      pd      set GPIO pin-pad pull down
+      pn      set GPIO pull none (no pull)
+      dh      set GPIO to drive to high (1) level (only valid if set to be an output)
+      dl      set GPIO to drive low (0) level (only valid if set to be an output)
+
+    Examples:
+      raspi-gpio get              Prints state of all GPIOs one per line
+      raspi-gpio get 20           Prints state of GPIO20
+      raspi-gpio get 20,21        Prints state of GPIO20 and GPIO21
+      raspi-gpio set 20 a5        Set GPIO20 to ALT5 function (GPCLK0)
+      raspi-gpio set 20 pu        Enable GPIO20 ~50k in-pad pull up
+      raspi-gpio set 20 pd        Enable GPIO20 ~50k in-pad pull down
+      raspi-gpio set 20 op        Set GPIO20 to be an output
+      raspi-gpio set 20 dl        Set GPIO20 to output low/zero (must already be set as an output)
+      raspi-gpio set 20 ip pd     Set GPIO20 to input with pull down
+      raspi-gpio set 35 a0 pu     Set GPIO35 to ALT0 function (SPI_CE1_N) with pull up
+      raspi-gpio set 20 op pn dh  Set GPIO20 to ouput with no pull and driving high
+
+    $ raspi-gpio get 20
+    GPIO 20: level=0 fsel=0 func=INPUT
+*/
+
+using System;
 using System.ComponentModel;
 using System.IO;
 using System.Text.RegularExpressions;
