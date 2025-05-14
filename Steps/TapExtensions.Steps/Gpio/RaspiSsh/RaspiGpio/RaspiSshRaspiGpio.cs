@@ -89,14 +89,14 @@ namespace TapExtensions.Steps.Gpio.RaspiSsh.RaspiGpio
 
         #region Private Methods
 
-        private protected void SendGpioInputCommand(string pin, EPinState state, EPull pull)
+        private protected void SetPinAsInput(string pin, EPinState state, EPull pull)
         {
             var retryCount = 3;
             for (var tryAttempt = 1; tryAttempt <= retryCount; tryAttempt++)
             {
                 Raspi.SendSshQuery("sudo raspi-gpio set " + pin + " " + GetPinType(state) + " " +
                                    GetPull(pull), 5, out _);
-                var substrings = GetGpioStatus(pin);
+                var substrings = GetPin(pin);
 
                 if (substrings[2] == "INPUT")
                 {
@@ -127,13 +127,13 @@ namespace TapExtensions.Steps.Gpio.RaspiSsh.RaspiGpio
             }
         }
 
-        private protected void SendGpioOutputCommand(string pin, EPinState state)
+        private protected void SetPinAsOutput(string pin, EPinState state)
         {
             var retryCount = 3;
             for (var tryAttempt = 1; tryAttempt <= retryCount; tryAttempt++)
             {
                 Raspi.SendSshQuery("sudo raspi-gpio set " + pin + " op " + GetPinType(state), 5, out _);
-                var substrings = GetGpioStatus(pin);
+                var substrings = GetPin(pin);
 
                 if (substrings[2] == "OUTPUT")
                 {
@@ -160,7 +160,7 @@ namespace TapExtensions.Steps.Gpio.RaspiSsh.RaspiGpio
             }
         }
 
-        private protected string[] GetGpioStatus(string pin)
+        private protected string[] GetPin(string pin)
         {
             Raspi.SendSshQuery("sudo raspi-gpio get " + pin, 5, out var verify);
             var regex = new Regex("level=(\\d+)\\s+.*func=([A-Z]+)");

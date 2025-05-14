@@ -7,7 +7,7 @@ namespace TapExtensions.Steps.Gpio.RaspiSsh.RaspiGpio
         Groups: new[] { "TapExtensions", "Steps", "Gpio", "RaspiSsh", "RaspiGpio" })]
     public class GpioSetPin : RaspiSshRaspiGpio
     {
-        [Display("Pin Number", Order: 2)] public string Pin { get; set; }
+        [Display("Pin Number", Order: 2)] public string PinNumber { get; set; }
 
         [Display("Pin State", Order: 3)] public EPinState PinState { get; set; }
 
@@ -23,15 +23,15 @@ namespace TapExtensions.Steps.Gpio.RaspiSsh.RaspiGpio
                 switch (GetPinType(PinState))
                 {
                     case "ip":
-                        SendGpioInputCommand(Pin, PinState, Pull);
+                        SetPinAsInput(PinNumber, PinState, Pull);
                         break;
 
                     case "dl":
-                        SendGpioOutputCommand(Pin, PinState);
+                        SetPinAsOutput(PinNumber, PinState);
                         break;
 
                     case "dh":
-                        SendGpioOutputCommand(Pin, PinState);
+                        SetPinAsOutput(PinNumber, PinState);
                         break;
                 }
 
