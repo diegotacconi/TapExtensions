@@ -144,7 +144,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
 
         #region Private Methods
 
-        private static readonly Dictionary<Enum, string> _dictionary =
+        private static readonly Dictionary<Enum, string> OptionsDictionary =
             new Dictionary<Enum, string>
             {
                 { EDirection.Input, "ip" },
@@ -179,7 +179,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
 
         private protected static string EnumToString(Enum key)
         {
-            if (!_dictionary.TryGetValue(key, out var value))
+            if (!OptionsDictionary.TryGetValue(key, out var value))
                 throw new InvalidOperationException(
                     $"Cannot find key of '{key}' in GPIO dictionary");
 
@@ -188,11 +188,11 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
 
         private protected static Enum StringToEnum(string value)
         {
-            if (!_dictionary.ContainsValue(value))
+            if (!OptionsDictionary.ContainsValue(value))
                 throw new InvalidOperationException(
                     $"Cannot find value of '{value}' in GPIO dictionary");
 
-            var key = _dictionary.FirstOrDefault(x => x.Value == value).Key;
+            var key = OptionsDictionary.FirstOrDefault(x => x.Value == value).Key;
             return key;
         }
 
@@ -225,7 +225,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
             // "%2d: %2s    %s | %s // %s%s%s\n"
             //    6: ip    pu | hi // GPIO6 = input
 
-            var pin = int.Parse(GetStringBetween(response, "", ": "));
+            // var pin = int.Parse(GetStringBetween(response, "", ": "));
             var middleSection = GetStringBetween(response, ": ", " | ");
             var fields = middleSection.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
             var direction = (EDirection)StringToEnum(fields.First());
