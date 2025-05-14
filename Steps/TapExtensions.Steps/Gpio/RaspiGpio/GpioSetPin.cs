@@ -2,15 +2,15 @@
 using OpenTap;
 using TapExtensions.Interfaces.Gpio;
 
-namespace TapExtensions.Steps.Gpio.Raspi
+namespace TapExtensions.Steps.Gpio.RaspiGpio
 {
-    [Display("RaspiGpioSetPin",
-        Groups: new[] { "TapExtensions", "Steps", "Gpio", "Raspi" })]
-    public class RaspiGpioSetPin : TestStep
+    [Display("GpioSetPin",
+        Groups: new[] { "TapExtensions", "Steps", "Gpio", "RaspiGpio" })]
+    public class GpioSetPin : TestStep
     {
         [Display("Gpio", Order: 1)] public IGpio Gpio { get; set; }
 
-        [Display("Pin Number", Order: 2)] public ERaspiGpio Pin { get; set; }
+        [Display("Pin Number", Order: 2)] public ERaspiGpio PinNumber { get; set; }
 
         [Display("Pin Direction", Order: 3)] public EDirection Direction { get; set; }
 
@@ -25,9 +25,9 @@ namespace TapExtensions.Steps.Gpio.Raspi
             try
             {
                 if (Direction == EDirection.Output)
-                    Gpio.SetPin((int)Pin, Direction, Pull, Drive);
+                    Gpio.SetPin((int)PinNumber, Direction, Pull, Drive);
                 else
-                    Gpio.SetPin((int)Pin, Direction, Pull);
+                    Gpio.SetPin((int)PinNumber, Direction, Pull);
 
                 UpgradeVerdict(Verdict.Pass);
             }

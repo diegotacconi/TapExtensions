@@ -59,11 +59,11 @@ using System.Text.RegularExpressions;
 using OpenTap;
 using TapExtensions.Interfaces.Ssh;
 
-namespace TapExtensions.Steps.Gpio.RaspiSsh
+namespace TapExtensions.Steps.Gpio.RaspiSsh.RaspiGpio
 {
-    [Display("RaspiSshGpioSetPin",
-        Groups: new[] { "TapExtensions", "Steps", "Gpio", "RaspiSsh" })]
-    public class RaspiSshGpioSetPin : TestStep
+    [Display("RaspiSshRaspiGpioSetPin",
+        Groups: new[] { "TapExtensions", "Steps", "Gpio", "RaspiSsh", "RaspiGpio" })]
+    public class RaspiSshRaspiGpioSetPin : TestStep
     {
         public enum EPinState
         {

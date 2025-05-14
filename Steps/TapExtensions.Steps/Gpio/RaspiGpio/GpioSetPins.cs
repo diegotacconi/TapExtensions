@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using OpenTap;
 using TapExtensions.Interfaces.Gpio;
 
-namespace TapExtensions.Steps.Gpio.Raspi
+namespace TapExtensions.Steps.Gpio.RaspiGpio
 {
-    [Display("RaspiGpioSetPins",
-        Groups: new[] { "TapExtensions", "Steps", "Gpio", "Raspi" })]
-    public class RaspiGpioSetPins : TestStep
+    [Display("GpioSetPins",
+        Groups: new[] { "TapExtensions", "Steps", "Gpio", "RaspiGpio" })]
+    public class GpioSetPins : TestStep
     {
         [Display("Gpio", Order: 1)] public IGpio Gpio { get; set; }
 
         public class Config : ValidatingObject
         {
-            [Display("Pin Number", Order: 2)] public ERaspiGpio Pin { get; set; }
+            [Display("Pin Number", Order: 2)] public ERaspiGpio PinNumber { get; set; }
 
             [Display("Direction", Order: 3)] public EDirection Direction { get; set; }
 
@@ -29,13 +29,13 @@ namespace TapExtensions.Steps.Gpio.Raspi
         {
             new Config
             {
-                Pin = ERaspiGpio.GPIO_05_PINHDR_29,
+                PinNumber = ERaspiGpio.GPIO_05_PINHDR_29,
                 Direction = EDirection.Input,
                 Pull = EPull.PullNone
             },
             new Config
             {
-                Pin = ERaspiGpio.GPIO_06_PINHDR_31,
+                PinNumber = ERaspiGpio.GPIO_06_PINHDR_31,
                 Direction = EDirection.Input,
                 Pull = EPull.PullNone
             }
@@ -48,9 +48,9 @@ namespace TapExtensions.Steps.Gpio.Raspi
                 foreach (var config in ListOfPins)
                 {
                     if (config.Direction == EDirection.Output)
-                        Gpio.SetPin((int)config.Pin, config.Direction, config.Pull, config.Drive);
+                        Gpio.SetPin((int)config.PinNumber, config.Direction, config.Pull, config.Drive);
                     else
-                        Gpio.SetPin((int)config.Pin, config.Direction, config.Pull);
+                        Gpio.SetPin((int)config.PinNumber, config.Direction, config.Pull);
                 }
 
                 UpgradeVerdict(Verdict.Pass);
