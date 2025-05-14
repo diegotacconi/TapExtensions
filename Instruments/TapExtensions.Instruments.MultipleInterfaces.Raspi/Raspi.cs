@@ -114,6 +114,11 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
             SshDisconnect();
         }
 
+        public bool Ping(uint timeoutMs, uint retryIntervalMs, uint minSuccessfulReplies)
+        {
+            throw new NotImplementedException();
+        }
+
         public void UploadFiles(List<(string localFile, string remoteFile)> files)
         {
             throw new NotImplementedException();
