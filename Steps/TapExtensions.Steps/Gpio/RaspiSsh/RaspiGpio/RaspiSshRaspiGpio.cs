@@ -22,7 +22,7 @@
     e.g. 4 or 18-21 or 7,9-11
 
     Note that omitting [GPIO] from raspi-gpio get prints all GPIOs.
-    raspi-gpio funcs will dump all the possible GPIO alt funcions in CSV format
+    raspi-gpio funcs will dump all the possible GPIO alt functions in CSV format
     or if [GPIO] is specified the alternate funcs just for that specific GPIO.
 
     Valid [options] for raspi-gpio set are:
@@ -46,13 +46,16 @@
       raspi-gpio set 20 dl        Set GPIO20 to output low/zero (must already be set as an output)
       raspi-gpio set 20 ip pd     Set GPIO20 to input with pull down
       raspi-gpio set 35 a0 pu     Set GPIO35 to ALT0 function (SPI_CE1_N) with pull up
-      raspi-gpio set 20 op pn dh  Set GPIO20 to ouput with no pull and driving high
+      raspi-gpio set 20 op pn dh  Set GPIO20 to output with no pull and driving high
 
-    $ raspi-gpio get 20
+    $ sudo raspi-gpio get 20
     GPIO 20: level=0 fsel=0 func=INPUT
+
+    $ sudo raspi-gpio set 5 ip pu
+    $ sudo raspi-gpio get 5
+    GPIO 5: level=1 func=INPUT pull=UP
 */
 
-using System;
 using System.ComponentModel;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -61,9 +64,7 @@ using TapExtensions.Interfaces.Ssh;
 
 namespace TapExtensions.Steps.Gpio.RaspiSsh.RaspiGpio
 {
-    [Display("RaspiSshRaspiGpioSetPin",
-        Groups: new[] { "TapExtensions", "Steps", "Gpio", "RaspiSsh", "RaspiGpio" })]
-    public class RaspiSshRaspiGpioSetPin : TestStep
+    public abstract class RaspiSshRaspiGpio : TestStep
     {
         public enum EPinState
         {
@@ -84,65 +85,30 @@ namespace TapExtensions.Steps.Gpio.RaspiSsh.RaspiGpio
         [Display("Raspi", Order: 1, Description: "RaspberryPi SSH Interface")]
         public ISshInstrument Raspi { get; set; }
 
-        [Display("Pin Number", Order: 2)] public string Pin { get; set; }
-
-        [Display("Pin State", Order: 3)] public EPinState PinState { get; set; }
-
-        [Display("Pull", Order: 4)] public EPull Pull { get; set; }
-
         #endregion
 
-        public override void Run()
-        {
-            try
-            {
-                Raspi.SendSshQuery("sudo raspi-gpio help", 5, out var check);
-                if (check == "") throw new InvalidOperationException("You are missing raspi-gpio module!");
+        #region Private Methods
 
-                switch (GetPinType(PinState))
-                {
-                    case "ip":
-                        SendGpioInputCommand();
-                        break;
-
-                    case "dl":
-                        SendGpioOutputCommand();
-                        break;
-
-                    case "dh":
-                        SendGpioOutputCommand();
-                        break;
-                }
-
-                UpgradeVerdict(Verdict.Pass);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message);
-                UpgradeVerdict(Verdict.Fail);
-            }
-        }
-
-        private void SendGpioInputCommand()
+        private protected void SendGpioInputCommand(string pin, EPinState state, EPull pull)
         {
             var retryCount = 3;
             for (var tryAttempt = 1; tryAttempt <= retryCount; tryAttempt++)
             {
-                Raspi.SendSshQuery("sudo raspi-gpio set " + Pin + " " + GetPinType(PinState) + " " +
-                                   GetPull(Pull), 5, out _);
-                var substrings = GetGpioStatus();
+                Raspi.SendSshQuery("sudo raspi-gpio set " + pin + " " + GetPinType(state) + " " +
+                                   GetPull(pull), 5, out _);
+                var substrings = GetGpioStatus(pin);
 
                 if (substrings[2] == "INPUT")
                 {
-                    if (GetPull(Pull) == "pd")
+                    if (GetPull(pull) == "pd")
                     {
                         Log.Info("pin set PULL_DOWN!");
                     }
-                    else if (GetPull(Pull) == "pn")
+                    else if (GetPull(pull) == "pn")
                     {
                         Log.Info("pin set PULL_NONE!");
                     }
-                    else if (GetPull(Pull) == "pu")
+                    else if (GetPull(pull) == "pu")
                     {
                         Log.Info("pin set PULL_UP!");
                     }
@@ -161,21 +127,21 @@ namespace TapExtensions.Steps.Gpio.RaspiSsh.RaspiGpio
             }
         }
 
-        private void SendGpioOutputCommand()
+        private protected void SendGpioOutputCommand(string pin, EPinState state)
         {
             var retryCount = 3;
             for (var tryAttempt = 1; tryAttempt <= retryCount; tryAttempt++)
             {
-                Raspi.SendSshQuery("sudo raspi-gpio set " + Pin + " op " + GetPinType(PinState), 5, out _);
-                var substrings = GetGpioStatus();
+                Raspi.SendSshQuery("sudo raspi-gpio set " + pin + " op " + GetPinType(state), 5, out _);
+                var substrings = GetGpioStatus(pin);
 
                 if (substrings[2] == "OUTPUT")
                 {
-                    if (substrings[1] == "0" && GetPinType(PinState) == "dl")
+                    if (substrings[1] == "0" && GetPinType(state) == "dl")
                     {
                         Log.Info("pin set LOW!");
                     }
-                    else if (substrings[1] == "1" && GetPinType(PinState) == "dh")
+                    else if (substrings[1] == "1" && GetPinType(state) == "dh")
                     {
                         Log.Info("pin set HIGH!");
                     }
@@ -194,14 +160,14 @@ namespace TapExtensions.Steps.Gpio.RaspiSsh.RaspiGpio
             }
         }
 
-        private string[] GetGpioStatus()
+        private protected string[] GetGpioStatus(string pin)
         {
-            Raspi.SendSshQuery("sudo raspi-gpio get " + Pin, 5, out var verify);
+            Raspi.SendSshQuery("sudo raspi-gpio get " + pin, 5, out var verify);
             var regex = new Regex("level=(\\d+)\\s+.*func=([A-Z]+)");
             return regex.Split(verify);
         }
 
-        private static string GetPinType(EPinState state)
+        private protected static string GetPinType(EPinState state)
         {
             string returnState;
 
@@ -226,7 +192,7 @@ namespace TapExtensions.Steps.Gpio.RaspiSsh.RaspiGpio
             return returnState;
         }
 
-        private static string GetPull(EPull pull)
+        private protected static string GetPull(EPull pull)
         {
             string returnPull;
 
@@ -250,5 +216,7 @@ namespace TapExtensions.Steps.Gpio.RaspiSsh.RaspiGpio
 
             return returnPull;
         }
+
+        #endregion
     }
 }
