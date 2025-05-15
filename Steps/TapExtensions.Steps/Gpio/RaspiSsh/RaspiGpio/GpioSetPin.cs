@@ -7,33 +7,24 @@ namespace TapExtensions.Steps.Gpio.RaspiSsh.RaspiGpio
         Groups: new[] { "TapExtensions", "Steps", "Gpio", "RaspiSsh", "RaspiGpio" })]
     public class GpioSetPin : RaspiSshRaspiGpio
     {
-        [Display("Pin Number", Order: 2)] public string PinNumber { get; set; }
+        [Display("Pin Number", Order: 2)] public int PinNumber { get; set; }
 
-        [Display("Pin State", Order: 3)] public EPinState PinState { get; set; }
+        [Display("Pin Direction", Order: 3)] public EDirection Direction { get; set; }
 
         [Display("Pin Pull", Order: 4)] public EPull Pull { get; set; }
+
+        [EnabledIf(nameof(Direction), EDirection.Output)]
+        [Display("Pin Output Drive", Order: 5)]
+        public EDrive Drive { get; set; }
 
         public override void Run()
         {
             try
             {
-                Raspi.SendSshQuery("sudo raspi-gpio help", 5, out var check);
-                if (check == "") throw new InvalidOperationException("You are missing raspi-gpio module!");
-
-                switch (GetPinType(PinState))
-                {
-                    case "ip":
-                        SetPinAsInput(PinNumber, PinState, Pull);
-                        break;
-
-                    case "dl":
-                        SetPinAsOutput(PinNumber, PinState);
-                        break;
-
-                    case "dh":
-                        SetPinAsOutput(PinNumber, PinState);
-                        break;
-                }
+                if (Direction == EDirection.Output)
+                    SetPin(PinNumber, Direction, Pull, Drive);
+                else
+                    SetPin(PinNumber, Direction, Pull);
 
                 UpgradeVerdict(Verdict.Pass);
             }
