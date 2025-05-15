@@ -8,16 +8,25 @@ namespace TapExtensions.Steps.Gpio.RaspiSsh.PinCtrl
         Groups: new[] { "TapExtensions", "Steps", "Gpio", "RaspiSsh", "PinCtrl" })]
     public class GpioGetPin : RaspiSshPinCtrl
     {
-        [Display("Pin Number", Order: 2)] public ERaspiGpio PinNumber { get; set; }
+        [Display("Pin Number", Order: 2)] public int PinNumber { get; set; }
 
         [Display("Expected Pin Level", Order: 3)]
         public ELevel ExpectedLevel { get; set; }
+
+        public GpioGetPin()
+        {
+            Rules.Add(() => PinNumber >= 2 && PinNumber <= 27,
+                "Raspberry Pi's GPIO number must be between 2 and 27",
+                nameof(PinNumber));
+        }
 
         public override void Run()
         {
             try
             {
-                var (_, _, measuredLevel) = GetPin((int)PinNumber);
+                ThrowOnValidationError(true);
+
+                var (_, _, measuredLevel) = GetPin(PinNumber);
                 if (measuredLevel != ExpectedLevel)
                     throw new InvalidOperationException(
                         $"Pin {PinNumber} measured an input level of {measuredLevel}, " +

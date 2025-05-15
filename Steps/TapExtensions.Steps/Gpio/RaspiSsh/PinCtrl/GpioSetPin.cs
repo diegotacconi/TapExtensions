@@ -8,7 +8,7 @@ namespace TapExtensions.Steps.Gpio.RaspiSsh.PinCtrl
         Groups: new[] { "TapExtensions", "Steps", "Gpio", "RaspiSsh", "PinCtrl" })]
     public class GpioSetPin : RaspiSshPinCtrl
     {
-        [Display("Pin Number", Order: 2)] public ERaspiGpio PinNumber { get; set; }
+        [Display("Pin Number", Order: 2)] public int PinNumber { get; set; }
 
         [Display("Pin Direction", Order: 3)] public EDirection Direction { get; set; }
 
@@ -18,14 +18,23 @@ namespace TapExtensions.Steps.Gpio.RaspiSsh.PinCtrl
         [Display("Pin Output Drive", Order: 5)]
         public EDrive Drive { get; set; }
 
+        public GpioSetPin()
+        {
+            Rules.Add(() => PinNumber >= 2 && PinNumber <= 27,
+                "Raspberry Pi's GPIO number must be between 2 and 27",
+                nameof(PinNumber));
+        }
+
         public override void Run()
         {
             try
             {
+                ThrowOnValidationError(true);
+
                 if (Direction == EDirection.Output)
-                    SetPin((int)PinNumber, Direction, Pull, Drive);
+                    SetPin(PinNumber, Direction, Pull, Drive);
                 else
-                    SetPin((int)PinNumber, Direction, Pull);
+                    SetPin(PinNumber, Direction, Pull);
 
                 UpgradeVerdict(Verdict.Pass);
             }

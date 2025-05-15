@@ -17,10 +17,19 @@ namespace TapExtensions.Steps.Gpio.RaspiSsh.RaspiGpio
         [Display("Pin Output Drive", Order: 5)]
         public EDrive Drive { get; set; }
 
+        public GpioSetPin()
+        {
+            Rules.Add(() => IsValidPinNumber(PinNumber),
+                "Raspberry Pi's GPIO number must be between 2 and 27",
+                nameof(PinNumber));
+        }
+
         public override void Run()
         {
             try
             {
+                ThrowOnValidationError(true);
+
                 if (Direction == EDirection.Output)
                     SetPin(PinNumber, Direction, Pull, Drive);
                 else

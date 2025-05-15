@@ -12,10 +12,19 @@ namespace TapExtensions.Steps.Gpio.RaspiSsh.RaspiGpio
         [Display("Expected Pin Level", Order: 3)]
         public ELevel ExpectedLevel { get; set; }
 
+        public GpioGetPin()
+        {
+            Rules.Add(() => IsValidPinNumber(PinNumber),
+                "Raspberry Pi's GPIO number must be between 2 and 27",
+                nameof(PinNumber));
+        }
+
         public override void Run()
         {
             try
             {
+                ThrowOnValidationError(true);
+
                 var (_, _, measuredLevel) = GetPin(PinNumber);
                 if (measuredLevel != ExpectedLevel)
                     throw new InvalidOperationException(

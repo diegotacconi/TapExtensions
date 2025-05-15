@@ -89,10 +89,44 @@ namespace TapExtensions.Steps.Gpio.RaspiSsh.RaspiGpio
 
         #region Settings
 
-        [Display("Raspi", Order: 1, Description: "RaspberryPi SSH Instrument Interface")]
+        [Display("Raspi Instrument", Order: 1, Description: "RaspberryPi SSH Instrument Interface")]
         public ISshInstrument Raspi { get; set; }
 
         #endregion
+
+        private protected bool IsValidPinNumber(int pinNumber)
+        {
+            var validPins = new List<int>
+            {
+                2, // GPIO=02, Header=03
+                3, // GPIO=03, Header=05
+                4, // GPIO=04, Header=07
+                5, // GPIO=05, Header=29
+                6, // GPIO=06, Header=31
+                7, // GPIO=07, Header=26
+                8, // GPIO=08, Header=24
+                9, // GPIO=09, Header=21
+                10, // GPIO=10, Header=19
+                11, // GPIO=11, Header=23
+                12, // GPIO=12, Header=32
+                13, // GPIO=13, Header=33
+                14, // GPIO=14, Header=08
+                15, // GPIO=15, Header=10
+                16, // GPIO=16, Header=36
+                17, // GPIO=17, Header=11
+                18, // GPIO=18, Header=12
+                19, // GPIO=19, Header=35
+                20, // GPIO=20, Header=38
+                21, // GPIO=21, Header=40
+                22, // GPIO=22, Header=15
+                23, // GPIO=23, Header=16
+                24, // GPIO=24, Header=18
+                25, // GPIO=25, Header=22
+                26, // GPIO=26, Header=37
+                27 // GPIO=27, Header=13
+            };
+            return validPins.Contains(pinNumber);
+        }
 
         private protected void SetPin(int pin, EDirection direction, EPull pull)
         {

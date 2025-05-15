@@ -69,7 +69,7 @@ namespace TapExtensions.Steps.Gpio.RaspiSsh.PinCtrl
     {
         #region Settings
 
-        [Display("Raspi", Order: 1, Description: "RaspberryPi SSH Instrument Interface")]
+        [Display("Raspi Instrument", Order: 1, Description: "RaspberryPi SSH Instrument Interface")]
         public ISshInstrument Raspi { get; set; }
 
         #endregion

@@ -13,7 +13,7 @@ namespace TapExtensions.Steps.Gpio.RaspiGpio
 
         public class Config : ValidatingObject
         {
-            [Display("Pin Number", Order: 2)] public ERaspiGpio PinNumber { get; set; }
+            [Display("Pin Number", Order: 2)] public int PinNumber { get; set; }
 
             [Display("Direction", Order: 3)] public EDirection Direction { get; set; }
 
@@ -22,6 +22,13 @@ namespace TapExtensions.Steps.Gpio.RaspiGpio
             [EnabledIf(nameof(Direction), EDirection.Output)]
             [Display("Output Drive", Order: 5)]
             public EDrive Drive { get; set; }
+
+            public Config()
+            {
+                Rules.Add(() => PinNumber >= 2 && PinNumber <= 27,
+                    "Raspberry Pi's GPIO number must be between 2 and 27",
+                    nameof(PinNumber));
+            }
         }
 
         [Display("List of Pins", Order: 6)]
@@ -29,13 +36,13 @@ namespace TapExtensions.Steps.Gpio.RaspiGpio
         {
             new Config
             {
-                PinNumber = ERaspiGpio.GPIO_05_PINHDR_29,
+                PinNumber = 5,
                 Direction = EDirection.Input,
                 Pull = EPull.PullNone
             },
             new Config
             {
-                PinNumber = ERaspiGpio.GPIO_06_PINHDR_31,
+                PinNumber = 6,
                 Direction = EDirection.Input,
                 Pull = EPull.PullNone
             }
@@ -48,9 +55,9 @@ namespace TapExtensions.Steps.Gpio.RaspiGpio
                 foreach (var config in ListOfPins)
                 {
                     if (config.Direction == EDirection.Output)
-                        Gpio.SetPin((int)config.PinNumber, config.Direction, config.Pull, config.Drive);
+                        Gpio.SetPin(config.PinNumber, config.Direction, config.Pull, config.Drive);
                     else
-                        Gpio.SetPin((int)config.PinNumber, config.Direction, config.Pull);
+                        Gpio.SetPin(config.PinNumber, config.Direction, config.Pull);
                 }
 
                 UpgradeVerdict(Verdict.Pass);

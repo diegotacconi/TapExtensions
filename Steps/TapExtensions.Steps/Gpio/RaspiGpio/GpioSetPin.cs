@@ -10,7 +10,7 @@ namespace TapExtensions.Steps.Gpio.RaspiGpio
     {
         [Display("Gpio", Order: 1)] public IGpio Gpio { get; set; }
 
-        [Display("Pin Number", Order: 2)] public ERaspiGpio PinNumber { get; set; }
+        [Display("Pin Number", Order: 2)] public int PinNumber { get; set; }
 
         [Display("Pin Direction", Order: 3)] public EDirection Direction { get; set; }
 
@@ -20,14 +20,23 @@ namespace TapExtensions.Steps.Gpio.RaspiGpio
         [Display("Pin Output Drive", Order: 5)]
         public EDrive Drive { get; set; }
 
+        public GpioSetPin()
+        {
+            Rules.Add(() => PinNumber >= 2 && PinNumber <= 27,
+                "Raspberry Pi's GPIO number must be between 2 and 27",
+                nameof(PinNumber));
+        }
+
         public override void Run()
         {
             try
             {
+                ThrowOnValidationError(true);
+
                 if (Direction == EDirection.Output)
-                    Gpio.SetPin((int)PinNumber, Direction, Pull, Drive);
+                    Gpio.SetPin(PinNumber, Direction, Pull, Drive);
                 else
-                    Gpio.SetPin((int)PinNumber, Direction, Pull);
+                    Gpio.SetPin(PinNumber, Direction, Pull);
 
                 UpgradeVerdict(Verdict.Pass);
             }
