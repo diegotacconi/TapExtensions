@@ -14,7 +14,7 @@ namespace TapExtensions.Steps.Gpio.RaspiSsh.RaspiGpio
 
         public GpioGetPin()
         {
-            Rules.Add(() => IsValidPinNumber(PinNumber),
+            Rules.Add(() => PinNumber >= 2 && PinNumber <= 27,
                 "Raspberry Pi's GPIO number must be between 2 and 27",
                 nameof(PinNumber));
         }
