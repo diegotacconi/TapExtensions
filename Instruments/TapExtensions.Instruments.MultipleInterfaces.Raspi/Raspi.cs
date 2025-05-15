@@ -151,6 +151,13 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
                 if (!string.IsNullOrWhiteSpace(line))
                     Log.Debug($"SSH << {line}");
 
+            var errors = cmd.Error.Split(new[] { "\r\n", "\n\r", "\r", "\n" },
+                StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var error in errors)
+                if (!string.IsNullOrWhiteSpace(error))
+                    Log.Warning($"SSH << {error}");
+
             return cmd.ExitStatus == 0;
         }
 
