@@ -65,7 +65,7 @@ using TapExtensions.Interfaces.Ssh;
 
 namespace TapExtensions.Steps.Gpio.RaspiSsh.PinCtrl
 {
-    public abstract class RaspiSshPinCtrl : TestStep, IGpioDevice
+    public abstract class RaspiSshPinCtrl : TestStep //, IGpioDevice
     {
         #region Settings
 
@@ -96,27 +96,36 @@ namespace TapExtensions.Steps.Gpio.RaspiSsh.PinCtrl
             throw new NotImplementedException();
         }
 
-        public void SetPin(int pin, EDirection direction, EPull pull)
+        public void SetPin(int pin, EDirection? direction = null, EPull? pull = null, EDrive? drive = null)
         {
-            var cmd = $"sudo pinctrl -e set {pin} {EnumToString(direction)} {EnumToString(pull)}";
+            // Build command
+            var cmd = $"sudo pinctrl -e set {pin}" +
+                      $" {(direction.HasValue ? EnumToString(direction.Value) : string.Empty)}" +
+                      $" {(pull.HasValue ? EnumToString(pull.Value) : string.Empty)}" +
+                      $" {(drive.HasValue ? EnumToString(drive.Value) : string.Empty)}";
+
+            // Send command
             if (!Raspi.SendSshQuery(cmd, 5, out var response))
                 throw new InvalidOperationException(
                     $"Exit status was not 0, when executing to the command of '{cmd}'");
 
-            VerifyResponse(response, direction);
-            VerifyResponse(response, pull);
-        }
+            // Verify response
+            var (directionResponse, pullResponse, levelResponse) = ParseResponse(response);
 
-        public void SetPin(int pin, EDirection direction, EPull pull, EDrive drive)
-        {
-            var cmd = $"sudo pinctrl -e set {pin} {EnumToString(direction)} {EnumToString(pull)} {EnumToString(drive)}";
-            if (!Raspi.SendSshQuery(cmd, 5, out var response))
-                throw new InvalidOperationException(
-                    $"Exit status was not 0, when executing to the command of '{cmd}'");
+            if (direction.HasValue)
+                if (direction.Value != directionResponse)
+                    throw new InvalidOperationException(
+                        $"Error setting direction to {direction.Value}");
 
-            VerifyResponse(response, direction);
-            VerifyResponse(response, pull);
-            VerifyResponse(response, drive);
+            if (pull.HasValue)
+                if (pull.Value != pullResponse)
+                    throw new InvalidOperationException(
+                        $"Error setting pull to {pull.Value}");
+
+            if (drive.HasValue)
+                if (DriveToLevel(drive.Value) != levelResponse)
+                    throw new InvalidOperationException(
+                        $"Error setting drive to {drive.Value} (the level measured was {levelResponse})");
         }
 
         public (EDirection direction, EPull pull, ELevel level) GetPin(int pin)
@@ -223,30 +232,6 @@ namespace TapExtensions.Steps.Gpio.RaspiSsh.PinCtrl
             var level = (ELevel)StringToEnum(GetStringBetween(response, " | ", " // "));
 
             return (direction, pull, level);
-        }
-
-        private protected static void VerifyResponse(string response, EDirection direction)
-        {
-            var (directionResponse, _, _) = ParseResponse(response);
-            if (direction != directionResponse)
-                throw new InvalidOperationException(
-                    $"Error setting direction to {direction}");
-        }
-
-        private protected static void VerifyResponse(string response, EPull pull)
-        {
-            var (_, pullResponse, _) = ParseResponse(response);
-            if (pull != pullResponse)
-                throw new InvalidOperationException(
-                    $"Error setting pull to {pull}");
-        }
-
-        private protected static void VerifyResponse(string response, EDrive drive)
-        {
-            var (_, _, levelResponse) = ParseResponse(response);
-            if (DriveToLevel(drive) != levelResponse)
-                throw new InvalidOperationException(
-                    $"Error setting drive to {drive} (the level measured was {levelResponse})");
         }
 
         #endregion
