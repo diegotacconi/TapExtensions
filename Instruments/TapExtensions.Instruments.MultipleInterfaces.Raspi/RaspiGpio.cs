@@ -69,35 +69,17 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
 
         public void SetPinDirection(int pin, EDirection direction)
         {
-            var cmd = $"sudo pinctrl -e set {pin} {EnumToString(direction)}";
-            if (!SendSshQuery(cmd, 5, out var response))
-                throw new InvalidOperationException(
-                    $"Exit status was not 0, when executing to the command of '{cmd}'");
-
-            VerifyResponse(response, direction);
+            SetPinAllOptions(pin, direction);
         }
 
         public void SetPinPull(int pin, EPull pull)
         {
-            // The Raspberry Pi GPIO pin typically have an in-pad pull-up or pull-down
-            // resistance value of approximately 50K Ohms.
-
-            var cmd = $"sudo pinctrl -e set {pin} {EnumToString(pull)}";
-            if (!SendSshQuery(cmd, 5, out var response))
-                throw new InvalidOperationException(
-                    $"Exit status was not 0, when executing to the command of '{cmd}'");
-
-            VerifyResponse(response, pull);
+            SetPinAllOptions(pin, null, pull);
         }
 
         public void SetPinDrive(int pin, EDrive drive)
         {
-            var cmd = $"sudo pinctrl -e set {pin} {EnumToString(drive)}";
-            if (!SendSshQuery(cmd, 5, out var response))
-                throw new InvalidOperationException(
-                    $"Exit status was not 0, when executing to the command of '{cmd}'");
-
-            VerifyResponse(response, drive);
+            SetPinAllOptions(pin, null, null, drive);
         }
 
         public ELevel GetPinLevel(int pin)
@@ -108,25 +90,44 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
 
         public void SetPin(int pin, EDirection direction, EPull pull)
         {
-            var cmd = $"sudo pinctrl -e set {pin} {EnumToString(direction)} {EnumToString(pull)}";
-            if (!SendSshQuery(cmd, 5, out var response))
-                throw new InvalidOperationException(
-                    $"Exit status was not 0, when executing to the command of '{cmd}'");
-
-            VerifyResponse(response, direction);
-            VerifyResponse(response, pull);
+            SetPinAllOptions(pin, direction, pull);
         }
 
         public void SetPin(int pin, EDirection direction, EPull pull, EDrive drive)
         {
-            var cmd = $"sudo pinctrl -e set {pin} {EnumToString(direction)} {EnumToString(pull)} {EnumToString(drive)}";
+            SetPinAllOptions(pin, direction, pull, drive);
+        }
+
+        public void SetPinAllOptions(int pin, EDirection? direction = null, EPull? pull = null, EDrive? drive = null)
+        {
+            // Build command
+            var directionCmd = direction.HasValue ? $" {EnumToString(direction.Value)}" : string.Empty;
+            var pullCmd = pull.HasValue ? $" {EnumToString(pull.Value)}" : string.Empty;
+            var driveCmd = drive.HasValue ? $" {EnumToString(drive.Value)}" : string.Empty;
+            var cmd = $"sudo pinctrl -e set {pin}{directionCmd}{pullCmd}{driveCmd}";
+
+            // Send command
             if (!SendSshQuery(cmd, 5, out var response))
                 throw new InvalidOperationException(
                     $"Exit status was not 0, when executing to the command of '{cmd}'");
 
-            VerifyResponse(response, direction);
-            VerifyResponse(response, pull);
-            VerifyResponse(response, drive);
+            // Verify response
+            var (directionResponse, pullResponse, levelResponse) = ParseResponse(response);
+
+            if (direction.HasValue)
+                if (direction.Value != directionResponse)
+                    throw new InvalidOperationException(
+                        $"Error setting direction to {direction.Value}");
+
+            if (pull.HasValue)
+                if (pull.Value != pullResponse)
+                    throw new InvalidOperationException(
+                        $"Error setting pull to {pull.Value}");
+
+            if (drive.HasValue)
+                if (DriveToLevel(drive.Value) != levelResponse)
+                    throw new InvalidOperationException(
+                        $"Error setting drive to {drive.Value} (the level measured was {levelResponse})");
         }
 
         public (EDirection direction, EPull pull, ELevel level) GetPin(int pin)
@@ -233,30 +234,6 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
             var level = (ELevel)StringToEnum(GetStringBetween(response, " | ", " // "));
 
             return (direction, pull, level);
-        }
-
-        private protected static void VerifyResponse(string response, EDirection direction)
-        {
-            var (directionResponse, _, _) = ParseResponse(response);
-            if (direction != directionResponse)
-                throw new InvalidOperationException(
-                    $"Error setting direction to {direction}");
-        }
-
-        private protected static void VerifyResponse(string response, EPull pull)
-        {
-            var (_, pullResponse, _) = ParseResponse(response);
-            if (pull != pullResponse)
-                throw new InvalidOperationException(
-                    $"Error setting pull to {pull}");
-        }
-
-        private protected static void VerifyResponse(string response, EDrive drive)
-        {
-            var (_, _, levelResponse) = ParseResponse(response);
-            if (DriveToLevel(drive) != levelResponse)
-                throw new InvalidOperationException(
-                    $"Error setting drive to {drive} (the level measured was {levelResponse})");
         }
 
         #endregion
