@@ -94,44 +94,36 @@ namespace TapExtensions.Steps.Gpio.RaspiSsh.RaspiGpio
 
         #endregion
 
-        private protected void SetPin(int pin, EDirection direction, EPull pull)
+        private protected void SetPin(int pin, EDirection? direction = null, EPull? pull = null, EDrive? drive = null)
         {
-            var cmd = $"sudo raspi-gpio set {pin} {EnumToString(direction)} {EnumToString(pull)}";
+            // Build command
+            var cmd = $"sudo raspi-gpio set {pin}" +
+                      $" {(direction.HasValue ? EnumToString(direction.Value) : string.Empty)}" +
+                      $" {(pull.HasValue ? EnumToString(pull.Value) : string.Empty)}" +
+                      $" {(drive.HasValue ? EnumToString(drive.Value) : string.Empty)}";
+
+            // Send command
             if (!Raspi.SendSshQuery(cmd, 5, out _))
                 throw new InvalidOperationException(
                     $"Exit status was not 0, when executing to the command of '{cmd}'");
 
-            var (directionResponse, pullResponse, _) = GetPin(pin);
-
-            if (direction != directionResponse)
-                throw new InvalidOperationException(
-                    $"Error setting direction to {direction}");
-
-            if (pull != pullResponse)
-                throw new InvalidOperationException(
-                    $"Error setting pull to {pull}");
-        }
-
-        private protected void SetPin(int pin, EDirection direction, EPull pull, EDrive drive)
-        {
-            var cmd = $"sudo raspi-gpio set {pin} {EnumToString(direction)} {EnumToString(pull)} {EnumToString(drive)}";
-            if (!Raspi.SendSshQuery(cmd, 5, out _))
-                throw new InvalidOperationException(
-                    $"Exit status was not 0, when executing to the command of '{cmd}'");
-
+            // Verify states
             var (directionResponse, pullResponse, levelResponse) = GetPin(pin);
 
-            if (direction != directionResponse)
-                throw new InvalidOperationException(
-                    $"Error setting direction to {direction}");
+            if (direction.HasValue)
+                if (direction.Value != directionResponse)
+                    throw new InvalidOperationException(
+                        $"Error setting direction to {direction.Value}");
 
-            if (pull != pullResponse)
-                throw new InvalidOperationException(
-                    $"Error setting pull to {pull}");
+            if (pull.HasValue)
+                if (pull.Value != pullResponse)
+                    throw new InvalidOperationException(
+                        $"Error setting pull to {pull.Value}");
 
-            if (DriveToLevel(drive) != levelResponse)
-                throw new InvalidOperationException(
-                    $"Error setting drive to {drive} (the level measured was {levelResponse})");
+            if (drive.HasValue)
+                if (DriveToLevel(drive.Value) != levelResponse)
+                    throw new InvalidOperationException(
+                        $"Error setting drive to {drive.Value} (the level measured was {levelResponse})");
         }
 
         private protected (EDirection direction, EPull pull, ELevel level) GetPin(int pin)
