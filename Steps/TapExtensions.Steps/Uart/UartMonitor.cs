@@ -8,7 +8,7 @@ namespace TapExtensions.Steps.Uart
         Groups: new[] { "TapExtensions", "Steps", "Uart" })]
     public class UartMonitor : TestStep
     {
-        [Display("Uart Dut", Order: 1)] public IUart Dut { get; set; }
+        [Display("Uart Dut", Order: 1)] public IUartDut UartDut { get; set; }
 
         public override void Run()
         {

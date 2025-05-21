@@ -11,7 +11,7 @@ namespace TapExtensions.Steps.Uart
     {
         #region Settings
 
-        [Display("Uart Dut", Order: 1)] public IUart Dut { get; set; }
+        [Display("Uart Dut", Order: 1)] public IUartDut UartDut { get; set; }
 
         [Display("Expected Login Message", Order: 2)]
         public string ExpectedLoginPrompt { get; set; }
@@ -75,10 +75,10 @@ namespace TapExtensions.Steps.Uart
                         $"Unable to find for Login prompt of '{ExpectedLoginPrompt}'");
 
                 // Enter username
-                Dut.Query(Username, ExpectedPasswordPrompt, CommandTimeout);
+                UartDut.Query(Username, ExpectedPasswordPrompt, CommandTimeout);
 
                 // Enter password
-                Dut.Query(Password, ExpectedShellPrompt, CommandTimeout);
+                UartDut.Query(Password, ExpectedShellPrompt, CommandTimeout);
 
                 UpgradeVerdict(Verdict.Pass);
             }
@@ -101,7 +101,7 @@ namespace TapExtensions.Steps.Uart
                 try
                 {
                     // Check for login prompt
-                    var response = Dut.Query("\r", ExpectedLoginPrompt, CommandTimeout);
+                    var response = UartDut.Query("\r", ExpectedLoginPrompt, CommandTimeout);
                     if (response.Contains(ExpectedLoginPrompt))
                     {
                         loginIsReady = true;

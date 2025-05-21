@@ -13,7 +13,7 @@ namespace TapExtensions.Steps.Uart
     {
         #region Settings
 
-        [Display("Uart Dut", Order: 1)] public IUart Dut { get; set; }
+        [Display("Uart Dut", Order: 1)] public IUartDut UartDut { get; set; }
 
         public class Query : ValidatingObject
         {
@@ -78,7 +78,7 @@ namespace TapExtensions.Steps.Uart
             var endOfMessage = _rnd.Next(10000, 99999).ToString();
             // const string expectedEndOfMessage = "$";
             var cmdWithEom = $"{command}; echo {endOfMessage}";
-            var response = Dut.Query(cmdWithEom, endOfMessage, timeout);
+            var response = UartDut.Query(cmdWithEom, endOfMessage, timeout);
 
             if (!response.Contains(expectedResponse))
                 throw new InvalidOperationException(

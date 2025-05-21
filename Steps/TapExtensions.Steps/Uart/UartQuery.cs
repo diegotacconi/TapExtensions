@@ -10,7 +10,7 @@ namespace TapExtensions.Steps.Uart
     {
         #region Settings
 
-        [Display("Uart Dut", Order: 1)] public IUart Dut { get; set; }
+        [Display("Uart Dut", Order: 1)] public IUartDut UartDut { get; set; }
 
         [Display("Command", Order: 2)] public string Command { get; set; }
 
@@ -43,7 +43,7 @@ namespace TapExtensions.Steps.Uart
         {
             try
             {
-                var response = Dut.Query(Command, ExpectedEndOfMessage, Timeout);
+                var response = UartDut.Query(Command, ExpectedEndOfMessage, Timeout);
 
                 if (!response.Contains(ExpectedResponse))
                     throw new InvalidOperationException(

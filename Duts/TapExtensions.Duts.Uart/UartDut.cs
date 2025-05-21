@@ -10,7 +10,7 @@ namespace TapExtensions.Duts.Uart
 {
     [Display("UartDut",
         Groups: new[] { "TapExtensions", "Duts", "Uart" })]
-    public class UartDut : Dut, IUart
+    public class UartDut : Dut, IUartDut
     {
         #region Settings
 
@@ -176,15 +176,11 @@ namespace TapExtensions.Duts.Uart
             Write(command);
             Expect(expectedEndOfMessage, timeout);
             var response = _response;
-            // var msg = Regex.Replace(response, @"\t|\n|\r", "_");
-            // Log.Debug($"RESPONSE: {msg}");
             return response;
         }
 
         public void Write(string command)
         {
-            // if (VerboseLoggingEnabled)
-            //     Log.Debug($"{_sp.PortName} >> {command}");
             _sp.DiscardOutBuffer();
             _sp.WriteLine(command);
         }

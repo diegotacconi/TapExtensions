@@ -10,7 +10,7 @@ namespace TapExtensions.Steps.Uart
     {
         #region Settings
 
-        [Display("Uart Dut", Order: 1)] public IUart Dut { get; set; }
+        [Display("Uart Dut", Order: 1)] public IUartDut UartDut { get; set; }
 
         [Display("Expected Response", Order: 2)]
         public string ExpectedResponse { get; set; }
@@ -36,7 +36,7 @@ namespace TapExtensions.Steps.Uart
         {
             try
             {
-                var success = Dut.Expect(ExpectedResponse, Timeout);
+                var success = UartDut.Expect(ExpectedResponse, Timeout);
                 UpgradeVerdict(success ? Verdict.Pass : Verdict.Fail);
             }
             catch (Exception ex)

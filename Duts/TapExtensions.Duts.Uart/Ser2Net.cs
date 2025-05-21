@@ -16,7 +16,7 @@ namespace TapExtensions.Duts.Uart
 {
     [Display("Ser2Net",
         Groups: new[] { "TapExtensions", "Duts", "Uart" })]
-    public class Ser2Net : Dut, IUart
+    public class Ser2Net : Dut, IUartDut
     {
         #region Settings
 
