@@ -34,18 +34,13 @@ namespace TapExtensions.Steps.Gpio.RaspiGpio
         [Display("List of Pins", Order: 6)]
         public List<Config> ListOfPins { get; set; } = new List<Config>
         {
-            new Config
-            {
-                PinNumber = 5,
-                Direction = EDirection.Input,
-                Pull = EPull.PullNone
-            },
-            new Config
-            {
-                PinNumber = 6,
-                Direction = EDirection.Input,
-                Pull = EPull.PullNone
-            }
+            new Config { PinNumber = 5, Direction = EDirection.Input, Pull = EPull.PullNone },
+            new Config { PinNumber = 6, Direction = EDirection.Input, Pull = EPull.PullNone },
+            new Config { PinNumber = 7, Direction = EDirection.Input, Pull = EPull.PullNone },
+            new Config { PinNumber = 8, Direction = EDirection.Input, Pull = EPull.PullNone },
+            new Config { PinNumber = 9, Direction = EDirection.Input, Pull = EPull.PullNone },
+            new Config { PinNumber = 10, Direction = EDirection.Input, Pull = EPull.PullNone },
+            new Config { PinNumber = 17, Direction = EDirection.Input, Pull = EPull.PullNone }
         };
 
         public override void Run()

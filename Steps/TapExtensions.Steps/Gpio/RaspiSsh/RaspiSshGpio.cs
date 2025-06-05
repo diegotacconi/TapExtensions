@@ -54,9 +54,72 @@ using System.Collections.Generic;
 using OpenTap;
 using TapExtensions.Interfaces.Ssh;
 
-namespace TapExtensions.Steps.Gpio.RaspiSsh.RaspiGpio
+namespace TapExtensions.Steps.Gpio.RaspiSsh
 {
-    public abstract class RaspiSshRaspiGpio : TestStep
+    [Display("RaspiSshGpioGetPin",
+        Groups: new[] { "TapExtensions", "Steps", "Gpio", "RaspiSsh" })]
+    public class RaspiSshGpioGetPin : RaspiSshGpio
+    {
+        [Display("Expected Pin Level", Order: 3)]
+        public ELevel ExpectedLevel { get; set; } = ELevel.Low;
+
+        public override void Run()
+        {
+            try
+            {
+                ThrowOnValidationError(true);
+
+                var (_, _, measuredLevel) = GetPin(PinNumber);
+                if (measuredLevel != ExpectedLevel)
+                    throw new InvalidOperationException(
+                        $"Pin {PinNumber} measured an input level of {measuredLevel}, " +
+                        $"which is not equal to the expected level of {ExpectedLevel}.");
+
+                Log.Debug($"Pin {PinNumber} measured {measuredLevel}");
+                UpgradeVerdict(Verdict.Pass);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+                UpgradeVerdict(Verdict.Fail);
+            }
+        }
+    }
+
+    [Display("RaspiSshGpioSetPin",
+        Groups: new[] { "TapExtensions", "Steps", "Gpio", "RaspiSsh" })]
+    public class RaspiSshGpioSetPin : RaspiSshGpio
+    {
+        [Display("Pin Direction", Order: 3)] public EDirection Direction { get; set; } = EDirection.Input;
+
+        [Display("Pin Pull", Order: 4)] public EPull Pull { get; set; } = EPull.PullNone;
+
+        [EnabledIf(nameof(Direction), EDirection.Output)]
+        [Display("Pin Output Drive", Order: 5)]
+        public EDrive Drive { get; set; }
+
+        public override void Run()
+        {
+            try
+            {
+                ThrowOnValidationError(true);
+
+                if (Direction == EDirection.Output)
+                    SetPin(PinNumber, Direction, Pull, Drive);
+                else
+                    SetPin(PinNumber, Direction, Pull);
+
+                UpgradeVerdict(Verdict.Pass);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+                UpgradeVerdict(Verdict.Fail);
+            }
+        }
+    }
+
+    public abstract class RaspiSshGpio : TestStep
     {
         #region Enums
 
@@ -87,12 +150,17 @@ namespace TapExtensions.Steps.Gpio.RaspiSsh.RaspiGpio
 
         #endregion
 
-        #region Settings
-
         [Display("Raspi Instrument", Order: 1, Description: "RaspberryPi SSH Instrument Interface")]
         public ISshInstrument Raspi { get; set; }
 
-        #endregion
+        [Display("Pin Number", Order: 2)] public int PinNumber { get; set; } = 5;
+
+        private protected RaspiSshGpio()
+        {
+            Rules.Add(() => PinNumber >= 2 && PinNumber <= 27,
+                "Raspberry Pi's GPIO number must be between 2 and 27",
+                nameof(PinNumber));
+        }
 
         private protected void SetPin(int pin, EDirection? direction = null, EPull? pull = null, EDrive? drive = null)
         {
