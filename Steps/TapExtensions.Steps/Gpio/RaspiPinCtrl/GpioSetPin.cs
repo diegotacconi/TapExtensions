@@ -2,11 +2,11 @@
 using OpenTap;
 using TapExtensions.Interfaces.Gpio;
 
-namespace TapExtensions.Steps.Gpio.RaspiSsh.PinCtrl
+namespace TapExtensions.Steps.Gpio.RaspiPinCtrl
 {
     [Display("GpioSetPin",
-        Groups: new[] { "TapExtensions", "Steps", "Gpio", "RaspiSsh", "PinCtrl" })]
-    public class GpioSetPin : RaspiSshPinCtrl
+        Groups: new[] { "TapExtensions", "Steps", "Gpio", "RaspiPinCtrl" })]
+    public class GpioSetPin : RaspiPinCtrlBase
     {
         [Display("Pin Number", Order: 2)] public int PinNumber { get; set; }
 
@@ -21,8 +21,7 @@ namespace TapExtensions.Steps.Gpio.RaspiSsh.PinCtrl
         public GpioSetPin()
         {
             Rules.Add(() => PinNumber >= 2 && PinNumber <= 27,
-                "Raspberry Pi's GPIO number must be between 2 and 27",
-                nameof(PinNumber));
+                "Pin number must be between 2 and 27", nameof(PinNumber));
         }
 
         public override void Run()

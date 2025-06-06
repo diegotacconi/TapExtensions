@@ -63,9 +63,9 @@ using OpenTap;
 using TapExtensions.Interfaces.Gpio;
 using TapExtensions.Interfaces.Ssh;
 
-namespace TapExtensions.Steps.Gpio.RaspiSsh.PinCtrl
+namespace TapExtensions.Steps.Gpio.RaspiPinCtrl
 {
-    public abstract class RaspiSshPinCtrl : TestStep //, IGpioDevice
+    public abstract class RaspiPinCtrlBase : TestStep //, IGpioDevice
     {
         #region Settings
 
