@@ -82,12 +82,6 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
             SetPinAllOptions(pin, null, null, drive);
         }
 
-        public ELevel GetPinLevel(int pin)
-        {
-            var (_, _, level) = GetPin(pin);
-            return level;
-        }
-
         public void SetPin(int pin, EDirection direction, EPull pull)
         {
             SetPinAllOptions(pin, direction, pull);
@@ -131,6 +125,12 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
                 if (DriveToLevel(drive.Value) != levelResponse)
                     throw new InvalidOperationException(
                         $"Error setting drive to {drive.Value} (the level measured was {levelResponse})");
+        }
+
+        public ELevel GetPinLevel(int pin)
+        {
+            var (_, _, level) = GetPin(pin);
+            return level;
         }
 
         public (EDirection direction, EPull pull, ELevel level) GetPin(int pin)

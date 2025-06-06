@@ -14,14 +14,16 @@ namespace TapExtensions.Interfaces.Gpio
 
         void SetPinDrive(int pin, EDrive drive);
 
-        ELevel GetPinLevel(int pin);
-
         void SetPin(int pin, EDirection direction, EPull pull);
 
         void SetPin(int pin, EDirection direction, EPull pull, EDrive drive);
 
+        ELevel GetPinLevel(int pin);
+
         (EDirection direction, EPull pull, ELevel level) GetPin(int pin);
     }
+
+    #region Enums
 
     public enum EDirection
     {
@@ -47,4 +49,6 @@ namespace TapExtensions.Interfaces.Gpio
         Low,
         High
     }
+
+    #endregion
 }

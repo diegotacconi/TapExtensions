@@ -110,6 +110,16 @@ namespace TapExtensions.Instruments.Gpio
             throw new NotImplementedException();
         }
 
+        public void SetPin(int pin, EDirection direction, EPull pull)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetPin(int pin, EDirection direction, EPull pull, EDrive drive)
+        {
+            throw new NotImplementedException();
+        }
+
         public ELevel GetPinLevel(int pin)
         {
             // Debug start
@@ -130,16 +140,6 @@ namespace TapExtensions.Instruments.Gpio
 
             // ToDo: Determine ELevel
             return ELevel.Low;
-        }
-
-        public void SetPin(int pin, EDirection direction, EPull pull)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetPin(int pin, EDirection direction, EPull pull, EDrive drive)
-        {
-            throw new NotImplementedException();
         }
 
         public (EDirection direction, EPull pull, ELevel level) GetPin(int pin)

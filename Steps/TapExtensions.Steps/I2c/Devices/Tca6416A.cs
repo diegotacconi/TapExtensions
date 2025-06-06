@@ -225,6 +225,16 @@ namespace TapExtensions.Steps.I2c.Devices
             log.Debug($"OutputDrives = {ToBinaryString(outputDrives)}");
         }
 
+        public void SetPin(int pin, EDirection direction, EPull pull)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void SetPin(int pin, EDirection direction, EPull pull, EDrive drive)
+        {
+            throw new NotImplementedException();
+        }
+
         public ELevel GetPinLevel(int pin)
         {
             if (pin < 0 || pin > 15)
@@ -236,16 +246,6 @@ namespace TapExtensions.Steps.I2c.Devices
 
             var level = IsBitSet(inputLevels, pin) ? ELevel.High : ELevel.Low;
             return level;
-        }
-
-        public void SetPin(int pin, EDirection direction, EPull pull)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetPin(int pin, EDirection direction, EPull pull, EDrive drive)
-        {
-            throw new NotImplementedException();
         }
 
         public (EDirection direction, EPull pull, ELevel level) GetPin(int pin)
