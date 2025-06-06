@@ -2,10 +2,10 @@
 using OpenTap;
 using TapExtensions.Interfaces.Gpio;
 
-namespace TapExtensions.Steps.Gpio.RaspiGpio
+namespace TapExtensions.Steps.Gpio
 {
     [Display("GpioSetPin",
-        Groups: new[] { "TapExtensions", "Steps", "Gpio", "RaspiGpio" })]
+        Groups: new[] { "TapExtensions", "Steps", "Gpio" })]
     public class GpioSetPin : TestStep
     {
         [Display("Gpio", Order: 1)] public IGpio Gpio { get; set; }
@@ -22,17 +22,15 @@ namespace TapExtensions.Steps.Gpio.RaspiGpio
 
         public GpioSetPin()
         {
-            Rules.Add(() => PinNumber >= 2 && PinNumber <= 27,
-                "Raspberry Pi's GPIO number must be between 2 and 27",
-                nameof(PinNumber));
+            // Check for valid pin when using Raspberry Pi
+            Rules.Add(() => Gpio?.GetType().Name != "Raspi" || (PinNumber >= 2 && PinNumber <= 27),
+                "Pin number must be between 2 and 27", nameof(PinNumber));
         }
 
         public override void Run()
         {
             try
             {
-                ThrowOnValidationError(true);
-
                 if (Direction == EDirection.Output)
                     Gpio.SetPin(PinNumber, Direction, Pull, Drive);
                 else
