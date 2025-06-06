@@ -13,7 +13,7 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
         Groups: new[] { "TapExtensions", "Instruments", "MultipleInterfaces" })]
     public partial class Raspi : Instrument, ISshInstrument
     {
-        #region Settings
+        #region SSH Settings
 
         [Display("IP Address", Order: 1, Group: "SSH Settings")]
         public string IpAddress { get; set; }
