@@ -59,12 +59,48 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using OpenTap;
 using TapExtensions.Interfaces.Gpio;
 
 namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
 {
     public partial class Raspi : IGpio
     {
+        #region GPIO Settings
+
+        [Display("Use GPIO", Order: 20, Groups: new[] { "GPIO Settings" }, Collapsed: true)]
+        public bool UseGpio { get; set; } = false;
+
+        public class GpioPin : ValidatingObject
+        {
+            [Display("Pin Number", Order: 2)] public int PinNumber { get; set; }
+
+            [Display("Direction", Order: 3)] public EDirection Direction { get; set; }
+
+            [Display("Pull", Order: 4)] public EPull Pull { get; set; }
+
+            [EnabledIf(nameof(Direction), EDirection.Output)]
+            [Display("Output Drive", Order: 5)]
+            public EDrive Drive { get; set; }
+
+            public GpioPin()
+            {
+                Rules.Add(() => PinNumber >= 2 && PinNumber <= 27,
+                    "Pin number must be between 2 and 27",
+                    nameof(PinNumber));
+            }
+        }
+
+        [EnabledIf(nameof(UseGpio), HideIfDisabled = true)]
+        [Display("Initialize GPIO Pins", Order: 21, Groups: new[] { "GPIO Settings" }, Collapsed: true)]
+        public List<GpioPin> InitializeGpioPins { get; set; } = new List<GpioPin>
+        {
+            new GpioPin { PinNumber = 5, Direction = EDirection.Input, Pull = EPull.PullNone },
+            new GpioPin { PinNumber = 6, Direction = EDirection.Input, Pull = EPull.PullNone }
+        };
+
+        #endregion
+
         #region GPIO Interface Implementation
 
         public void SetPinDirection(int pin, EDirection direction)
@@ -152,6 +188,20 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
         #endregion
 
         #region Private Methods
+
+        private protected void InitializeGpio()
+        {
+            if (!UseGpio)
+                return;
+
+            foreach (var gpioPin in InitializeGpioPins)
+            {
+                if (gpioPin.Direction == EDirection.Output)
+                    SetPin(gpioPin.PinNumber, gpioPin.Direction, gpioPin.Pull, gpioPin.Drive);
+                else
+                    SetPin(gpioPin.PinNumber, gpioPin.Direction, gpioPin.Pull);
+            }
+        }
 
         private protected static void CheckIfPinNumberIsValid(int pin)
         {

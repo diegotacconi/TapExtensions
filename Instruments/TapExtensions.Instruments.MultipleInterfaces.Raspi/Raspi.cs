@@ -31,6 +31,10 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
         [Unit("s")]
         public int KeepAliveInterval { get; set; }
 
+        [Display("Verbose Logging", Order: 6, Group: "SSH Settings",
+            Description: "Enables verbose logging of SSH communication.")]
+        public bool VerboseLoggingEnabled { get; set; } = true;
+
         [Display("Use SSH Tunnel", Order: 10, Groups: new[] { "SSH Settings", "SSH Tunnel" }, Collapsed: true)]
         public bool UseSshTunnel { get; set; }
 
@@ -53,10 +57,6 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
         [Display("Forwarded Port", Order: 14, Groups: new[] { "SSH Settings", "SSH Tunnel" }, Collapsed: true,
             Description: "remote server")]
         public uint SshTunnelForwardedPort { get; set; }
-
-        [Display("Verbose Logging", Order: 20, Group: "Debug", Collapsed: true,
-            Description: "Enables verbose logging of SSH communication.")]
-        public bool VerboseLoggingEnabled { get; set; } = true;
 
         #endregion
 
@@ -91,6 +91,13 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
         {
             base.Open();
             IsConnected = false;
+
+            // GPIO Configuration
+            InitializeGpio();
+
+            // ToDo: I2C Configuration
+
+            // ToDo: SPI Configuration
         }
 
         public override void Close()
