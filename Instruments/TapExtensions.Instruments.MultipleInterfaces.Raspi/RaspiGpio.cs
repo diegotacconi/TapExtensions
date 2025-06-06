@@ -100,6 +100,9 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
 
         public void SetPinAllOptions(int pin, EDirection? direction = null, EPull? pull = null, EDrive? drive = null)
         {
+            // Validate inputs
+            CheckIfPinNumberIsValid(pin);
+
             // Build command
             var directionCmd = direction.HasValue ? $" {EnumToString(direction.Value)}" : string.Empty;
             var pullCmd = pull.HasValue ? $" {EnumToString(pull.Value)}" : string.Empty;
@@ -132,11 +135,16 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
 
         public (EDirection direction, EPull pull, ELevel level) GetPin(int pin)
         {
+            // Validate inputs
+            CheckIfPinNumberIsValid(pin);
+
+            // Send command
             var cmd = $"sudo pinctrl get {pin}";
             if (!SendSshQuery(cmd, 5, out var response))
                 throw new InvalidOperationException(
                     $"Exit status was not 0, when executing to the command of '{cmd}'");
 
+            // Parse response
             var (direction, pull, level) = ParseResponse(response);
             return (direction, pull, level);
         }
@@ -144,6 +152,13 @@ namespace TapExtensions.Instruments.MultipleInterfaces.Raspi
         #endregion
 
         #region Private Methods
+
+        private protected static void CheckIfPinNumberIsValid(int pin)
+        {
+            if (pin < 2 || pin > 27)
+                throw new InvalidOperationException(
+                    "Pin number must be between 2 and 27");
+        }
 
         private static readonly Dictionary<Enum, string> OptionsDictionary =
             new Dictionary<Enum, string>
