@@ -57,6 +57,13 @@ jobs:
     - name: Build Solution
       run: dotnet build TapExtensions.sln --configuration Release --no-restore
 
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: TapPackage
+        retention-days: 7
+        path: bin/Release/TapExtensions*.TapPackage
+
 
   Build-MacOS:
     runs-on: macOS-latest
