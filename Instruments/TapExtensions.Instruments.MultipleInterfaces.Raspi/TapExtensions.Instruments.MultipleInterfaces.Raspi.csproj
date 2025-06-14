@@ -17,12 +17,11 @@
 
   <ItemGroup>
     <PackageReference Include="OpenTAP">
-      <Version>9.16.4</Version>
       <PrivateAssets>compile</PrivateAssets>
       <IncludeAssets>compile</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="SSH.NET" Version="2023.0.1" />
-    <PackageReference Include="System.IO.Ports" Version="6.0.0" />
+    <PackageReference Include="SSH.NET" />
+    <PackageReference Include="System.IO.Ports" />
   </ItemGroup>
 
   <ItemGroup>

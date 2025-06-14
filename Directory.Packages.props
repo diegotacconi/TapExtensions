@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="OpenTAP" Version="9.16.4" />
+    <PackageVersion Include="SSH.NET" Version="2023.0.1" />
+    <PackageVersion Include="System.IO.Ports" Version="6.0.0" />
+    <PackageVersion Include="System.Management" Version="8.0.0" />
+  </ItemGroup>
+</Project>

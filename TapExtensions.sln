@@ -57,6 +57,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TapExtensions.Instruments.G
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TapExtensions.Duts.RadioShell", "Duts\TapExtensions.Duts.RadioShell\TapExtensions.Duts.RadioShell.csproj", "{E4F1B73D-98B8-DE66-3797-32A1AF101C52}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".root", ".root", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Packages.props = Directory.Packages.props
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

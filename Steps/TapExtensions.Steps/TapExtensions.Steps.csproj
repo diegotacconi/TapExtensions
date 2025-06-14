@@ -23,7 +23,6 @@
 
   <ItemGroup>
     <PackageReference Include="OpenTAP">
-      <Version>9.16.4</Version>
       <PrivateAssets>compile</PrivateAssets>
       <IncludeAssets>compile</IncludeAssets>
     </PackageReference>
