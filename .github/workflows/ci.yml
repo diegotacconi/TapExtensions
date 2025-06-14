@@ -1,6 +1,11 @@
 name: CI
-
 on: [push]
+
+env:
+  OPENTAP_ANSI_COLORS: true
+  OPENTAP_NO_UPDATE_CHECK: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_CONSOLE_ANSI_COLOR: true
 
 jobs:
   Build-Win:
@@ -57,13 +62,15 @@ jobs:
     - name: Build Solution
       run: dotnet build TapExtensions.sln --configuration Release --no-restore
 
+    - name: Move Packages
+      run: mv bin/Release/*.TapPackage .
+
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: TapPackage
-        retention-days: 14
-        path: |
-          bin/Release/TapExtensions*.TapPackage
+        retention-days: 7
+        path: "*.TapPackage"
 
 
   Build-MacOS:
