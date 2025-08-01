@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Xml.Serialization;
 using OpenTap;
-using static TapExtensions.Steps.ParentChild.Temperature;
 
 namespace TapExtensions.Steps.ParentChild
 {
@@ -15,7 +14,7 @@ namespace TapExtensions.Steps.ParentChild
     {
         [XmlIgnore]
         [Browsable(false)]
-        public List<Measurement> Measurements => GetParent<Temperature>().Measurements;
+        public List<Temperature.Measurement> Measurements => GetParent<Temperature>().Measurements;
 
         public override void Run()
         {
