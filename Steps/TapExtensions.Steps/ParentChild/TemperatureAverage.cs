@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Xml.Serialization;
 using OpenTap;
+using static TapExtensions.Steps.ParentChild.Temperature;
 
 namespace TapExtensions.Steps.ParentChild
 {
@@ -13,20 +14,18 @@ namespace TapExtensions.Steps.ParentChild
     public class TemperatureAverage : TestStep
     {
         [XmlIgnore]
-        [Browsable(true)]
-        [Display("Measurements", Group: "From Parent", Collapsed: true)]
-        public List<double> Measurements => GetParent<Temperature>().Measurements;
+        [Browsable(false)]
+        public List<Measurement> Measurements => GetParent<Temperature>().Measurements;
 
         public override void Run()
         {
             try
             {
                 foreach (var m in Measurements)
-                    Log.Debug($"{m}");
+                    Log.Debug($"{m.SensorDevicePath}, {m.Temperature}");
 
-                var average = Measurements.Average();
+                var average = Measurements.Average(m => m.Temperature);
                 Log.Debug($"average = {average}");
-
                 UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)

@@ -13,26 +13,30 @@ namespace TapExtensions.Steps.ParentChild
     {
         [XmlIgnore]
         [Browsable(false)]
-        public List<double> Measurements { get; } = new List<double>();
+        public List<Measurement> Measurements { get; } = new List<Measurement>();
+
+        public class Measurement
+        {
+            public string SensorDevicePath { get; set; }
+            public double Temperature { get; set; }
+        }
 
         public override void Run()
         {
             try
             {
                 Measurements.Clear();
-
                 var random = new Random();
                 for (var i = 1; i <= 5; i++)
                 {
                     var value = Math.Round(random.NextDouble() * 5, 3);
-                    Measurements.Add(value);
+                    Measurements.Add(new Measurement { SensorDevicePath = $"sensor{i}", Temperature = value });
                 }
 
                 foreach (var m in Measurements)
-                    Log.Debug($"{m}");
+                    Log.Debug($"{m.SensorDevicePath}, {m.Temperature}");
 
                 RunChildSteps();
-
                 UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)
