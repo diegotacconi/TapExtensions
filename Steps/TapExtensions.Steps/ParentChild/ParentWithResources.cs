@@ -9,14 +9,14 @@ namespace TapExtensions.Steps.ParentChild
 {
     [Display("ParentWithResources",
         Groups: new[] { "TapExtensions", "Steps", "ParentChild" })]
-    [AllowChildrenOfType(typeof(ChildSeekingResources))]
+    [AllowAnyChild]
     public class ParentWithResources : TestStep
     {
         #region Settings
 
         public Dut SomeDut { get; set; }
         public Instrument SomeInstrument { get; set; }
-        public string SomeString { get; set; }
+        public string SomeString { get; set; } = "ABC";
 
         #endregion
 
@@ -24,12 +24,19 @@ namespace TapExtensions.Steps.ParentChild
         {
             try
             {
-                Log.Debug($"Parent={Name}, " +
+                // Show values before running child steps
+                Log.Debug($"Parent={Name}(before), " +
                           $"Dut={SomeDut.Name}, " +
                           $"Instrument={SomeInstrument.Name}, " +
                           $"String={SomeString}.");
 
                 RunChildSteps();
+
+                // Show values after running child steps
+                Log.Debug($"Parent={Name}(after), " +
+                          $"Dut={SomeDut.Name}, " +
+                          $"Instrument={SomeInstrument.Name}, " +
+                          $"String={SomeString}.");
 
                 UpgradeVerdict(Verdict.Pass);
             }
