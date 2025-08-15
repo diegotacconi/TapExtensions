@@ -32,7 +32,13 @@ namespace TapExtensions.Duts.Uart
         [Display("Flow Control", Order: 6, Group: "Serial Port Settings")]
         public Handshake Handshake { get; set; }
 
-        [Display("Verbose Logging", Order: 7, Group: "Debug", Collapsed: true,
+        [Display("Username", Order: 7, Group: "Login Credentials")]
+        public string Username { get; set; }
+
+        [Display("Password", Order: 8, Group: "Login Credentials")]
+        public string Password { get; set; }
+
+        [Display("Verbose Logging", Order: 9, Group: "Debug", Collapsed: true,
             Description: "Enables verbose logging of serial port (UART) communication.")]
         public bool VerboseLoggingEnabled { get; set; } = true;
 
@@ -59,6 +65,8 @@ namespace TapExtensions.Duts.Uart
             DataBits = 8;
             StopBits = StopBits.One;
             Handshake = Handshake.None;
+            Username = "";
+            Password = "";
         }
 
         public override void Open()
@@ -136,6 +144,30 @@ namespace TapExtensions.Duts.Uart
             _readBuffer.Append(data);
             ReadEvent?.Invoke(_readBuffer.ToString());
             LogLineByLine(data, _sp.PortName);
+        }
+
+        public void Login(string expectedUsernamePrompt, string expectedPasswordPrompt, string expectedShellPrompt,
+            int timeout)
+        {
+            _readBuffer.Clear();
+
+            // Get login prompt
+            Write(_sp.NewLine);
+            var loginOk = Expect(expectedUsernamePrompt, timeout);
+            if (!loginOk)
+                throw new InvalidOperationException("Cannot login (username prompt not found)");
+
+            // Enter username
+            Write(Username);
+            var usernameOk = Expect(expectedPasswordPrompt, timeout);
+            if (!usernameOk)
+                throw new InvalidOperationException("Cannot login (password prompt not found)");
+
+            // Enter password
+            Write(Password);
+            var passwordOk = Expect(expectedShellPrompt, timeout);
+            if (!passwordOk)
+                throw new InvalidOperationException("Cannot login (shell prompt not found)");
         }
 
         public bool Expect(string expectedResponse, int timeout)

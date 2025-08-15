@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using OpenTap;
 using TapExtensions.Interfaces.Uart;
 
@@ -13,73 +12,39 @@ namespace TapExtensions.Steps.Uart
 
         [Display("Uart Dut", Order: 1)] public IUartDut UartDut { get; set; }
 
-        [Display("Expected Login Message", Order: 2)]
-        public string ExpectedLoginPrompt { get; set; }
+        [Display("Expected Username Prompt", Order: 2)]
+        public string ExpectedUsernamePrompt { get; set; }
 
-        [Display("Username", Order: 3)] public string Username { get; set; }
-
-        [Display("Expected Password Message", Order: 4)]
+        [Display("Expected Password Prompt", Order: 3)]
         public string ExpectedPasswordPrompt { get; set; }
 
-        [Display("Password", Order: 4)] public string Password { get; set; }
-
-        [Display("Expected Shell Prompt", Order: 5)]
+        [Display("Expected Shell Prompt", Order: 4)]
         public string ExpectedShellPrompt { get; set; }
 
-        [Display("Command Timeout", Order: 6,
-            Description: "Timeout when waiting for the response to a single command")]
+        [Display("Timeout", Order: 5)]
         [Unit("s")]
-        public int CommandTimeout { get; set; }
-
-        [Display("Retry Period", Order: 7,
-            Description: "Time period to retry checking for the login prompt")]
-        [Unit("s")]
-        public double RetryPeriod { get; set; }
-
-        [Display("Retry Timeout", Order: 8,
-            Description: "Timeout when retrying for the login prompt")]
-        [Unit("s")]
-        public int RetryTimeout { get; set; }
+        public int Timeout { get; set; }
 
         #endregion
 
         public UartLogin()
         {
             // Default values
-            ExpectedLoginPrompt = "login:";
-            Username = "pi";
+            ExpectedUsernamePrompt = "login:";
             ExpectedPasswordPrompt = "Password:";
-            Password = "raspberry";
             ExpectedShellPrompt = "$";
-            CommandTimeout = 20;
-            RetryPeriod = 5;
-            RetryTimeout = 60;
+            Timeout = 10;
 
             // Validation rules
-            Rules.Add(() => CommandTimeout > 0,
-                "Must be greater than zero", nameof(CommandTimeout));
-            Rules.Add(() => RetryPeriod >= 0,
-                "Must be greater than or equal to zero", nameof(RetryPeriod));
-            Rules.Add(() => RetryTimeout > 0,
-                "Must be greater than zero", nameof(RetryTimeout));
+            Rules.Add(() => Timeout > 0,
+                "Must be greater than zero", nameof(Timeout));
         }
 
         public override void Run()
         {
             try
             {
-                // Try to get the login prompt
-                var loginIsReady = CheckForLogin(RetryTimeout, RetryPeriod);
-                if (!loginIsReady)
-                    throw new InvalidOperationException(
-                        $"Unable to find for Login prompt of '{ExpectedLoginPrompt}'");
-
-                // Enter username
-                UartDut.Query(Username, ExpectedPasswordPrompt, CommandTimeout);
-
-                // Enter password
-                UartDut.Query(Password, ExpectedShellPrompt, CommandTimeout);
-
+                UartDut.Login(ExpectedUsernamePrompt, ExpectedPasswordPrompt, ExpectedShellPrompt, Timeout);
                 UpgradeVerdict(Verdict.Pass);
             }
             catch (Exception ex)
@@ -87,47 +52,6 @@ namespace TapExtensions.Steps.Uart
                 Log.Error(ex.Message);
                 UpgradeVerdict(Verdict.Fail);
             }
-        }
-
-        private bool CheckForLogin(double timeout, double interval)
-        {
-            var loginIsReady = false;
-            var keepChecking = true;
-            var timer = new Stopwatch();
-            timer.Start();
-
-            do
-            {
-                try
-                {
-                    // Check for login prompt
-                    var response = UartDut.Query("\r", ExpectedLoginPrompt, CommandTimeout);
-                    if (response.Contains(ExpectedLoginPrompt))
-                    {
-                        loginIsReady = true;
-                        keepChecking = false;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // Ignore exceptions
-                    if (!string.IsNullOrWhiteSpace(ex.Message))
-                        Log.Warning(ex.Message);
-                }
-
-                if (timer.Elapsed > TimeSpan.FromSeconds(timeout))
-                {
-                    Log.Warning($"Timeout occurred at {timeout} s");
-                    keepChecking = false;
-                }
-
-                if (keepChecking)
-                    TapThread.Sleep(TimeSpan.FromSeconds(interval));
-
-                OfferBreak();
-            } while (keepChecking);
-
-            return loginIsReady;
         }
     }
 }

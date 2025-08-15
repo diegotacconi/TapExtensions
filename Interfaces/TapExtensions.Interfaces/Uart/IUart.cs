@@ -12,6 +12,8 @@ namespace TapExtensions.Interfaces.Uart
 
     public interface IUart
     {
+        void Login(string expectedUsernamePrompt, string expectedPasswordPrompt, string expectedShellPrompt, int timeout);
+
         bool Expect(string expectedResponse, int timeout);
 
         string Query(string command, string expectedEndOfMessage, int timeout);

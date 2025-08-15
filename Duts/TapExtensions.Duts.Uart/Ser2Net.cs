@@ -109,6 +109,11 @@ namespace TapExtensions.Duts.Uart
             LogLineByLine(data, e.IpPort);
         }
 
+        public void Login(string expectedUsernamePrompt, string expectedPasswordPrompt, string expectedShellPrompt, int timeout)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool Expect(string expectedResponse, int timeout)
         {
             // Start monitoring serial port
