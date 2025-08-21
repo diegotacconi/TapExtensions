@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# /usr/local/bin/radioShell.sh
+# sudo chmod +x /usr/local/bin/radioShell.sh
+# sudo chown root /usr/local/bin/radioShell.sh
+# sudo chgrp root /usr/local/bin/radioShell.sh
+
 echo "Welcome to RadioShell"
 echo -n '$ '
 
