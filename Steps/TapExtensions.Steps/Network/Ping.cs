@@ -34,7 +34,7 @@ namespace TapExtensions.Steps.Network
 
             // Validation rules
             Rules.Add(() => IPAddress.TryParse(IpAddress, out _),
-                "Not a valid IPv4 Address", nameof(IpAddress));
+                "IP Address is not a valid", nameof(IpAddress));
         }
 
         public override void Run()
@@ -61,12 +61,16 @@ namespace TapExtensions.Steps.Network
             Timeout = 30;
 
             // Validation rules
+            Rules.Add(() => MinSuccessfulReplies >= 0,
+                "Minimum number of successful replies " +
+                "must be greater than or equal to zero", nameof(MinSuccessfulReplies));
             Rules.Add(() => Timeout > 0,
                 "Timeout must be greater than zero", nameof(Timeout));
         }
 
         private protected void BaseRun(string ipAddress)
         {
+            ThrowOnValidationError(true);
             try
             {
                 var pingOk = PingHost(ipAddress, Timeout, MinSuccessfulReplies);
@@ -79,7 +83,8 @@ namespace TapExtensions.Steps.Network
             }
         }
 
-        private protected bool PingHost(string ipAddress, int timeout, int minSuccessfulReplies)
+        private protected bool PingHost(string ipAddress, int timeout, int minSuccessfulReplies,
+            double delayBetweenPings = 1.0)
         {
             var pingOk = false;
             var pingOkReplies = 0;
@@ -91,7 +96,10 @@ namespace TapExtensions.Steps.Network
                 // Create a buffer of 32 bytes of data to be transmitted.
                 var buffer = Encoding.ASCII.GetBytes("12345678901234567890123456789012");
 
-                var address = IPAddress.Parse(ipAddress);
+                // Check for valid IP Address
+                if (!IPAddress.TryParse(ipAddress, out var address))
+                    throw new InvalidOperationException("IP Address is not a valid");
+
                 Log.Info($"Pinging {address}");
                 timer.Start();
 
@@ -130,7 +138,7 @@ namespace TapExtensions.Steps.Network
                         pingOkReplies = 0;
                     }
 
-                    TapThread.Sleep(TimeSpan.FromSeconds(1));
+                    TapThread.Sleep(TimeSpan.FromSeconds(delayBetweenPings));
                     OfferBreak();
                 }
             }
