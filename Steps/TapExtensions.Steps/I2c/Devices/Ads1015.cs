@@ -1,4 +1,4 @@
-﻿// Texas Instruments ADS1015 Precision ADC (Analog to Digital Converter)
+// Texas Instruments ADS1015 Precision ADC (Analog to Digital Converter)
 // https://www.ti.com/product/ADS1015
 
 /*
@@ -22,33 +22,37 @@ namespace TapExtensions.Steps.I2c.Devices
     public class Ads1015
     {
         private readonly TraceSource _log = Log.CreateSource("Ads1015");
-        private readonly II2C _i2CAdapter;
+        private readonly II2C _i2C;
         private readonly ushort _deviceAddress;
 
         public Ads1015(II2C i2C, ushort deviceAddress = 0x48)
         {
-            _i2CAdapter = i2C;
+            _i2C = i2C;
             _deviceAddress = deviceAddress;
         }
 
         /// <summary> Programmable Gain Amplifier (PGA) with input ranges from ±256mV to ±6.144V </summary>
         public enum EGainResolution
         {
+            // @formatter:off
             [Display("Range = \u00b16.144V and Resolution = 3mV")] Range0,
             [Display("Range = \u00b14.096V and Resolution = 2mV")] Range1,
-            [Display("Range = \u00b12.048V and Resolution = 1mV")] Range2,
+            [Display("Range = \u00b12.048V and Resolution = 1mV (default)")]Range2,
             [Display("Range = \u00b11.024V and Resolution = 0.5mV")] Range3,
             [Display("Range = \u00b10.512V and Resolution = 0.25mV")] Range4,
             [Display("Range = \u00b10.256V and Resolution = 0.125mV")] Range5
+            // @formatter:on
         }
 
         /// <summary> Input Multiplexer (MUX) </summary>
         public enum EInputMux
         {
+            // @formatter:off
             [Display("AINp = AIN0 and AINn = GND")] Ain0,
             [Display("AINp = AIN1 and AINn = GND")] Ain1,
             [Display("AINp = AIN2 and AINn = GND")] Ain2,
             [Display("AINp = AIN3 and AINn = GND")] Ain3
+            // @formatter:on
         }
 
         public double MeasureVoltage(EInputMux inputMux, EGainResolution gainResolution)
@@ -157,7 +161,7 @@ namespace TapExtensions.Steps.I2c.Devices
 
         private ushort ReadRegister(byte[] regAddress)
         {
-            var regValue = _i2CAdapter.Read(_deviceAddress, 2, regAddress);
+            var regValue = _i2C.Read(_deviceAddress, 2, regAddress);
             return (ushort)((regValue[0] << 8) | regValue[1]);
         }
 
@@ -185,7 +189,7 @@ namespace TapExtensions.Steps.I2c.Devices
         {
             var bytes = BitConverter.GetBytes(regValue);
             Array.Reverse(bytes, 0, bytes.Length);
-            _i2CAdapter.Write(_deviceAddress, regAddress, bytes);
+            _i2C.Write(_deviceAddress, regAddress, bytes);
         }
 
         private void WriteConfigRegister(ushort regValue)
