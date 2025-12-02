@@ -1,6 +1,6 @@
-﻿using OpenTap;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using OpenTap;
 using TapExtensions.Interfaces.Switch;
 
 namespace TapExtensions.Instruments.Switch
@@ -9,6 +9,23 @@ namespace TapExtensions.Instruments.Switch
         Groups: new[] { "TapExtensions", "Instruments", "Switch" })]
     public class SwitchGroup : Instrument, ISwitch
     {
+        #region Settings
+
+        [Display("List of Switch Instruments")]
+        public List<ISwitch> SwitchInstruments
+        {
+            get
+            {
+                _switchInstruments.RemoveAll(item => item == null || item.Name == nameof(SwitchGroup));
+                return _switchInstruments;
+            }
+            set => _switchInstruments = value;
+        }
+
+        private List<ISwitch> _switchInstruments = new List<ISwitch>();
+
+        #endregion
+
         public SwitchGroup()
         {
             Name = "SwitchGroup";
@@ -16,7 +33,8 @@ namespace TapExtensions.Instruments.Switch
 
         public void SetRoute(string routeName)
         {
-            throw new NotImplementedException();
+            foreach (var switchInstrument in SwitchInstruments)
+                Log.Debug(switchInstrument.Name);
         }
 
         private static Dictionary<string, string> SsuRoutes = new Dictionary<string, string>
