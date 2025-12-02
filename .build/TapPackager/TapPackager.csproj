@@ -37,6 +37,7 @@
     <ProjectReference Include="..\..\Instruments\TapExtensions.Instruments.MultipleInterfaces.Aardvark\TapExtensions.Instruments.MultipleInterfaces.Aardvark.csproj" />
     <ProjectReference Include="..\..\Instruments\TapExtensions.Instruments.MultipleInterfaces.Raspi\TapExtensions.Instruments.MultipleInterfaces.Raspi.csproj" />
     <ProjectReference Include="..\..\Instruments\TapExtensions.Instruments.SigGen\TapExtensions.Instruments.SigGen.csproj" />
+    <ProjectReference Include="..\..\Instruments\TapExtensions.Instruments.Switch\TapExtensions.Instruments.Switch.csproj" />
     <ProjectReference Include="..\..\Interfaces\TapExtensions.Interfaces\TapExtensions.Interfaces.csproj" />
     <ProjectReference Include="..\..\Results\TapExtensions.Results.ZipFile\TapExtensions.Results.ZipFile.csproj" />
     <ProjectReference Include="..\..\Settings\TapExtensions.Settings.Integrity\TapExtensions.Settings.Integrity.csproj" />

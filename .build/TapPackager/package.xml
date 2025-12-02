@@ -40,6 +40,9 @@
     <File Path="Packages/TapExtensions/TapExtensions.Instruments.SigGen.dll" SourcePath="TapExtensions.Instruments.SigGen.dll">
       <SetAssemblyInfo Attributes="Version" />
     </File>
+    <File Path="Packages/TapExtensions/TapExtensions.Instruments.Switch.dll" SourcePath="TapExtensions.Instruments.Switch.dll">
+      <SetAssemblyInfo Attributes="Version" />
+    </File>
     <File Path="Packages/TapExtensions/TapExtensions.Interfaces.dll" SourcePath="TapExtensions.Interfaces.dll">
       <SetAssemblyInfo Attributes="Version" />
     </File>
