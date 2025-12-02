@@ -9,6 +9,11 @@ namespace TapExtensions.Instruments.Switch
         Groups: new[] { "TapExtensions", "Instruments", "Switch" })]
     public class SwitchGroup : Instrument, ISwitch
     {
+        public SwitchGroup()
+        {
+            Name = "SwitchGroup";
+        }
+
         public void SetRoute(string routeName)
         {
             throw new NotImplementedException();

@@ -14,7 +14,7 @@ namespace TapExtensions.Instruments.Switch
 
         public void SetRoute(string routeName)
         {
-            Log.Info($"SetRoute({routeName})");
+            Log.Debug($"SetRoute({routeName})");
         }
     }
 }
