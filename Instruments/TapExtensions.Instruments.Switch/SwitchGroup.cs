@@ -52,18 +52,32 @@ namespace TapExtensions.Instruments.Switch
             foreach (var route in routes)
             {
                 var routeString = route.Split('_').Last().Trim();
-                var instrumentName = "AppSsu1"; // item.Split('_').First();
+                var instrumentName = GetInstrumentName(route.Split('_').First());
                 var switchInstrument = SwitchInstruments.First(x => x.Name.Equals(instrumentName));
                 if (switchInstrument == null)
-                    throw new InvalidOperationException("Cannot find Switch Instrument  at #" + instrumentName);
+                    throw new InvalidOperationException($"Cannot find Switch Instrument named '{instrumentName}'");
 
-                Log.Debug($"Setting route '{routeString}' on {switchInstrument}");
+                // Log.Debug($"Setting route '{routeString}' on {switchInstrument}");
                 switchInstrument.SetRoute(routeString);
             }
+        }
 
+        private static Dictionary<string, string> _instruments = new Dictionary<string, string>
+        {
+            { "A1", "AppSsu1" },
+            { "A2", "AppSsu2" },
+            { "A3", "AppSsu3" },
+            { "A4", "AppSsu4" },
+            { "P1", "PxiSwitch" }
+        };
 
-            //foreach (var switchInstrument in SwitchInstruments)
-            //    Log.Debug(switchInstrument.Name);
+        internal static string GetInstrumentName(string instrumentCode)
+        {
+            if (!_instruments.TryGetValue(instrumentCode, out var instrumentName))
+                throw new ArgumentException(
+                    $"{nameof(_instruments)} does not have an entry for '{instrumentCode}'.");
+
+            return instrumentName;
         }
 
         private static Dictionary<string, string> _routeGroups = new Dictionary<string, string>
@@ -71,7 +85,7 @@ namespace TapExtensions.Instruments.Switch
             // @formatter:off
 
             // DownLink B7
-            { "Rf1",  "A1_ANT1toSA" },
+            { "Rf1",  "A1_ANT1toSA, P1_SW1toPM" },
             { "Rf2",  "A1_ANT2toSA" },
             { "Rf3",  "A1_ANT3toSA" },
             { "Rf4",  "A1_ANT4toSA" },
