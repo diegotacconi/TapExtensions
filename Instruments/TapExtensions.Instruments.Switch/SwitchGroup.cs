@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using OpenTap;
 using TapExtensions.Interfaces.Switch;
 
@@ -33,11 +34,39 @@ namespace TapExtensions.Instruments.Switch
 
         public void SetRoute(string routeName)
         {
-            foreach (var switchInstrument in SwitchInstruments)
-                Log.Debug(switchInstrument.Name);
+            if (string.IsNullOrWhiteSpace(routeName))
+                return;
+
+            var routeGroup = GetRouteGroup(routeName);
+            Log.Debug($"routeGroup = '{routeGroup}'");
+
+            // Split SsuRoutes string into multiple route strings
+            var separators = new List<char> { ',', '\t', '\n', '\r' };
+            var parts = routeGroup.Split(separators.ToArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            // Remove all white-spaces from the beginning and end of the route strings
+            var routes = new List<string>();
+            foreach (var part in parts)
+                routes.Add(part.Trim());
+
+            foreach (var route in routes)
+            {
+                var routeString = route.Split('_').Last().Trim();
+                var instrumentName = "AppSsu1"; // item.Split('_').First();
+                var switchInstrument = SwitchInstruments.First(x => x.Name.Equals(instrumentName));
+                if (switchInstrument == null)
+                    throw new InvalidOperationException("Cannot find Switch Instrument  at #" + instrumentName);
+
+                Log.Debug($"Setting route '{routeString}' on {switchInstrument}");
+                switchInstrument.SetRoute(routeString);
+            }
+
+
+            //foreach (var switchInstrument in SwitchInstruments)
+            //    Log.Debug(switchInstrument.Name);
         }
 
-        private static Dictionary<string, string> SsuRoutes = new Dictionary<string, string>
+        private static Dictionary<string, string> _routeGroups = new Dictionary<string, string>
         {
             // @formatter:off
 
@@ -116,14 +145,13 @@ namespace TapExtensions.Instruments.Switch
             // @formatter:on
         };
 
-        internal static string GetSsuRoute(string rf)
+        internal static string GetRouteGroup(string routeName)
         {
-            if (!SsuRoutes.TryGetValue(rf, out var ssuRoute))
+            if (!_routeGroups.TryGetValue(routeName, out var routeGroup))
                 throw new ArgumentException(
-                    $"{nameof(SsuRoutes)} does not have an entry " +
-                    $"for {nameof(rf)}={rf}.");
+                    $"{nameof(_routeGroups)} does not have an entry for '{routeName}'.");
 
-            return ssuRoute;
+            return routeGroup;
         }
     }
 }
