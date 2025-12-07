@@ -3,7 +3,7 @@
   <Steps>
     <TestStep type="TapExtensions.Steps.Switch.SwitchRoute" Id="fbb69c87-0200-4b2e-8d9d-c882cf3cc493">
       <Switch type="TapExtensions.Instruments.Switch.SwitchGroup" Source="OpenTap.InstrumentSettings">SsuGroup</Switch>
-      <Route>Rf1</Route>
+      <Route>RF1</Route>
       <Name Metadata="Step Name">SwitchRoute_({Route})</Name>
     </TestStep>
   </Steps>
