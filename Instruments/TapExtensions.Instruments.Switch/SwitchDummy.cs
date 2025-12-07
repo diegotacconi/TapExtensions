@@ -9,7 +9,7 @@ namespace TapExtensions.Instruments.Switch
     {
         public SwitchDummy()
         {
-            Name = "SwitchDummy";
+            Name = nameof(SwitchDummy);
         }
 
         public void SetRoute(string routeName)

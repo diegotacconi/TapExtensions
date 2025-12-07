@@ -29,7 +29,7 @@ namespace TapExtensions.Instruments.Switch
 
         public SwitchGroup()
         {
-            Name = "SwitchGroup";
+            Name = nameof(SwitchGroup);
         }
 
         public void SetRoute(string routeName)

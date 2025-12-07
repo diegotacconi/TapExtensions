@@ -11,7 +11,7 @@ namespace TapExtensions.Instruments.Dio
     {
         public DioDummy()
         {
-            Name = "DioDummy";
+            Name = nameof(DioDummy);
         }
 
         public List<EInputState> GetInputState(List<short> channels)
