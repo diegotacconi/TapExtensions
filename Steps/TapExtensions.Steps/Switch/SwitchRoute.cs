@@ -16,7 +16,6 @@ namespace TapExtensions.Steps.Switch
         {
             try
             {
-                Log.Debug($"Setting route '{Route}' on {Switch}");
                 Switch.SetRoute(Route);
                 UpgradeVerdict(Verdict.Pass);
             }
