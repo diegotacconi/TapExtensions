@@ -21,9 +21,10 @@ namespace TapExtensions.Instruments.Dio
 
         public void SetOutputState(List<short> channels, List<EOutputState> states)
         {
-            var msg = $"{nameof(SetOutputState)}: ";
+            var msg = $"{nameof(SetOutputState)}( ";
             for (var i = 0; i < channels.Count; i++)
-                msg += $"({channels[i]},{states[i]}) ";
+                msg += $"[{channels[i]},{states[i]}] ";
+            msg += ")";
             Log.Debug(msg);
         }
     }
