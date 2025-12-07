@@ -64,6 +64,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".root", ".root", "{8EC462FD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TapExtensions.Instruments.Switch", "Instruments\TapExtensions.Instruments.Switch\TapExtensions.Instruments.Switch.csproj", "{17C4522A-DDBB-CDD3-4140-87E62B26B59A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TapExtensions.Instruments.Dio", "Instruments\TapExtensions.Instruments.Dio\TapExtensions.Instruments.Dio.csproj", "{17077B96-88AA-9C90-D086-3EC2BFC089BB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -146,6 +148,10 @@ Global
 		{17C4522A-DDBB-CDD3-4140-87E62B26B59A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17C4522A-DDBB-CDD3-4140-87E62B26B59A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17C4522A-DDBB-CDD3-4140-87E62B26B59A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17077B96-88AA-9C90-D086-3EC2BFC089BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17077B96-88AA-9C90-D086-3EC2BFC089BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17077B96-88AA-9C90-D086-3EC2BFC089BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17077B96-88AA-9C90-D086-3EC2BFC089BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -170,6 +176,7 @@ Global
 		{1EE2DB7D-936D-413B-B5D9-B838EF45C3C5} = {6536E8DB-FFA1-4E97-91E7-DBA37839B386}
 		{E4F1B73D-98B8-DE66-3797-32A1AF101C52} = {A21FD5A5-C473-4C8C-B929-A658A40020B4}
 		{17C4522A-DDBB-CDD3-4140-87E62B26B59A} = {6536E8DB-FFA1-4E97-91E7-DBA37839B386}
+		{17077B96-88AA-9C90-D086-3EC2BFC089BB} = {6536E8DB-FFA1-4E97-91E7-DBA37839B386}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4A1F67F2-6AC5-4761-9B2F-17DE13AAFB3B}

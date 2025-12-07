@@ -28,6 +28,9 @@
     <File Path="Packages/TapExtensions/TapExtensions.Instruments.DcPwr.dll" SourcePath="TapExtensions.Instruments.DcPwr.dll">
       <SetAssemblyInfo Attributes="Version" />
     </File>
+    <File Path="Packages/TapExtensions/TapExtensions.Instruments.Dio.dll" SourcePath="TapExtensions.Instruments.Dio.dll">
+      <SetAssemblyInfo Attributes="Version" />
+    </File>
     <File Path="Packages/TapExtensions/TapExtensions.Instruments.Gpio.dll" SourcePath="TapExtensions.Instruments.Gpio.dll">
       <SetAssemblyInfo Attributes="Version" />
     </File>
