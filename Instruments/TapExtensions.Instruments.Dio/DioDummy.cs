@@ -5,10 +5,15 @@ using TapExtensions.Interfaces.Dio;
 
 namespace TapExtensions.Instruments.Dio
 {
-    [Display("GpioDummy",
+    [Display("DioDummy",
         Groups: new[] { "TapExtensions", "Instruments", "Dio" })]
-    public class GpioDummy : Instrument, IDio
+    public class DioDummy : Instrument, IDio
     {
+        public DioDummy()
+        {
+            Name = "DioDummy";
+        }
+
         public List<EInputState> GetInputState(List<short> channels)
         {
             throw new NotImplementedException();
