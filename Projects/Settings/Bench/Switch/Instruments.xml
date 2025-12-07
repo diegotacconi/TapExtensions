@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<InstrumentSettings type="OpenTap.InstrumentSettings">
+  <SwitchDummy type="TapExtensions.Instruments.Switch.SwitchDummy" Source="">
+    <Name>AppSsu1</Name>
+  </SwitchDummy>
+  <SwitchDummy type="TapExtensions.Instruments.Switch.SwitchDummy" Source="">
+    <Name>AppSsu2</Name>
+  </SwitchDummy>
+  <SwitchDummy type="TapExtensions.Instruments.Switch.SwitchDummy" Source="">
+    <Name>AppSsu3</Name>
+  </SwitchDummy>
+  <SwitchDummy type="TapExtensions.Instruments.Switch.SwitchDummy" Source="">
+    <Name>AppSsu4</Name>
+  </SwitchDummy>
+  <DioToSwitch type="TapExtensions.Instruments.Switch.DioToSwitch" Source="">
+    <Dio type="TapExtensions.Instruments.Dio.DioDummy" Source="OpenTap.InstrumentSettings">M9187A</Dio>
+    <Name>PxiSsu</Name>
+  </DioToSwitch>
+  <DioDummy type="TapExtensions.Instruments.Dio.DioDummy" Source="">
+    <Name>M9187A</Name>
+  </DioDummy>
+  <SwitchGroup type="TapExtensions.Instruments.Switch.SwitchGroup" Source="">
+    <Instruments>
+      <SwitchDummy type="TapExtensions.Instruments.Switch.SwitchDummy" Source="OpenTap.InstrumentSettings">AppSsu1</SwitchDummy>
+      <SwitchDummy type="TapExtensions.Instruments.Switch.SwitchDummy" Source="OpenTap.InstrumentSettings">AppSsu2</SwitchDummy>
+      <SwitchDummy type="TapExtensions.Instruments.Switch.SwitchDummy" Source="OpenTap.InstrumentSettings">AppSsu3</SwitchDummy>
+      <SwitchDummy type="TapExtensions.Instruments.Switch.SwitchDummy" Source="OpenTap.InstrumentSettings">AppSsu4</SwitchDummy>
+      <DioToSwitch type="TapExtensions.Instruments.Switch.DioToSwitch" Source="OpenTap.InstrumentSettings">PxiSsu</DioToSwitch>
+    </Instruments>
+    <Name>SsuGroup</Name>
+  </SwitchGroup>
+  <Package.Dependencies />
+</InstrumentSettings>
