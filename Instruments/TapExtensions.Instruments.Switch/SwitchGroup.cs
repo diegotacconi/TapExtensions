@@ -85,14 +85,14 @@ namespace TapExtensions.Instruments.Switch
             // @formatter:off
 
             // DownLink B7
-            { "Rf1",  "A1_ANT1toSA, P1_SW1toPM" },
-            { "Rf2",  "A1_ANT2toSA" },
-            { "Rf3",  "A1_ANT3toSA" },
-            { "Rf4",  "A1_ANT4toSA" },
-            { "Rf5",  "A1_ANT5toSA" },
-            { "Rf6",  "A1_ANT6toSA" },
-            { "Rf7",  "A1_ANT7toSA" },
-            { "Rf8",  "A1_ANT8toSA" },
+            { "Rf1",  "AppSsu1.ANT1toSA, PxiDio.Cto2" },
+            { "Rf2",  "AppSsu1.ANT2toSA" },
+            { "Rf3",  "AppSsu1.ANT3toSA" },
+            { "Rf4",  "AppSsu1.ANT4toSA" },
+            { "Rf5",  "AppSsu1.ANT5toSA" },
+            { "Rf6",  "AppSsu1.ANT6toSA" },
+            { "Rf7",  "AppSsu1.ANT7toSA" },
+            { "Rf8",  "AppSsu1.ANT8toSA" },
             { "Rf9",  "" },
             { "Rf10", "" },
             { "Rf11", "" },
@@ -100,7 +100,7 @@ namespace TapExtensions.Instruments.Switch
             { "Rf13", "" },
             { "Rf14", "" },
             { "Rf15", "" },
-            { "Rf16", "" },
+            { "Rf16", "AppSsu4.ANT8toSA, PxiDio.Cto3" },
 
             // DownLink B1B3
             { "Rf17", "" },
@@ -121,7 +121,7 @@ namespace TapExtensions.Instruments.Switch
             { "Rf32", "" },
 
             // DownLink B1B3
-            { "Rf65", "" },
+            { "Rf65", "AppSsu2.ANT16toSA, PxiDio.Cto1" },
             { "Rf66", "" },
             { "Rf67", "" },
             { "Rf68", "" },
@@ -148,7 +148,7 @@ namespace TapExtensions.Instruments.Switch
             { "Rf87", "" },
             { "Rf88", "" },
             { "Rf89", "" },
-            { "Rf90", "" },
+            { "Rf90", "AppSsu3.ANT7toSA, PxiDio.Cto4" },
             { "Rf91", "" },
             { "Rf92", "" },
             { "Rf93", "" },
