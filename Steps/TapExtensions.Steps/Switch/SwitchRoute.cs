@@ -12,6 +12,12 @@ namespace TapExtensions.Steps.Switch
 
         [Display("Route", Order: 2)] public string Route { get; set; }
 
+        public SwitchRoute()
+        {
+            // Default values
+            Name = "SwitchRoute_({Route})";
+        }
+
         public override void Run()
         {
             try
